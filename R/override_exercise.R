@@ -20,7 +20,7 @@
 exercise_server_chunk <- function(label) {
   # reactive for exercise execution
   rmarkdown::shiny_prerendered_chunk('server', sprintf(
-    '`tutorial-exercise-%s-result` <- masteryExams:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-%s-code-editor`)), session)
+    '`tutorial-exercise-%s-result` <- ISDSfunctions:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-%s-code-editor`)), session)
 output$`tutorial-exercise-%s-output` <- renderUI({
   `tutorial-exercise-%s-result`()
 })', label, label, label, label))
@@ -297,7 +297,7 @@ setup_exercise_handler <- function(exercise_rx, session) {
 ################################################################################
 # Taken from knitr_hooks.R
 # contains the function exercise_server_chunk() which we need to override
-# ONLY change is forcing masteryExams:::exercise_server_chunk
+# ONLY change is forcing ISDSfunctions:::exercise_server_chunk
 tutorial_knitr_options <- function() {
   
   # helper to check for runtime: shiny_prerendered being active
@@ -685,7 +685,7 @@ tutorial_knitr_options <- function() {
         ))
         
         # write server code
-        masteryExams:::exercise_server_chunk(options$label)
+        ISDSfunctions:::exercise_server_chunk(options$label)
       }
       else {
         # forward a subset of standard knitr chunk options
@@ -809,7 +809,7 @@ tutorial_knitr_options <- function() {
 ################################################################################
 #making sure we grab our tutorial_knitr_options above
 install_knitr_hooks <- function() {
-  knit_opts <- masteryExams:::tutorial_knitr_options()
+  knit_opts <- ISDSfunctions:::tutorial_knitr_options()
   knitr::opts_chunk$set(tutorial = knit_opts$opts_chunk$tutorial)
   knitr::opts_hooks$set(tutorial = knit_opts$opts_hooks$tutorial)
   knitr::knit_hooks$set(tutorial = knit_opts$knit_hooks$tutorial)

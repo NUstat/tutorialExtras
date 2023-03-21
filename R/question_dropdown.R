@@ -35,7 +35,7 @@ question_dropdown <- function(
   options = sortable::sortable_options()
 ) {
   question <-
-    masteryExams:::drop_question(
+    ISDSfunctions:::drop_question(
       text = text,
       ...,
       type = "dropdown",

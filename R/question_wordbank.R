@@ -68,7 +68,7 @@ question_wordbank <- function(
     random_answer_order = TRUE,
     options = sortable::sortable_options()
 ) {
-  masteryExams:::wordbank_question(
+  ISDSfunctions:::wordbank_question(
     text = text,
     ...,
     choices = choices,

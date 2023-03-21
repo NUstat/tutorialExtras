@@ -1,7 +1,7 @@
 # Override the tutorial html dependency to 
 # remove start over button from learnr template.
 # This is so exams cannot be restarted.
-# This is only used when setting the template to masteryExams.
+# This is only used when setting the template to ISDSfunctions.
 
 
 #' Tutorial HTML dependency
@@ -14,7 +14,7 @@
 tutorial_html_dependency <- function() {
   htmltools::htmlDependency(
     name = "tutorial",
-    version = utils::packageVersion("masteryExams"),
+    version = utils::packageVersion("ISDSfunctions"),
     src = learnr:::html_dependency_src("lib", "tutorial"),
     script = "tutorial.js",
     stylesheet = "tutorial.css",
@@ -23,7 +23,7 @@ tutorial_html_dependency <- function() {
 }
 
 # tutorial is where the html-dependency is referenced.
-# This is only used when setting the template to masteryExams.
+# This is only used when setting the template to ISDSfunctions.
 
 #' Tutorial document format
 #'
@@ -100,7 +100,7 @@ tutorial <- function(
   # template
   args <- c(args, "--template", rmarkdown::pandoc_path_arg(
     system.file("rmarkdown/templates/tutorial/resources/tutorial-format.htm",
-                package = "learnr") #masteryExams?
+                package = "learnr") #ISDSfunctions?
   ))
   
   # content includes
@@ -139,12 +139,12 @@ tutorial <- function(
   # tutorial.js (and the API it provides) is always loaded prior to our
   # tutorial-format.js file.
   extra_dependencies <- append(extra_dependencies, list(
-    masteryExams:::tutorial_html_dependency(),
+    ISDSfunctions:::tutorial_html_dependency(),
     learnr:::tutorial_i18n_html_dependency(language),
     htmltools::htmlDependency(
       name = "tutorial-format",
-      version = utils::packageVersion("masteryExams"),
-      src = system.file("rmarkdown/templates/tutorial/resources", package = "masteryExams"),
+      version = utils::packageVersion("ISDSfunctions"),
+      src = system.file("rmarkdown/templates/tutorial/resources", package = "ISDSfunctions"),
       script = "tutorial-format.js",
       stylesheet = stylesheets
     )

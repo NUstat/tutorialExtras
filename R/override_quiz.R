@@ -14,7 +14,7 @@
 #' @rdname knit_print
 knit_print.tutorial_question <- function(x, ...) {
   question <- x
-  ui <- masteryExams:::question_module_ui(question$ids$question)
+  ui <- ISDSfunctions:::question_module_ui(question$ids$question)
   
   # too late to try to set a chunk attribute
   # knitr::set_chunkattr(echo = FALSE)
@@ -22,7 +22,7 @@ knit_print.tutorial_question <- function(x, ...) {
     'server',
     sprintf(
       #OVERRIDE
-      'masteryExams:::question_prerendered_chunk(%s, session = session)',
+      'ISDSfunctions:::question_prerendered_chunk(%s, session = session)',
       learnr:::dput_to_string(question)
     )
   )
@@ -37,7 +37,7 @@ question_prerendered_chunk <- function(question, ..., session = getDefaultReacti
   
   question_state <-
     callModule(
-      masteryExams:::question_module_server,
+      ISDSfunctions:::question_module_server,
       question$ids$question,
       question = question,
       session = session
@@ -90,7 +90,7 @@ question_module_server <- function(
   observeEvent(
     req(session$userData$learnr_state() == "restored"),
     once = TRUE,
-    masteryExams:::question_module_server_impl(input, output, session, question, question_state)
+    ISDSfunctions:::question_module_server_impl(input, output, session, question, question_state)
   )
   
   question_state
