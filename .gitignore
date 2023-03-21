@@ -1,4 +1,16 @@
+# Ignore these hidden folders
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.secrets
+*.html
+
+# Ignore these file types
+*.DS_Store
+Rplots.pdf
+
+# Ignore these folders
+inst/doc/
+inst/tutorials/*/*.html
+docs

@@ -1,0 +1,118 @@
+---
+title: "RC 01: Preface & Chapter 1"
+tutorial:
+  id: "RC_01"
+  version: 0.1
+  
+output:
+  learnr::tutorial:
+    progressive: false
+    allow_skip: true
+    
+runtime: shiny_prerendered
+description: >
+  Learn the basics of Quarto.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(ISDStutorials)
+library(masteryExams)
+library(gradethis)
+
+conflicted::conflict_prefer_all("masteryExams")
+
+gradethis_setup()
+isds_setup(isds_exam = TRUE)
+
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+```{r, context = "server"}
+grade_server("grade")
+lock_server("lock")
+reset_server("reset")
+```
+
+```{r}
+grade_button_ui(id = "grade")
+grade_output_ui(id = "grade")
+grade_print_ui(id = "grade")
+
+lock_button_ui(id = "lock")
+reset_button_ui(id = "reset")
+```
+
+<!-- Will need this to handle a random seed. -->
+<!-- ```{r context="server-start"} -->
+<!-- event_register_handler("section_viewed", -->
+<!--   function(session, event, data) { -->
+<!--     one_time( -->
+<!--       session, -->
+<!--       cond = data$sectionId == "section-exercise-with-hint", -->
+<!--       expr = { message("Seeing ", data$sectionId, " for the first time.") } -->
+<!--     ) -->
+<!--   } -->
+<!-- ) -->
+<!-- ``` -->
+
+<!-- ```{r Ex1b, context = "render", echo= TRUE, exercise = FALSE} -->
+<!-- 1+2 -->
+<!-- ``` -->
+
+
+## Exercises
+
+**Exercise 1:**
+
+A code chunk can be used as a calculator. Try typing 2+2 into the code chunk and running the code.
+
+```{r Ex1, context = NULL, exercise = TRUE}
+
+```
+
+
+
+```{r Ex1-solution, exercise.reveal_solution = FALSE}
+2 + 2
+```
+
+```{r Ex1-code-check}
+grade_this_code()
+```
+
+```{r Q}
+
+quiz(
+  question("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           answer("29"),
+           answer("18", correct = TRUE),
+           answer("21"),
+           allow_retry = TRUE,
+           try_again = "Submitted",
+           random_answer_order = TRUE,
+           options = list(exam = TRUE)),
+  
+  masteryExams::question_dropdown("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           answer("29"),
+           answer("18", correct = TRUE),
+           answer("21"),
+           allow_retry = TRUE,
+           incorrect = "Submitted",
+           try_again = "Submitted",
+           random_answer_order = TRUE),
+  question_wordbank("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           choices= c("a"),
+           wordbank = c("18", "21", "29"),
+           answer("18", correct = TRUE),
+           allow_retry = TRUE,
+           try_again = "Submitted",
+           random_answer_order = TRUE)
+  
+)
+```
+
+
