@@ -54,13 +54,14 @@ grade_output_ui <- function(id) {
 # Define the server logic for a module to compute grade
 #' @title Tutorial grade server
 #' @param id ID matching ui with server
-#' @param rubric Either NULL or a data frame containing a vector of question names and a vector of pts_possible for each question
+#' @param label Either NULL or a vector containing the names of each question/exercise.
+#' @param pts_possible Either NULL or a vector containing the number of points corresponding to each question/exercise in label.
 #' @param num_try Number of tries allowed before grade deduction on that question. Default is 3.
 #' @param deduction The percent (as a decimal) to be deducted for each additional incorrect attempt after num_try. Default is 0.1.
-#' @param name Have "Name" count towards grade? TRUE or FALSE
+#' @param name Have "Name" count towards grade if that question exists? TRUE or FALSE
 #'
 #' @export
-grade_server <- function(id, rubric = NULL, num_try = 3, deduction = 0.1, name = TRUE ) {
+grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduction = 0.1, name = TRUE ) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -73,16 +74,33 @@ grade_server <- function(id, rubric = NULL, num_try = 3, deduction = 0.1, name =
       
       #one way to get all ex/q names
       #names(isolate(learnr:::get_tutorial_cache())
-      rubric <- tibble(label = tutorial_info$items$label,
-                       pts_possible = rep(1, length(label)) )
+      if(!is.null(label) || !is.null(pts_possible)){
+        if (length(label) != length(pts_possible)) {
+          stop("Length of label must equal length of pts_possible.")
+        }
+        label_check <- map(label, function(x){
+          if( !(x %in% tutorial_info$items$label)){
+            stop(paste0(x, " is not a name of a question or exercise."))
+          }
+          })
+        rubric <- tibble(label = label, 
+                         pts_possible = as.numeric(pts_possible))
+      }else{
+        rubric <- tibble(label = tutorial_info$items$label,
+                         pts_possible = rep(1, length(label)) )
+      }
+      
       
       #this will get number of attempts and if correct
       get_grades <- isolate(learnr::get_tutorial_state())
       
       # create a list of each question/exercise
       table_list <- map(names(get_grades), function(x){
+        get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+        print(get_grades[[x]])
         store <- get_grades[[x]] %>% as_tibble()
         store$label = x
+        print(store)
         
         if(store$type == "exercise"){
           store <- store %>% 
@@ -94,6 +112,11 @@ grade_server <- function(id, rubric = NULL, num_try = 3, deduction = 0.1, name =
       })
       # turn table_list into tibble
       table <- bind_rows(table_list) 
+      
+      # catch error - if empty do not continue
+      if(is_empty(table)){
+        return()
+      }
       
       if("exercise" %in% table$type){
         table <- table %>% 
@@ -109,12 +132,12 @@ grade_server <- function(id, rubric = NULL, num_try = 3, deduction = 0.1, name =
                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
       
       #if there is a code chunk question labeled "Name" get the name
-      user_name <- ifelse("Name" %in% calc$label, calc %>% filter(label == "Name") %>% pull(answer),
+      user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% pull(answer),
                      tutorial_info$user_id)
       
       if(name == FALSE){
         calc <- calc %>% 
-          filter(label != "Name")
+          dplyr::filter(label != "Name")
       }
       
       scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
@@ -168,4 +191,3 @@ grade_server <- function(id, rubric = NULL, num_try = 3, deduction = 0.1, name =
     }) #close observe event
     }) #close module server
   } #close main grade server
-

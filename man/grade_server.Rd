@@ -4,18 +4,27 @@
 \alias{grade_server}
 \title{Tutorial grade server}
 \usage{
-grade_server(id, rubric = NULL, num_try = 3, deduction = 0.1, name = TRUE)
+grade_server(
+  id,
+  label = NULL,
+  pts_possible = NULL,
+  num_try = 3,
+  deduction = 0.1,
+  name = TRUE
+)
 }
 \arguments{
 \item{id}{ID matching ui with server}
 
-\item{rubric}{Either NULL or a data frame containing a vector of question names and a vector of pts_possible for each question}
+\item{label}{Either NULL or a vector containing the names of each question/exercise.}
+
+\item{pts_possible}{Either NULL or a vector containing the number of points corresponding to each question/exercise in label.}
 
 \item{num_try}{Number of tries allowed before grade deduction on that question. Default is 3.}
 
 \item{deduction}{The percent (as a decimal) to be deducted for each additional incorrect attempt after num_try. Default is 0.1.}
 
-\item{name}{Have "Name" count towards grade? TRUE or FALSE}
+\item{name}{Have "Name" count towards grade if that question exists? TRUE or FALSE}
 }
 \description{
 Tutorial grade server

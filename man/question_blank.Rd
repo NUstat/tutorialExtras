@@ -17,7 +17,6 @@ question_blank(
   trim = TRUE,
   rows = NULL,
   cols = NULL,
-  style = "tutorial_question",
   options = list()
 )
 }
@@ -57,8 +56,6 @@ number of rows or character columns visible to the user. If either \code{rows}
 or \code{cols} are provided, the quiz input will use \code{\link[shiny:textAreaInput]{shiny::textAreaInput()}}
 for the text input, otherwise the default input element is a single-line
 \code{\link[shiny:textInput]{shiny::textInput()}}.}
-
-\item{style}{can change display of question to "notes" or "exam"}
 
 \item{options}{Extra options to be stored in the question object. This is
 useful when using custom question types. See \code{\link[sortable:question_rank]{sortable::question_rank()}}

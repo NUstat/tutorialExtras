@@ -212,6 +212,12 @@ question_module_server_impl <- function(
   
   init_question <- function(restoreValue = NULL) {
     if (question$random_answer_order) {
+      # see if we can shuffle the wordbank choices
+      # if(question$type == "wordbank"){
+      #   new_order <- learnr:::shuffle(1:length(question$choices))
+      #   question$choices <<- question$choices[new_order]
+      #   question$answers[[1]]$option <<- question$answers[[1]]$option[new_order]
+      # }
       # Shuffle visible answer options (i.e. static, non-function answers)
       is_visible_option <- !learnr:::answer_type_is_function(question$answers)
       question$answers[is_visible_option] <<- learnr:::shuffle(question$answers[is_visible_option])

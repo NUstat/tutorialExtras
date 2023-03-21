@@ -18,10 +18,10 @@ description: >
 library(learnr)
 library(tidyverse)
 library(ISDStutorials)
-library(masteryExams)
+library(ISDSfunctions)
 library(gradethis)
 
-conflicted::conflict_prefer_all("masteryExams")
+conflicted::conflict_prefer_all("ISDSfunctions")
 
 gradethis_setup()
 isds_setup(isds_exam = TRUE)
@@ -63,6 +63,17 @@ reset_button_ui(id = "reset")
 <!-- 1+2 -->
 <!-- ``` -->
 
+```{r, Name}
+ISDSfunctions::question_blank("Name: ___",
+                            answer_fn(function(value){
+                              if (length(value) >= 1 ) {
+                                return(mark_as(TRUE))
+                                }
+                              return(mark_as(FALSE) )
+                              }),
+               type = "blank",
+               allow_retry = FALSE )
+```
 
 ## Exercises
 
@@ -96,7 +107,7 @@ quiz(
            random_answer_order = TRUE,
            options = list(exam = TRUE)),
   
-  masteryExams::question_dropdown("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
+  ISDSfunctions::question_dropdown("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
            answer("29"),
            answer("18", correct = TRUE),
            answer("21"),
@@ -104,10 +115,10 @@ quiz(
            incorrect = "Submitted",
            try_again = "Submitted",
            random_answer_order = TRUE),
-  question_wordbank("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
-           choices= c("a"),
-           wordbank = c("18", "21", "29"),
-           answer("18", correct = TRUE),
+  ISDSfunctions::question_wordbank("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           choices= c("a", "b"),
+           wordbank = c("18", "21"),
+           answer(c("18", "21"), correct = TRUE),
            allow_retry = TRUE,
            try_again = "Submitted",
            random_answer_order = TRUE)

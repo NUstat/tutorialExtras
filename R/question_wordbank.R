@@ -342,9 +342,11 @@ question_is_correct.wordbank <- function(question, value, ...) {
         ans$message
       ))
     }
+    # how many are correct out of total blanks?
+    partial <- sum(ans$option == value)/length(value)
 
   }
-  mark_as(FALSE, NULL)
+  mark_as(FALSE, partial)
 
 }
 
