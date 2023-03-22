@@ -169,25 +169,6 @@ quiz(caption = NULL,
 
 ## Reading Quiz
 
-```{r Q2}
-quiz(caption = NULL,
-  #Q1
-  question("Q1) Which of the following help ensure research is reproducible? Select all that apply.",
-           answer("Copying and pasting results into a word processor"),
-           answer("Using a workflow tool such as RMarkdown", correct = TRUE),
-           answer("Literate programming (i.e. code that is readable)", correct = TRUE),
-           answer("Well-documented data cleaning and analyses", correct = TRUE),
-           allow_retry = TRUE,
-           random_answer_order = TRUE),
-  question("Q2) ___ is a programming language (like a car's engine); and ___ is an inintegrated development environment (like a car dashboard)",
-           answer("R; RStudio", correct = TRUE),
-           answer("RStudio; R"),
-           allow_retry = TRUE,
-           random_answer_order = TRUE)
-  
-)
-```
-
 
 ```{r Q}
 quiz(caption = NULL,

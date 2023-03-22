@@ -103,15 +103,18 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
       
       #this will get number of attempts and if correct
       get_grades <- isolate(learnr::get_tutorial_state())
-      print(get_grades)
       # create a list of each question/exercise
       table_list <- map(names(get_grades), function(x){
-        get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+        get_grades[[x]]$answer <- as.character( toString(get_grades[[x]]$answer) )
         
-        store <- get_grades[[x]] %>% tidyr::as_tibble()
+        store <- get_grades[[x]] %>% 
+          tidyr::as_tibble()
+        
         store$label = x
         
         if(store$type == "exercise"){
+          get_grades[[x]]$answer_last <- as.character( toString(get_grades[[x]]$answer_last) )
+          
           store <- store %>% 
             dplyr::mutate(answer = answer_last,
                    correct = correct_last,
@@ -120,6 +123,7 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
         store
       })
       # turn table_list into tibble
+      print(table_list)
       table <- dplyr::bind_rows(table_list) 
       print("table")
       print(table)
