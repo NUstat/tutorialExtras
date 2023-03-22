@@ -13,6 +13,8 @@
 #' @param id ID matching ui with server
 #' @param label Label to appear on the submit grade button
 #'
+#' @import dplyr
+#' @import tidyr
 #' @export
 grade_button_ui <- function(id, label = "grade tutorial") {
   ns <- NS(id)
