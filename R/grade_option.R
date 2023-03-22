@@ -74,7 +74,7 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
       
       #check if exclude list is valid
       if(!is.null(exclude)){
-         map(exclude, function(x){
+         purrr::map(exclude, function(x){
            if(!(x %in% tutorial_info$items$label)){
              stop(paste0(x, " is not a name of a question or exercise."))
           }
@@ -91,55 +91,57 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
             stop(paste0(x, " is not a name of a question or exercise."))
           }
         })
-        rubric <- tibble(label = label, 
+        rubric <- tidyr::tibble(label = label, 
                          pts_possible = as.numeric(pts_possible))
       }else{
-        rubric <- tibble(label = tutorial_info$items$label,
+        rubric <- tidyr::tibble(label = tutorial_info$items$label,
                          pts_possible = rep(1, length(label)) )
       }
       
       
       #this will get number of attempts and if correct
       get_grades <- isolate(learnr::get_tutorial_state())
-      
+      print(get_grades)
       # create a list of each question/exercise
       table_list <- map(names(get_grades), function(x){
         get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
         
-        store <- get_grades[[x]] %>% as_tibble()
+        store <- get_grades[[x]] %>% tidyr::as_tibble()
         store$label = x
         
         if(store$type == "exercise"){
           store <- store %>% 
-            mutate(answer = answer_last,
+            dplyr::mutate(answer = answer_last,
                    correct = correct_last,
                    timestamp = time_last)
         }
         store
       })
       # turn table_list into tibble
-      table <- bind_rows(table_list) 
-      
+      table <- dplyr::bind_rows(table_list) 
+      print("table")
+      print(table)
       # catch error - if empty do not continue
-      if(is_empty(table)){
+      if(rlang::is_empty(table)){
         return()
       }
       
       if("exercise" %in% table$type){
         table <- table %>% 
-          select(-c(answer_last, correct_last, time_last))
+          dplyr::select(-c(answer_last, correct_last, time_last))
       }
         
-      grades <- left_join(rubric, table, by = "label")
-      
+      grades <- dplyr::left_join(rubric, table, by = "label")
+      print("join")
+      print(grades)
       calc <- grades %>% 
-        mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
+        dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
                deduction = ifelse(deduction > 1, 1, deduction),
                pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
       
       #if there is a code chunk question labeled "Name" get the name
-      user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% pull(answer),
+      user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
                      tutorial_info$user_id)
       
       if(!is.null(exclude)){
@@ -148,21 +150,17 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
       }
       
       scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
+      print("scaled")
+      print(scaled)
       
-      
-      #output$grade <- renderText({
       output$grade <- renderTable({
-        #if('scaled' %in% display){
         calc %>% 
-          select(label, pts_possible, correct, attempt, pts_earned)
-        
-        #}
+          dplyr::select(label, pts_possible, correct, attempt, pts_earned)
       }, caption = paste0('<span style=\"font-size:30px; font-weight:normal; color:red\">',
                           scaled, "/10"))
       
       output$downloadHTML <- downloadHandler(
         filename = function() {
-          #paste0(Sys.time(), ".html")
           paste0(tutorial_info$tutorial_id,
                  "-",
                  user_name,
@@ -173,7 +171,7 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
           
           tab_html <- calc %>%
             as.data.frame() %>%
-            select(-c(type, answer, timestamp, deduction)) %>% 
+            dplyr::select(-c(type, answer, timestamp, deduction)) %>% 
             tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
                                                  tz = "America/Chicago",
                                                  usetz = TRUE), " - ",
@@ -198,3 +196,9 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
     }) #close observe event
     }) #close module server
   } #close main grade server
+
+
+
+################################################################################
+################################################################################
+# GRADE AN EXAM

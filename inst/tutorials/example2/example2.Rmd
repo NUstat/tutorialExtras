@@ -81,17 +81,17 @@ question_blank("Name: ___",
 
 A code chunk can be used as a calculator. Try typing 2+2 into the code chunk and running the code.
 
-```{r Ex1, context = NULL, exercise = TRUE}
+```{r Ex1a, context = NULL, exercise = TRUE}
 
 ```
 
 
 
-```{r Ex1-solution, exercise.reveal_solution = FALSE}
+```{r Ex1a-solution, exercise.reveal_solution = FALSE}
 2 + 2
 ```
 
-```{r Ex1-code-check}
+```{r Ex1a-code-check}
 grade_this_code()
 ```
 
@@ -121,9 +121,114 @@ quiz(
            answer(c("18", "21"), correct = TRUE),
            allow_retry = TRUE,
            try_again = "Submitted",
-           random_answer_order = TRUE)
+           random_answer_order = TRUE),
+  question("Q1) Which of the following help ensure research is reproducible? Select all that apply.",
+           answer("Copying and pasting results into a word processor"),
+           answer("Using a workflow tool such as RMarkdown", correct = TRUE),
+           answer("Literate programming (i.e. code that is readable)", correct = TRUE),
+           answer("Well-documented data cleaning and analyses", correct = TRUE),
+           allow_retry = TRUE,
+           random_answer_order = TRUE
+           )
+  # # Q2
+  # question("Q2) ___ is a programming language (like a car's engine); and ___ is an inintegrated development environment (like a car dashboard)",
+  #          answer("R; RStudio", correct = TRUE),
+  #          answer("RStudio; R"),
+  #          allow_retry = TRUE,
+  #          random_answer_order = TRUE)
   
 )
 ```
 
 
+```{r Ex1, exercise=TRUE}
+
+```
+
+```{r Ex1-solution, exercise.reveal_solution = FALSE}
+2 + 2
+```
+
+```{r Ex1-code-check}
+grade_this_code()
+```
+
+**Exercise 2:**
+
+You can **store** output/results into a variable. Storing output allows you to access the variable later on. When working in Posit, these variables will appear in your **Environment** tab.
+
+Fill in the blanks to store the result of `20*40` into the variable `x`. Note that * is the notation for multiply.
+
+```{r Ex2, exercise=TRUE}
+x ___ 20*___
+```
+
+```{r Ex2-hint-1}
+The assignment operator is `<-`
+```
+
+```{r Ex2-solution, exercise.reveal_solution = FALSE}
+x <- 20*40
+```
+
+```{r Ex2-code-check}
+grade_this_code()
+```
+
+
+**Exercise 3:**
+
+A **boolean** statement evaluates to TRUE or FALSE. Type any equation that evaluates to `TRUE`.
+
+```{r Ex3, exercise=TRUE}
+
+```
+
+```{r Ex3-solution, exercise.reveal_solution = FALSE}
+3 != 2
+```
+
+```{r Ex3-check}
+grade_this({
+  # custom checking code appears here
+  if (identical(.result, .solution)) {
+    pass("Great work!")
+  }
+  fail("Try again!")
+})
+```
+
+
+**Exercise 4:**
+
+The `mpg` dataset is included in the `ggplot2` package. Print the dataset to answer the following questions. You can "print" output by typing the name of the dataset or variable in a code chunk. Try typing `mpg` in the code chunk and clicking `run`.
+
+```{r Ex4, exercise = TRUE}
+
+```
+
+
+```{r Ex4-Q}
+quiz(caption = NULL,
+    # Ex4Q1
+  question("Ex4Q1) Which of the following are names of variables in the mpg data frame?",
+           answer("audi"),
+           answer("manufacturer", correct = TRUE),
+           answer("dplyr"),
+           answer("year", correct = TRUE),
+           answer("drv", correct = TRUE),
+           answer("glimpse"),
+           answer("chr"),
+           allow_retry = TRUE,
+           random_answer_order = TRUE), 
+  # Ex4Q2
+  question("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           answer("29"),
+           answer("18", correct = TRUE),
+           answer("21"),
+           answer("0"),
+           answer("NA"),
+           answer("4"), 
+           allow_retry = TRUE,
+           random_answer_order = TRUE) )
+```

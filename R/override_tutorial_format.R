@@ -123,7 +123,7 @@ tutorial <- function(
   
   # ace theme
   if (!identical(ace_theme, "textmate")) {
-    ace_theme <- match.arg(ace_theme, ACE_THEMES)
+    ace_theme <- match.arg(ace_theme, learnr::ACE_THEMES)
     args <- c(args, "--variable", paste0("ace-theme=", ace_theme))
   }
   
