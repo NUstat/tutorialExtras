@@ -24,6 +24,7 @@ Imports:
     sortable,
     stringr,
     tableHTML,
+    tidyr,
     utils
 Suggests:
     spelling
