@@ -64,15 +64,15 @@ reset_button_ui(id = "reset")
 <!-- ``` -->
 
 ```{r, Name}
-ISDSfunctions::question_blank("Name: ___",
-                            answer_fn(function(value){
-                              if (length(value) >= 1 ) {
+question_blank("Name: ___",
+              answer_fn(function(value){
+                              if(length(value) >= 1 ) {
                                 return(mark_as(TRUE))
                                 }
                               return(mark_as(FALSE) )
                               }),
-               type = "blank",
-               allow_retry = FALSE )
+              correct = "Submitted",
+              allow_retry = FALSE )
 ```
 
 ## Exercises

@@ -10,7 +10,7 @@ grade_server(
   pts_possible = NULL,
   num_try = 3,
   deduction = 0.1,
-  name = TRUE
+  exclude = NULL
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ grade_server(
 
 \item{deduction}{The percent (as a decimal) to be deducted for each additional incorrect attempt after num_try. Default is 0.1.}
 
-\item{name}{Have "Name" count towards grade if that question exists? TRUE or FALSE}
+\item{exclude}{Either NULL or a vector of names of questions/exercises to exclude.}
 }
 \description{
 Tutorial grade server
