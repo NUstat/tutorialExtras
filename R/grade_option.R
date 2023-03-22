@@ -105,7 +105,7 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
       get_grades <- isolate(learnr::get_tutorial_state())
       # create a list of each question/exercise
       table_list <- map(names(get_grades), function(x){
-        get_grades[[x]]$answer <- as.character( toString(get_grades[[x]]$answer) )
+        get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
         
         store <- get_grades[[x]] %>% 
           tidyr::as_tibble()
@@ -113,33 +113,31 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
         store$label = x
         
         if(store$type == "exercise"){
-          get_grades[[x]]$answer_last <- as.character( toString(get_grades[[x]]$answer_last) )
-          
-          store <- store %>% 
-            dplyr::mutate(answer = answer_last,
-                   correct = correct_last,
-                   timestamp = time_last)
+          #if this column exists proceed...
+          if("answer_last" %in% colnames(store)){
+            store <- store %>% 
+              dplyr::mutate(answer = answer_last,
+                            correct = correct_last,
+                            timestamp = time_last) %>% 
+              dplyr::select(-c(answer_last, correct_last, time_last))
+          }
         }
-        store
+        # fix possible data typing errors
+        store %>% 
+          dplyr::mutate(label = as.character(label),
+                        pts_possible = as.numeric(pts_possible),
+                        answer = as.character(answer),
+                        attempt = as.numeric(attempt))
       })
       # turn table_list into tibble
-      print(table_list)
       table <- dplyr::bind_rows(table_list) 
-      print("table")
-      print(table)
       # catch error - if empty do not continue
       if(rlang::is_empty(table)){
         return()
       }
       
-      if("exercise" %in% table$type){
-        table <- table %>% 
-          dplyr::select(-c(answer_last, correct_last, time_last))
-      }
-        
       grades <- dplyr::left_join(rubric, table, by = "label")
-      print("join")
-      print(grades)
+      
       calc <- grades %>% 
         dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
                deduction = ifelse(deduction > 1, 1, deduction),
@@ -156,8 +154,6 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
       }
       
       scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
-      print("scaled")
-      print(scaled)
       
       output$grade <- renderTable({
         calc %>% 
