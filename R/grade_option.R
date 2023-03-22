@@ -125,7 +125,6 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
         # fix possible data typing errors
         store %>% 
           dplyr::mutate(label = as.character(label),
-                        pts_possible = as.numeric(pts_possible),
                         answer = as.character(answer),
                         attempt = as.numeric(attempt))
       })
