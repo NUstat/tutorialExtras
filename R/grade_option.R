@@ -69,122 +69,134 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
     function(input, output, session) {
     # View grade
     observeEvent(input$button, {
-
-      ns <- getDefaultReactiveDomain()$ns
-      
-      tutorial_info <- isolate(get_tutorial_info())
-      
-      #check if exclude list is valid
-      if(!is.null(exclude)){
-         purrr::map(exclude, function(x){
-           if(!(x %in% tutorial_info$items$label)){
-             stop(paste0(x, " is not a name of a question or exercise."))
-          }
-        })
-      }
-      #check if label and pts_possible are valid
-      #names(isolate(learnr:::get_tutorial_cache())
-      if(!is.null(label) || !is.null(pts_possible)){
-        if (length(label) != length(pts_possible)) {
-          stop("Length of label must equal length of pts_possible.")
-        }
-        map(label, function(x){
-          if( !(x %in% tutorial_info$items$label)){
-            stop(paste0(x, " is not a name of a question or exercise."))
-          }
-        })
-        rubric <- tidyr::tibble(label = label, 
-                         pts_possible = as.numeric(pts_possible))
-      }else{
-        rubric <- tidyr::tibble(label = tutorial_info$items$label,
-                         pts_possible = rep(1, length(label)) )
-      }
-      
-      
-      #this will get number of attempts and if correct
-      get_grades <- isolate(learnr::get_tutorial_state())
-      # create a list of each question/exercise
-      table_list <- map(names(get_grades), function(x){
-        get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
-        
-        store <- get_grades[[x]] %>% 
-          tidyr::as_tibble()
-        
-        store$label = x
-        
-        if(store$type == "exercise"){
-          #if this column exists proceed...
-          if("answer_last" %in% colnames(store)){
-            store <- store %>% 
-              dplyr::mutate(answer = answer_last,
-                            correct = correct_last,
-                            timestamp = time_last) %>% 
-              dplyr::select(-c(answer_last, correct_last, time_last))
-          }
-        }
-        # fix possible data typing errors
-        store %>% 
-          dplyr::mutate(label = as.character(label),
-                        answer = as.character(answer),
-                        attempt = as.numeric(attempt))
-      })
-      # turn table_list into tibble
-      table <- dplyr::bind_rows(table_list) 
-      # catch error - if empty do not continue
-      if(rlang::is_empty(table)){
-        return()
-      }
-      
-      grades <- dplyr::left_join(rubric, table, by = "label")
-      
-      calc <- grades %>% 
-        dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
-               deduction = ifelse(deduction > 1, 1, deduction),
-               pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
-               pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
-      
-      #if there is a code chunk question labeled "Name" get the name
-      user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
-                     tutorial_info$user_id)
-      
-      if(!is.null(exclude)){
-        calc <- calc %>% 
-          dplyr::filter(!(label %in% exclude))
-      }
-      
-      scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
+      grade <- grade_calc(id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
+      # ns <- getDefaultReactiveDomain()$ns
+      # 
+      # tutorial_info <- isolate(get_tutorial_info())
+      # 
+      # #check if exclude list is valid
+      # if(!is.null(exclude)){
+      #    purrr::map(exclude, function(x){
+      #      if(!(x %in% tutorial_info$items$label)){
+      #        stop(paste0(x, " is not a name of a question or exercise."))
+      #     }
+      #   })
+      # }
+      # #check if label and pts_possible are valid
+      # #names(isolate(learnr:::get_tutorial_cache())
+      # if(!is.null(label) || !is.null(pts_possible)){
+      #   if (length(label) != length(pts_possible)) {
+      #     stop("Length of label must equal length of pts_possible.")
+      #   }
+      #   map(label, function(x){
+      #     if( !(x %in% tutorial_info$items$label)){
+      #       stop(paste0(x, " is not a name of a question or exercise."))
+      #     }
+      #   })
+      #   rubric <- tidyr::tibble(label = label, 
+      #                    pts_possible = as.numeric(pts_possible))
+      # }else{
+      #   rubric <- tidyr::tibble(label = tutorial_info$items$label,
+      #                    pts_possible = rep(1, length(label)) )
+      # }
+      # 
+      # 
+      # #this will get number of attempts and if correct
+      # get_grades <- isolate(learnr::get_tutorial_state())
+      # # create a list of each question/exercise
+      # table_list <- map(names(get_grades), function(x){
+      #   get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+      #   
+      #   store <- get_grades[[x]] %>% 
+      #     tidyr::as_tibble()
+      #   
+      #   store$label = x
+      #   
+      #   if(store$type == "exercise"){
+      #     #if this column exists proceed...
+      #     if("answer_last" %in% colnames(store)){
+      #       store <- store %>% 
+      #         dplyr::mutate(answer = answer_last,
+      #                       correct = correct_last,
+      #                       timestamp = time_last) %>% 
+      #         dplyr::select(-c(answer_last, correct_last, time_last))
+      #     }
+      #   }
+      #   # fix possible data typing errors
+      #   store %>% 
+      #     dplyr::mutate(label = as.character(label),
+      #                   answer = as.character(answer),
+      #                   attempt = as.numeric(attempt))
+      # })
+      # # turn table_list into tibble
+      # table <- dplyr::bind_rows(table_list) 
+      # # catch error - if empty do not continue
+      # if(rlang::is_empty(table)){
+      #   return()
+      # }
+      # 
+      # grades <- dplyr::left_join(rubric, table, by = "label")
+      # 
+      # calc <- grades %>% 
+      #   dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
+      #          deduction = ifelse(deduction > 1, 1, deduction),
+      #          pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
+      #          pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
+      # 
+      # #if there is a code chunk question labeled "Name" get the name
+      # user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+      #                tutorial_info$user_id)
+      # 
+      # if(!is.null(exclude)){
+      #   calc <- calc %>% 
+      #     dplyr::filter(!(label %in% exclude))
+      # }
+      # 
+      # scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
       
       output$grade <- renderTable({
-        calc %>% 
+        grade$calc %>% 
           dplyr::select(label, pts_possible, correct, attempt, pts_earned)
       }, caption = paste0('<span style=\"font-size:30px; font-weight:normal; color:red\">',
-                          scaled, "/10"))
+                          grade$scaled, "/10"))
       
-      output$downloadHTML <- downloadHandler(
+    }) #close observe event button View grade
+    
+    # move download handler outside of observe event
+    output$downloadHTML <- downloadHandler(
         filename = function() {
-          paste0(tutorial_info$tutorial_id,
-                 "-",
-                 user_name,
-                ".html")
+          paste0("STAT_RC_", Sys.time(),
+                 ".html")
+          # paste0(tutorial_info$tutorial_id,
+          #        "-",
+          #        user_name,
+          #        ".html")
         },
         content = function(file) {
           ns <- getDefaultReactiveDomain()$ns
           
-          tab_html <- calc %>%
+          grade <- grade_calc(id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
+          
+          if(is.null(grade)){
+            return()
+          }
+          
+          tab_html <- grade$calc %>%
             as.data.frame() %>%
             dplyr::select(-c(type, answer, timestamp, deduction)) %>% 
             tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
-                                                 tz = "America/Chicago",
-                                                 usetz = TRUE), " - ",
-                                                 tutorial_info$user_id),
+                                                        tz = "America/Chicago",
+                                                        usetz = TRUE), " - ",
+                                                 #tutorial_info$user_id,
+                                                 grade$user_name),
                                  rownames = FALSE,
                                  caption = paste0("Scaled score: ",
-                                                  scaled, "/10"),
+                                                  grade$scaled, "/10"),
                                  second_headers = list(c(5),
-                                                       c(paste0(tutorial_info$tutorial_id,
-                                                                 " - ",
-                                                                 user_name)) 
-                                                       ) ) %>%
+                                                       c(paste0(grade$tutorial_id,
+                                                                " - ",
+                                                                grade$user_name)) 
+                                 ) ) %>%
             tableHTML::add_theme('rshiny-blue')
           
           tableHTML::write_tableHTML(tab_html,
@@ -192,14 +204,283 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
         },
         contentType = "text/html"
       )
-      
-      
-    }) #close observe event
     }) #close module server
   } #close main grade server
 
+# need to calculate outside of observe event so that it can apply to download handler
+grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduction = 0.1, exclude = NULL){
+  ns <- getDefaultReactiveDomain()$ns
+  
+  tutorial_info <- isolate(get_tutorial_info())
+  
+  #check if exclude list is valid
+  if(!is.null(exclude)){
+    purrr::map(exclude, function(x){
+      if(!(x %in% tutorial_info$items$label)){
+        stop(paste0(x, " is not a name of a question or exercise."))
+      }
+    })
+  }
+  #check if label and pts_possible are valid
+  #names(isolate(learnr:::get_tutorial_cache())
+  if(!is.null(label) || !is.null(pts_possible)){
+    if (length(label) != length(pts_possible)) {
+      stop("Length of label must equal length of pts_possible.")
+    }
+    map(label, function(x){
+      if( !(x %in% tutorial_info$items$label)){
+        stop(paste0(x, " is not a name of a question or exercise."))
+      }
+    })
+    rubric <- tidyr::tibble(label = label, 
+                            pts_possible = as.numeric(pts_possible))
+  }else{
+    rubric <- tidyr::tibble(label = tutorial_info$items$label,
+                            pts_possible = rep(1, length(label)) )
+  }
+  
+  
+  #this will get number of attempts and if correct
+  get_grades <- isolate(learnr::get_tutorial_state())
+  # create a list of each question/exercise
+  table_list <- map(names(get_grades), function(x){
+    get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+    
+    store <- get_grades[[x]] %>% 
+      tidyr::as_tibble()
+    
+    store$label = x
+    
+    if(store$type == "exercise"){
+      #if this column exists proceed...
+      if("answer_last" %in% colnames(store)){
+        store <- store %>% 
+          dplyr::mutate(answer = answer_last,
+                        correct = correct_last,
+                        timestamp = time_last) %>% 
+          dplyr::select(-c(answer_last, correct_last, time_last))
+      }
+    }
+    # fix possible data typing errors
+    store %>% 
+      dplyr::mutate(label = as.character(label),
+                    answer = as.character(answer),
+                    attempt = as.numeric(attempt))
+  })
+  # turn table_list into tibble
+  table <- dplyr::bind_rows(table_list) 
+  # catch error - if empty do not continue
+  if(rlang::is_empty(table)){
+    return()
+  }
+  
+  grades <- dplyr::left_join(rubric, table, by = "label")
+  
+  calc <- grades %>% 
+    dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
+                  deduction = ifelse(deduction > 1, 1, deduction),
+                  pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
+                  pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
+  
+  #if there is a code chunk question labeled "Name" get the name
+  user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+                      tutorial_info$user_id)
+  
+  if(!is.null(exclude)){
+    calc <- calc %>% 
+      dplyr::filter(!(label %in% exclude))
+  }
+  
+  scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
+  
+  return(list(calc = calc, scaled = scaled, 
+              user_name = user_name, tutorial_id = tutorial_info$tutorial_id))
+}
 
 
+################################################################################
+################################################################################
+################################################################################
+################################################################################
 ################################################################################
 ################################################################################
 # GRADE AN EXAM
+#' @title Exam grade button
+#'
+#' @description print an exam
+#' 
+#' @param id ID matching ui with server
+#' @param label Label to appear on the submit grade button
+#'
+#' @export
+grade_exam_ui <- function(id, label = "Download Exam") {
+  ns <- NS(id)
+  
+  tagList(
+    #actionButton( ns("printGrade"), label = "Download Grade"),
+    downloadButton(ns("downloadExam"), label)
+  )
+}
+
+
+# Define the server logic for a module to compute grade
+#' @title Tutorial grade server
+#' @param id ID matching ui with server
+#' @param label Either NULL or a vector containing the names of each question/exercise.
+#' @param pts_possible Either NULL or a vector containing the number of points corresponding to each question/exercise in label.
+#' @param exclude Either NULL or a vector of names of questions/exercises to exclude.
+#'
+#' @export
+grade_exam_server <- function(id, label = NULL, pts_possible = NULL, exclude = NULL ) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      # View grade
+      observeEvent(input$downloadExam, {
+        
+        ns <- getDefaultReactiveDomain()$ns
+        
+        tutorial_info <- isolate(get_tutorial_info())
+        
+        #check if exclude list is valid
+        if(!is.null(exclude)){
+          purrr::map(exclude, function(x){
+            if(!(x %in% tutorial_info$items$label)){
+              stop(paste0(x, " is not a name of a question or exercise."))
+            }
+          })
+        }
+        #check if label and pts_possible are valid
+        #names(isolate(learnr:::get_tutorial_cache())
+        if(!is.null(label) || !is.null(pts_possible)){
+          if (length(label) != length(pts_possible)) {
+            stop("Length of label must equal length of pts_possible.")
+          }
+          map(label, function(x){
+            if( !(x %in% tutorial_info$items$label)){
+              stop(paste0(x, " is not a name of a question or exercise."))
+            }
+          })
+          rubric <- tidyr::tibble(label = label, 
+                                  pts_possible = as.numeric(pts_possible))
+        }else{
+          rubric <- tidyr::tibble(label = tutorial_info$items$label,
+                                  pts_possible = rep(1, length(label)) )
+        }
+        
+        
+        #this will get number of attempts and if correct
+        get_grades <- isolate(learnr::get_tutorial_state())
+        # create a list of each question/exercise
+        table_list <- map(names(get_grades), function(x){
+          get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+          
+          store <- get_grades[[x]] %>% 
+            tidyr::as_tibble()
+          
+          store$label = x
+          
+          if(store$type == "exercise"){
+            #if this column exists proceed...
+            if("answer_last" %in% colnames(store)){
+              store <- store %>% 
+                dplyr::mutate(answer = answer_last,
+                              correct = correct_last,
+                              timestamp = time_last) %>% 
+                dplyr::select(-c(answer_last, correct_last, time_last))
+            }
+          }
+          # fix possible data typing errors
+          store %>% 
+            dplyr::mutate(label = as.character(label),
+                          answer = as.character(answer),
+                          attempt = as.numeric(attempt))
+        })
+        # turn table_list into tibble
+        table <- dplyr::bind_rows(table_list) 
+        # catch error - if empty do not continue
+        if(rlang::is_empty(table)){
+          return()
+        }
+        
+        grades <- dplyr::left_join(rubric, table, by = "label")
+        
+        calc <- grades %>% 
+          dplyr::mutate(pts_earned = pts_possible *as.numeric(correct),
+                        pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
+        
+        #if there is a code chunk question labeled "Name" get the name
+        user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+                            tutorial_info$user_id)
+        
+        if(!is.null(exclude)){
+          calc <- calc %>% 
+            dplyr::filter(!(label %in% exclude))
+        }
+        
+        scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
+        
+        # output$grade <- renderTable({
+        #   calc %>% 
+        #     dplyr::select(label, pts_possible, correct, attempt, pts_earned)
+        # }, caption = paste0('<span style=\"font-size:30px; font-weight:normal; color:red\">',
+        #                     scaled, "/10"))
+        
+        output$downloadHTML <- downloadHandler(
+          filename = function() {
+            paste0(tutorial_info$tutorial_id,
+                   "-",
+                   user_name,
+                   ".html")
+          },
+          content = function(file) {
+            ns <- getDefaultReactiveDomain()$ns
+            
+            tab_html <- calc %>%
+              as.data.frame() %>%
+              dplyr::select(-c(type, answer, timestamp)) %>% 
+              tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
+                                                          tz = "America/Chicago",
+                                                          usetz = TRUE), " - ",
+                                                   tutorial_info$user_id),
+                                   rownames = FALSE,
+                                   caption = paste0("Total score: ",
+                                                    scaled, "/10"),
+                                   second_headers = list(c(5),
+                                                         c(paste0(tutorial_info$tutorial_id,
+                                                                  " - ",
+                                                                  user_name)) 
+                                   ) ) %>%
+              tableHTML::add_theme('rshiny-blue')
+            
+            tableHTML::write_tableHTML(tab_html,
+                                       file)
+          },
+          contentType = "text/html"
+        )
+        
+        
+      }) #close observe event
+    }) #close module server
+} #close main grade server
+
+
+#knit_print the exam - test
+knit_print.exam <- function() {
+  question <- x
+  ui <- ISDSfunctions:::question_module_ui(question$ids$question)
+  
+  # too late to try to set a chunk attribute
+  # knitr::set_chunkattr(echo = FALSE)
+  rmarkdown::shiny_prerendered_chunk(
+    'server',
+    sprintf(
+      #OVERRIDE
+      'ISDSfunctions:::question_prerendered_chunk(%s, session = session)',
+      learnr:::dput_to_string(question)
+    )
+  )
+  
+  # regular knit print the UI
+  knitr::knit_print(ui)
+}
