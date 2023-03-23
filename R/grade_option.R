@@ -16,7 +16,7 @@
 #' @import dplyr
 #' @import tidyr
 #' @export
-grade_button_ui <- function(id, label = "grade tutorial") {
+grade_button_ui <- function(id, label = "View grade") {
   ns <- NS(id)
   tagList(
     actionButton( ns("button"), label = label)
