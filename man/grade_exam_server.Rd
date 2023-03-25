@@ -4,16 +4,30 @@
 \alias{grade_exam_server}
 \title{Tutorial grade server}
 \usage{
-grade_exam_server(id, label = NULL, pts_possible = NULL, exclude = NULL)
+grade_exam_server(
+  id,
+  graded = NULL,
+  graded_pts = NULL,
+  ex = NULL,
+  ex_pts = NULL,
+  manual = NULL,
+  manual_pts = NULL
+)
 }
 \arguments{
 \item{id}{ID matching ui with server}
 
-\item{label}{Either NULL or a vector containing the names of each question/exercise.}
+\item{graded}{Either NULL or a vector containing the names of each question/exercise.}
 
-\item{pts_possible}{Either NULL or a vector containing the number of points corresponding to each question/exercise in label.}
+\item{graded_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in label.}
 
-\item{exclude}{Either NULL or a vector of names of questions/exercises to exclude.}
+\item{ex}{Either NULL or a vector containing the names of each question/exercise.}
+
+\item{ex_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in label.}
+
+\item{manual}{Either NULL or a vector containing the names of each question/exercise.}
+
+\item{manual_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in label.}
 }
 \description{
 Tutorial grade server

@@ -60,7 +60,7 @@ knit_hooks$set lets you create custom code chunk arguments
 
 A code chunk can be used as a calculator. Try typing 2+2 into the code chunk and running the code.
 
-```{r Ex1, exercise = TRUE}
+```{r Ex1, exercise = TRUE, exercise.eval = TRUE}
 
 ```
 

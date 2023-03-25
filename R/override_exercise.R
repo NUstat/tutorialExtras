@@ -555,6 +555,7 @@ tutorial_knitr_options <- function() {
       options$include <- TRUE
       options$highlight <- FALSE
       options$comment <- NA
+      
       if (!is.null(options$exercise.eval))
         options$eval <- options$exercise.eval
       else

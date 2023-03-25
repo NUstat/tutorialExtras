@@ -32,15 +32,20 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r, context = "server"}
-grade_server("grade")
-lock_server("lock")
-reset_server("reset")
+# grade_server("grade")
+# lock_server("lock")
+# reset_server("reset")
+
+grade_exam_server("exam")
 ```
 
 ```{r}
-grade_button_ui(id = "grade")
-grade_output_ui(id = "grade")
-grade_print_ui(id = "grade")
+# grade_button_ui(id = "grade")
+# grade_output_ui(id = "grade")
+# grade_print_ui(id = "grade")
+
+grade_exam_ui("exam")
+
 
 lock_button_ui(id = "lock")
 reset_button_ui(id = "reset")

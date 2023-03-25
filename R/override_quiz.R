@@ -51,7 +51,6 @@ question_prerendered_chunk <- function(question, ..., session = getDefaultReacti
   question_state
 }
 
-# ADD SHINY JS
 # WHEN LOCK IS PRESSED AUTOSUBMIT
 question_module_ui <- function(id) {
   ns <- NS(id)

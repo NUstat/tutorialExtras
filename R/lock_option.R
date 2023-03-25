@@ -20,6 +20,11 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
   max_attempt <<- max_attempt
 }
 
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+################################################################################
 
 #' @title Tutorial lock button
 #'
@@ -64,18 +69,6 @@ lock_server <- function(id) {
         # trigger a reload to resubmit questions and lock
         session$reload()
       }) #close observe event
-      
-      # eventReactive(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock, 
-      #               ignoreNULL = F,{
-      #                 isolate(mastery <<- ifelse(is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock),
-      #                                            FALSE, learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock))
-      #                 print(mastery)
-      #               })
-      # observeEvent(
-      #   req(session$userData$learnr_state() == "restored"),
-      #   once = TRUE,
-      #   
-      # )
       
     }) #close module server
 } #close main function
