@@ -22,6 +22,7 @@ Imports:
     rlang,
     rmarkdown (>= 1.12.0),
     shiny (>= 1.0),
+    shinyjs,
     sortable,
     stringr,
     tableHTML,
