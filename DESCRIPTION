@@ -25,6 +25,7 @@ Imports:
     sortable,
     stringr,
     tableHTML,
+    TeachingDemos,
     tidyr,
     utils
 Suggests:
