@@ -97,7 +97,8 @@ question_module_server <- function(
 
 # Internal function
 # OVERRIDE QUESTION MODULE SERVER
-# ADD COUNT FEATURE
+# ADDED COUNT ATTEMPTS FEATURE
+# ADDED LOCK FEATURE
 question_module_server_impl <- function(
     input, output, session,
     question,
@@ -107,7 +108,6 @@ question_module_server_impl <- function(
   ns <- getDefaultReactiveDomain()$ns
   # set a seed for each user session for question methods to use
   question$seed <- learnr:::random_seed()
-  
   
   # new ============================
   # initialize counter
@@ -128,13 +128,9 @@ question_module_server_impl <- function(
   if(isolate(val$lock)){
     question$allow_retry = FALSE
   }
-  #print(question$options$exam)
-  # if no options$exam is set default is FALSE
-  # if(is.null(question$options$exam)){
-  #   question$options$exam <- FALSE
-  # }
-  #print(question$options$exam)
   # ================================
+  #get_grades <- learnr:::get_object(session, question$label)
+  #print(get_grades)
   
   
   # only set when a submit button has been pressed
@@ -156,7 +152,6 @@ question_module_server_impl <- function(
     
     # new : Increment counter =======
     isolate(val$numtry <- val$numtry+1)
-    #numtry <- numtry +1
     learnr:::save_object(session, ns("count"), 
                          learnr:::tutorial_object("count",
                                                   list(numtry = isolate(val$numtry)) ) )
@@ -232,7 +227,6 @@ question_module_server_impl <- function(
   # initialize with the past answer
   #  this should cascade throughout the app to display correct answers and final outputs
   init_question(past_submission_answer)
-  
   
   output$action_button_container <- renderUI({
     learnr:::question_button_label(
@@ -318,6 +312,13 @@ question_module_server_impl <- function(
     
     submitted_answer(input$answer)
     
+    # new ------
+    # when submit button is clicked save the time
+    learnr:::save_object(session, ns("submit"),
+                         learnr:::tutorial_object("submit",
+                                                  list(time = learnr:::timestamp_utc())))
+    #-------
+    
     # submit question to server
     learnr:::event_trigger(
       session = session,
@@ -337,12 +338,21 @@ question_module_server_impl <- function(
   observe({
     # Update the `question_state()` reactive to report state back to the Shiny session
     req(submitted_answer(), is.reactive(question_state))
+    
+    # new ------
+    # get time from last submission
+    time_last <- ifelse(is.null(learnr:::get_object(session, ns("submit"))$data$time),
+                               learnr:::timestamp_utc(), learnr:::get_object(session, ns("submit"))$data$time)
+    # ----------
+    
     current_answer_state <- list(
       type = "question",
       answer = submitted_answer(),
       correct = is_correct_info()$correct,
       #NEW ADDED TRACKER
-      attempt = isolate(val$numtry)
+      attempt = isolate(val$numtry),
+      #Only record time when submitting - do not want to update every restart
+      time_last = time_last
     )
     question_state(current_answer_state)
   })

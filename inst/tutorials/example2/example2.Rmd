@@ -17,11 +17,11 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-library(ISDStutorials)
+#library(ISDStutorials)
 library(ISDSfunctions)
 library(gradethis)
 
-conflicted::conflict_prefer_all("ISDSfunctions")
+#conflicted::conflict_prefer_all("ISDSfunctions")
 
 gradethis_setup()
 isds_setup(isds_exam = TRUE)
@@ -33,10 +33,10 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r, context = "server"}
 # grade_server("grade")
-# lock_server("lock")
-# reset_server("reset")
+lock_server("lock0")
+#reset_server("reset")
 
-grade_exam_server("exam")
+#grade_exam_server("exam4")
 ```
 
 ```{r}
@@ -44,25 +44,12 @@ grade_exam_server("exam")
 # grade_output_ui(id = "grade")
 # grade_print_ui(id = "grade")
 
-grade_exam_ui("exam")
+#grade_exam_ui("exam4")
 
 
-lock_button_ui(id = "lock")
-reset_button_ui(id = "reset")
+lock_button_ui(id = "lock0")
+#reset_button_ui(id = "reset")
 ```
-
-<!-- Will need this to handle a random seed. -->
-<!-- ```{r context="server-start"} -->
-<!-- event_register_handler("section_viewed", -->
-<!--   function(session, event, data) { -->
-<!--     one_time( -->
-<!--       session, -->
-<!--       cond = data$sectionId == "section-exercise-with-hint", -->
-<!--       expr = { message("Seeing ", data$sectionId, " for the first time.") } -->
-<!--     ) -->
-<!--   } -->
-<!-- ) -->
-<!-- ``` -->
 
 <!-- ```{r Ex1b, context = "render", echo= TRUE, exercise = FALSE} -->
 <!-- 1+2 -->
@@ -77,6 +64,7 @@ question_blank("Name: ___",
                               return(mark_as(FALSE) )
                               }),
               correct = "Submitted",
+              incorrect = "Submitted",
               allow_retry = FALSE )
 ```
 
@@ -100,6 +88,7 @@ A code chunk can be used as a calculator. Try typing 2+2 into the code chunk and
 grade_this_code()
 ```
 
+## Quiz
 ```{r Q}
 
 quiz(
@@ -145,18 +134,7 @@ quiz(
 )
 ```
 
-
-```{r Ex1, exercise=TRUE}
-
-```
-
-```{r Ex1-solution, exercise.reveal_solution = FALSE}
-2 + 2
-```
-
-```{r Ex1-code-check}
-grade_this_code()
-```
+## Ex2
 
 **Exercise 2:**
 

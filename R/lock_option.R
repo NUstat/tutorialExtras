@@ -46,18 +46,56 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
 lock_button_ui <- function(id, label = "lock exam") {
   ns <- NS(id)
   tagList(
-    actionButton( ns("lock"), label = label)
+    actionButton( ns("lock"), label = label),
+    uiOutput(ns("dwnld"))
   )
 }
 
-# Define the server logic for a module to lock exam
-#' @title Tutorial lock server
-#' @param id ID matching ui with server#'
+# Define the server logic for a module to lock and grade exam
+#' @title Exam lock and grade server
+#' @param id ID matching ui with server
+#' @param graded Either NULL or a vector containing the names of each question/exercise.
+#' @param graded_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in graded.
+#' @param ex Either NULL or a vector containing the names of each question/exercise.
+#' @param ex_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in ex.
+#' @param manual Either NULL or a vector containing the names of each question/exercise to be manually graded.
+#' @param manual_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in manual.
+#' @param exclude Either NULL or a vector containing the names of each question/exercise to exclude from grading.
+#' @param tz Time zone to display start time on report.
 #' @export
-lock_server <- function(id) {
+lock_server <- function(id, graded = NULL, graded_pts = NULL, 
+                        ex = NULL, ex_pts = NULL, 
+                        manual = NULL, manual_pts = NULL,
+                        exclude = NULL, tz = Sys.timezone()) {
   moduleServer(
     id,
     function(input, output, session) {
+     
+      # Set time and determine if download should be shown
+      observeEvent(
+        req(session$userData$learnr_state() == "restored"),{
+        ns <- getDefaultReactiveDomain()$ns
+        
+        # if session restarted get original start time or set start time to now
+        start_time <<- ifelse(is.null(learnr:::get_object(session, NS("time", id = "start"))$data$time),
+                              learnr:::timestamp_utc(), learnr:::get_object(session, NS("time", id = "start"))$data$time)
+
+        # save original start time as object for restart
+        learnr:::save_object(session, object_id = NS("time", id = "start"),
+                             learnr:::tutorial_object("time",
+                                                      list(time = start_time) ) )
+        
+        #show download button if lock is pressed
+        output$dwnld <- renderUI({
+          if(is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock)){
+            return(NULL)
+          }else{
+            downloadButton(ns("downloadExam"), label = "Download Exam")
+          }
+        })
+      })
+      
+      # register that lock was pressed and reload exam to lock all questions
       observeEvent(input$lock, {
         ns <- getDefaultReactiveDomain()$ns
         
@@ -68,13 +106,203 @@ lock_server <- function(id) {
         
         # trigger a reload to resubmit questions and lock
         session$reload()
+        
       }) #close observe event
+      
+      # Download grade handler
+      output$downloadExam <- downloadHandler(
+        filename = function() {
+          paste0("STAT_Exam_", Sys.time(),
+                 ".html")
+          # paste0(tutorial_info$tutorial_id,
+          #        "-",
+          #        user_name,
+          #        ".html")
+        },
+        content = function(file) {
+          ns <- getDefaultReactiveDomain()$ns
+          
+          tutorial_info <- isolate(get_tutorial_info())
+          
+          #error checking for label names provided
+          #check if exclude list is valid
+          all_labels <- c(graded, ex, manual, exclude)
+          if(!is.null(all_labels)){
+            purrr::map(all_labels, function(x){
+              if(!(x %in% tutorial_info$items$label)){
+                stop(paste0(x, " is not a name of a question or exercise."))
+              }
+            })
+          }
+          # add error checking that length names match length points
+          
+          # Error checking complete
+          #--------------------------------------------------------------------
+          
+          #define rubric points
+          if(!is.null(graded)){
+            rubric_1 <- tidyr::tibble(label = graded,
+                                      pts_possible = graded_pts,
+                                      eval = rep("question", length(label)))
+          }else{rubric_1 <- NULL}
+          if(!is.null(ex)){
+            rubric_2 <- tidyr::tibble(label = ex,
+                                      pts_possible = ex_pts,
+                                      eval = rep("exercise", length(label)))
+          }else{rubric_2 <- NULL}
+          if(!is.null(manual)){
+            rubric_3 <- tidyr::tibble(label = manual,
+                                      pts_possible = manual_pts,
+                                      eval = rep("manual", length(label)) )
+          }else{rubric_3 <- NULL}
+          
+          set_pts <- rbind(rubric_1, rubric_2, rubric_3)
+          
+          rubric_tmp <- tidyr::tibble(label = tutorial_info$items$label)
+          
+          if(!is.null(set_pts)){
+            rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label") %>%
+              mutate(pts_possible = ifelse(is.na(pts_possible), 1, pts_possible))
+          }else{
+            rubric <- rubric_tmp %>%
+              mutate(pts_possible = rep(1, length(label)),
+                     eval = rep(NA, length(label)))
+          }
+          #Set up rubric points complete
+          #--------------------------------------------------------------------
+          
+          # get and organize all user submission questions and exercises
+          get_grades <- isolate(learnr::get_tutorial_state())
+          
+          # organize submissions in a list
+          table_list <- map(names(get_grades), function(x){
+            get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+            
+            store <- get_grades[[x]] %>%
+              tidyr::as_tibble()
+            
+            store$label = x
+            if(store$type == "exercise"){
+              #if this column exists proceed...
+              if("answer_last" %in% colnames(store)){
+                store <- store %>%
+                  dplyr::mutate(answer = answer_last,
+                                correct = correct_last) %>%
+                                #timestamp = time_last
+                  dplyr::select(-c(answer_last, correct_last))
+              }
+            }
+            # fix possible data typing errors
+            store %>%
+              dplyr::mutate(label = as.character(label),
+                            answer = as.character(answer),
+                            attempt = as.numeric(attempt),
+                            timestamp = time_last) %>% 
+              dplyr::select(-time_last)
+          })
+          table <- dplyr::bind_rows(table_list)
+          # # catch error - if empty do not continue
+          if(rlang::is_empty(table)){
+            return()
+          }
+          
+          grades <- dplyr::left_join(rubric, table, by = "label") %>%
+            dplyr::select(-attempt) %>%
+            dplyr::mutate(eval = ifelse(!is.na(eval), eval,
+                                        ifelse(!is.na(type), type, eval)),
+                          pts_earned = pts_possible *as.numeric(correct),
+                          pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
+                          #calculate time since exam start
+                          time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2))
+          
+          # need to get name before removing "excluded" questions
+          # if there is a code chunk question labeled "Name" get the name
+          user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+                              tutorial_info$user_id)
+          
+          # exclude questions if listed
+          if(!is.null(exclude)){
+            grades <- grades %>%
+              dplyr::filter(!(label %in% exclude))
+          }
+          
+          # submission organization complete
+          #--------------------------------------------------------------------
+          
+          # Divide into subsections for rendered report
+          graded <- grades %>%
+            dplyr::filter(eval == "question") %>%
+            dplyr::select(label, answer, time, pts_earned)
+          
+          score <- ifelse(nrow(graded) == 0, 0, sum(graded$pts_earned))
+          
+          exercises <- grades %>%
+            dplyr::filter(eval == "exercise") %>%
+            transpose()
+          
+          manual <- grades %>%
+            dplyr::filter(eval == "manual") %>%
+            dplyr::select(label, answer, time, pts_earned) 
+          
+          incomplete <- grades %>%
+            dplyr::filter(is.na(eval)) %>%
+            dplyr::select(label, answer, time, pts_earned) 
+          
+          #--------------------------------------------------------------------
+          # Create string of each section header
+          yaml_string <- c("---", 
+                           toString(paste0("title: ", tutorial_info$tutorial_id)), 
+                           toString(paste0("author: ", user_name)),
+                           toString(paste0("date: ", format(as.POSIXct(start_time, tz = "UTC"), tz = tz, usetz=TRUE)) ), "---")
+         
+          graded_string <- c(toString(paste0("# Concept  ", score)), "```{r concept, echo=FALSE}", "graded %>% knitr::kable()", "```")
+          
+          exercise_substring <- map(exercises, function(x){
+            c(toString(paste0("### ", x$label, " - ", ifelse(isTRUE(x$correct), "Correct", "Needs Grading")) ), 
+              toString(paste0("Time: ", x$time)),
+              toString(paste0("```{r ", x$label, ", echo = TRUE}")), 
+              as.character(x$answer), "```")
+          })
+          
+          exercise_substring <- unlist(exercise_substring)
+          
+          exercise_string <- c("# Exercises", exercise_substring)
+          
+          manual_string <- c("# Manually Graded", "```{r manual, echo=FALSE}", "manual %>% knitr::kable()", "```")
+          
+          if(nrow(manual) == 0){
+            manual_string <- c("# Manually Graded", "No manually graded questions.", " ")
+          }
+          
+          dnf_string <- c("# Incomplete Problems", "```{r incomplete, echo=FALSE}", "incomplete %>% knitr::kable()", "```")
+          
+          if(nrow(incomplete) == 0){
+            dnf_string <- c("# Incomplete Problems", "No incomplete problems.")
+          }
+          
+          #--------------------------------------------------------------------
+          # write to rmd, render to html and download!
+          
+          # create a temporary empty file to write rmd to
+          tmp_file <- tempfile(fileext = ".Rmd")
+          # write to Rmd
+          writeLines(c(yaml_string, graded_string, exercise_string, manual_string, dnf_string),
+                     con = tmp_file)
+          # render to html
+          output <- rmarkdown::render(tmp_file)
+          
+          # download html
+          file.copy(output, file)
+        },
+        contentType = "text/html"
+      )
       
     }) #close module server
 } #close main function
 
 
-
+#---------------------------------------------------------------------------
+#---------------------------------------------------------------------------
 #' @title Tutorial reset button
 #'
 #' @description
@@ -132,46 +360,3 @@ reset_server <- function(id) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-# DELETE - FAILED ATTEMPT AT OVERRIDING exercise options
-# .onLoad <- function(libname, pkgname) {
-#   mastery <<- FALSE
-#   
-#   knitr::opts_hooks$set(mastery = function(options) {
-#     if (isTRUE(options$mastery)) {
-#       options$context = "render";
-#       options$echo= TRUE;
-#       options$exercise = FALSE;
-#     }else{
-#       options$context = NULL;
-#       options$echo= FALSE;
-#       options$exercise = TRUE;
-#     }
-#     options
-#   })
-  #register_ISDS_handlers()
-  # callModule(
-  #   masteryExams:::register_ISDS_handlers("run"),
-  #   "test"
-  # )
-  #NEED TO FIND A WAY TO TRIGGER SESSION OBJECT ON LOAD
-#}
-
-# register_ISDS_handlers <-  function() {
-#   rmarkdown::shiny_prerendered_chunk('server', 
-#       mastery <<- ifelse(is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock),
-#                          FALSE, learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock)
-#       )
-#   print(mastery)
-# }

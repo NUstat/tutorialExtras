@@ -2,13 +2,39 @@
 % Please edit documentation in R/lock_option.R
 \name{lock_server}
 \alias{lock_server}
-\title{Tutorial lock server}
+\title{Exam lock and grade server}
 \usage{
-lock_server(id)
+lock_server(
+  id,
+  graded = NULL,
+  graded_pts = NULL,
+  ex = NULL,
+  ex_pts = NULL,
+  manual = NULL,
+  manual_pts = NULL,
+  exclude = NULL,
+  tz = Sys.timezone()
+)
 }
 \arguments{
-\item{id}{ID matching ui with server#'}
+\item{id}{ID matching ui with server}
+
+\item{graded}{Either NULL or a vector containing the names of each question/exercise.}
+
+\item{graded_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in graded.}
+
+\item{ex}{Either NULL or a vector containing the names of each question/exercise.}
+
+\item{ex_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in ex.}
+
+\item{manual}{Either NULL or a vector containing the names of each question/exercise to be manually graded.}
+
+\item{manual_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in manual.}
+
+\item{exclude}{Either NULL or a vector containing the names of each question/exercise to exclude from grading.}
+
+\item{tz}{Time zone to display start time on report.}
 }
 \description{
-Tutorial lock server
+Exam lock and grade server
 }
