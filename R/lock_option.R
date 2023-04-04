@@ -274,6 +274,7 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
          
           graded_string <- c(toString(paste0("# Concept  ", score)), "```{r concept, echo=FALSE}", "graded %>% knitr::kable()", "```")
           
+          
           exercise_substring <- map(exercises, function(x){
             c(toString(paste0("### ", x$label, " - ", ifelse(isTRUE(x$correct), "Correct", "Needs Grading")) ), 
               toString(paste0("Time: ", x$time)),
@@ -288,7 +289,7 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
           manual_string <- c("# Manually Graded", "```{r manual, echo=FALSE}", "manual %>% knitr::kable()", "```")
           
           if(nrow(manual) == 0){
-            manual_string <- c("# Manually Graded", "No manually graded questions.", " ")
+            manual_string <- c(" ", "# Manually Graded", "No manually graded questions.", " ")
           }
           
           dnf_string <- c("# Incomplete Problems", "```{r incomplete, echo=FALSE}", "incomplete %>% knitr::kable()", "```")
@@ -298,16 +299,37 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
           }
           
           #--------------------------------------------------------------------
-          # write to rmd, render to html and download!
+          # create a temporary empty file to write rmd and data folder to
+          tmp_dir <- tempdir()
           
-          # create a temporary empty file to write rmd to
-          tmp_file <- tempfile(fileext = ".Rmd")
+          #--------------------------------------------------------------------
+          # write data folder to a temporary directory
+          file.copy("data", tmp_dir, recursive = TRUE)
+          # Need to load required datasets and packages
+          file_names <- list.files("data", full.names=FALSE)
+          dataset_substring <- map(file_names, function(x){
+            if(grepl(".csv", x, fixed = TRUE)){
+              paste0(gsub(".csv", "", x), " <- read.csv(", gsub("\\\\", "/", tmp_dir), "/data/", x, ")")
+            }
+            if(grepl(".rds", x, fixed = TRUE)){
+              paste0(gsub(".rds", "", x), " <- read.rds(", gsub("\\\\", "/", tmp_dir), "/data/", x, ")")
+            }
+            if(grepl(".rda", x, fixed = TRUE)){
+              paste0("load('", gsub("\\\\", "/", tmp_dir), "/data/", x, "')")
+            }
+          })
+          
+          setup_string <- c("```{r setup, include = FALSE}",
+                            unlist(dataset_substring), "```")
+          
+          #--------------------------------------------------------------------
+          tmp_file <- tempfile(tmpdir = tmp_dir, fileext = ".Rmd")
           # write to Rmd
-          writeLines(c(yaml_string, graded_string, exercise_string, manual_string, dnf_string),
+          writeLines(c(yaml_string, setup_string, graded_string, 
+                       exercise_string, manual_string, dnf_string),
                      con = tmp_file)
           # render to html
           output <- rmarkdown::render(tmp_file)
-          
           # download html
           file.copy(output, file)
         },

@@ -78,13 +78,10 @@ A code chunk can be used as a calculator. Try typing 2+2 into the code chunk and
 ```
 
 ```{r Ex1a-code-check}
-grade_this({
-  # custom checking code appears here
-  grade_this_code(
-  correct = "Correct",
-  incorrect = "Needs Grading"
+grade_this_code(
+  correct = "Submitted",
+  incorrect = "Submitted"
 )
-})
 ```
 
 ## Exam
