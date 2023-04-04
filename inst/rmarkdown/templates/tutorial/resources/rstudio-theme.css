@@ -56,18 +56,17 @@ ul {
   .btn-default:focus {
     background-color: #e0e0e0; }
 
-/* TODO-barret add css for btn-warning */
-
+/* Modified for NU colors */
 .btn-primary, .btn-success, .btn-info {
-  background-color: #75aadb;
+  background-color: #4E2A84; /* #75aadb */
   background-image: none;
   border: none; }
   .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary:focus:active, .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success:focus:active, .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info:focus:active {
-    background-color: #5a9ddb; }
+    background-color: #B6ACD1; } /* #5a9ddb */
   .btn-primary:focus:hover, .btn-primary:active:hover, .btn-primary:focus:active:hover, .btn-success:focus:hover, .btn-success:active:hover, .btn-success:focus:active:hover, .btn-info:focus:hover, .btn-info:active:hover, .btn-info:focus:active:hover {
-    background-color: #4c83b6; }
+    background-color: #836EAA; } /* #4c83b6 */
   .btn-primary.disabled, .btn-primary:disabled, .btn-primary.disabled:hover, .btn-primary:disabled:hover, .btn-success.disabled, .btn-success:disabled, .btn-success.disabled:hover, .btn-success:disabled:hover, .btn-info.disabled, .btn-info:disabled, .btn-info.disabled:hover, .btn-info:disabled:hover {
-    background-color: #75aadb; }
+    background-color: #4E2A84; }
 
 .panel, pre {
   border-radius: 0;
@@ -120,6 +119,25 @@ code {
 .alert {
   width: fit-content;
 }
+
+
+/* added color for correct and incorrect to be the same so that in exam
+user will not know if they are correct or not*/
+
+.alert {
+  color: #4E2A84;
+  background-color: #e8e8e8;
+  background-image: none;
+  border: none;}
+
+.btn-warning {
+  color: #E4E0EE;
+  background-color: #404040;
+  background-image: none;
+  border: none;}
+  .btn-warning:hover {
+    color: #404040;
+    background-color: #E4E0EE;}
 
 /* .answers {
   padding-left: 25px;

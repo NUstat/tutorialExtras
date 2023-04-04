@@ -128,10 +128,10 @@ question_module_server_impl <- function(
   if(isolate(val$lock)){
     question$allow_retry = FALSE
   }
-  # ================================
-  #get_grades <- learnr:::get_object(session, question$label)
-  #print(get_grades)
   
+  # initialize partial_cred as NA
+  partial_cred <- NA
+  # ================================
   
   # only set when a submit button has been pressed
   # (or reset when try again is hit)
@@ -143,6 +143,15 @@ question_module_server_impl <- function(
     if (is.null(submitted_answer())) return(NULL)
     # find out if answer is right
     ret <- question_is_correct(question, submitted_answer())
+    
+    # get partial credit for wordbank and blank
+    if(question$type == "wordbank"){
+      partial_cred <- as.numeric(ret$messages)
+      # then remove partial credit message output
+      ret$messages <- NULL
+    }
+    
+    question$partial_cred <<- partial_cred
     
     # new : mark wrong until locked =======
     # if exam == TRUE and lock is NOT pressed; mark_as(FALSE)
@@ -352,7 +361,9 @@ question_module_server_impl <- function(
       #NEW ADDED TRACKER
       attempt = isolate(val$numtry),
       #Only record time when submitting - do not want to update every restart
-      time_last = time_last
+      time_last = time_last,
+      partial_cred = question$partial_cred
+      #partial_cred = partial_cred
     )
     question_state(current_answer_state)
   })

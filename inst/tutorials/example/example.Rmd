@@ -5,9 +5,10 @@ tutorial:
   version: 0.1
   
 output:
-  masteryExams::tutorial:
+  ISDSfunctions::tutorial:
     progressive: false
     allow_skip: true
+    css: ["css/nu-theme.css"]
 runtime: shiny_prerendered
 description: >
   Learn the basics of Quarto.
@@ -16,41 +17,28 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-library(ISDStutorials)
-library(masteryExams)
+library(ISDSfunctions)
 library(gradethis)
 
-conflicted::conflict_prefer_all("masteryExams")
-
-
 gradethis_setup()
-knitr::opts_chunk$set(echo = FALSE)
 
-options(tutorial.event_recorder = ISDStutorials::isds_recorder)
+isds_setup(isds_exam = TRUE)
+
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
 ```{r, context = "server"}
 
-grade_server("grade")
+lock_server("lock0", graded = c("Q-2", "E-3"), graded_pts = c(2, 3))
+reset_server("reset")
 ```
 
 ```{r}
-grade_button_ui(id = "grade")
+lock_button_ui(id = "lock0")
+reset_button_ui(id = "reset")
 ```
 
-<!-- Will need this to handle a random seed. -->
-<!-- ```{r context="server-start"} -->
-<!-- event_register_handler("section_viewed", -->
-<!--   function(session, event, data) { -->
-<!--     one_time( -->
-<!--       session, -->
-<!--       cond = data$sectionId == "section-exercise-with-hint", -->
-<!--       expr = { message("Seeing ", data$sectionId, " for the first time.") } -->
-<!--     ) -->
-<!--   } -->
-<!-- ) -->
-<!-- ``` -->
 
 knit_hooks$set lets you create custom code chunk arguments
 
@@ -73,7 +61,6 @@ grade_this_code()
 ```
 
 ```{r Q}
-
 quiz(
   question("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
            answer("29"),
@@ -85,19 +72,4 @@ quiz(
 ```
 
 
-```{r}
-tagList(
-    actionButton( "button", label = "label")
-  )
-```
-
-```{r, context = "server"}
-observeEvent(input$button, {
-  learnr::disable_all_tags(
-    htmltools::tagList(
-      htmltools::a()
-    )
-  )
-})
-```
 

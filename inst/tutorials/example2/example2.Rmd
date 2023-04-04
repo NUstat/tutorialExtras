@@ -8,6 +8,7 @@ output:
   learnr::tutorial:
     progressive: false
     allow_skip: true
+    css: ["css/nu-theme.css"]
     
 runtime: shiny_prerendered
 description: >
@@ -17,13 +18,11 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-#library(ISDStutorials)
 library(ISDSfunctions)
 library(gradethis)
 
-#conflicted::conflict_prefer_all("ISDSfunctions")
-
 gradethis_setup()
+
 isds_setup(isds_exam = TRUE)
 
 knitr::opts_chunk$set(echo = FALSE)
@@ -32,23 +31,17 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r, context = "server"}
-# grade_server("grade")
-lock_server("lock0")
-#reset_server("reset")
 
-#grade_exam_server("exam4")
+lock_server("lock0", graded = c("Q-2", "E-3"), graded_pts = c(2, 3))
+reset_server("reset")
 ```
 
 ```{r}
 # grade_button_ui(id = "grade")
 # grade_output_ui(id = "grade")
-# grade_print_ui(id = "grade")
-
-#grade_exam_ui("exam4")
-
 
 lock_button_ui(id = "lock0")
-#reset_button_ui(id = "reset")
+reset_button_ui(id = "reset")
 ```
 
 <!-- ```{r Ex1b, context = "render", echo= TRUE, exercise = FALSE} -->
@@ -85,7 +78,53 @@ A code chunk can be used as a calculator. Try typing 2+2 into the code chunk and
 ```
 
 ```{r Ex1a-code-check}
-grade_this_code()
+grade_this({
+  # custom checking code appears here
+  grade_this_code(
+  correct = "Correct",
+  incorrect = "Needs Grading"
+)
+})
+```
+
+## Exam
+
+
+```{r E}
+
+exam( shuffle = FALSE,
+  # question("Q1) What's the city miles per gallon for the first observation in the mpg dataframe?",
+  #          answer("29"),
+  #          answer("18", correct = TRUE),
+  #          answer("21"),
+  #          allow_retry = TRUE,
+  #          try_again = "Submitted",
+  #          random_answer_order = TRUE,
+  #          options = list(exam = TRUE)),
+  question("Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           answer("29"),
+           answer("18", correct = TRUE),
+           answer("21"),
+           allow_retry = TRUE,
+           try_again = "Submitted",
+           random_answer_order = TRUE),
+  ISDSfunctions::question_dropdown("Q3) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           answer("29"),
+           answer("18", correct = TRUE),
+           answer("21"),
+           allow_retry = TRUE,
+           incorrect = "Submitted",
+           try_again = "Submitted",
+           random_answer_order = TRUE),
+  ISDSfunctions::question_wordbank("Q4) What's the city miles per gallon for the first observation in the mpg dataframe?",
+           choices = c("a", "b", "c"),
+           answer(c("1", "2", "3"), correct = TRUE),
+           allow_retry = TRUE,
+           incorrect = "Submitted",
+           try_again = "Submitted",
+           random_answer_order = TRUE)
+
+)
 ```
 
 ## Quiz
@@ -109,13 +148,6 @@ quiz(
            incorrect = "Submitted",
            try_again = "Submitted",
            random_answer_order = TRUE),
-  ISDSfunctions::question_wordbank("Ex4Q2) What's the city miles per gallon for the first observation in the mpg dataframe?",
-           choices= c("a", "b"),
-           wordbank = c("18", "21"),
-           answer(c("18", "21"), correct = TRUE),
-           allow_retry = TRUE,
-           try_again = "Submitted",
-           random_answer_order = TRUE),
   question("Q1) Which of the following help ensure research is reproducible? Select all that apply.",
            answer("Copying and pasting results into a word processor"),
            answer("Using a workflow tool such as RMarkdown", correct = TRUE),
@@ -124,12 +156,6 @@ quiz(
            allow_retry = TRUE,
            random_answer_order = TRUE
            )
-  # # Q2
-  # question("Q2) ___ is a programming language (like a car's engine); and ___ is an inintegrated development environment (like a car dashboard)",
-  #          answer("R; RStudio", correct = TRUE),
-  #          answer("RStudio; R"),
-  #          allow_retry = TRUE,
-  #          random_answer_order = TRUE)
   
 )
 ```

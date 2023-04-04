@@ -1,5 +1,6 @@
 # load isds_setup on load to prevent errors
 # user can define the options in setup
+# don't think we need this?
 .onLoad <- function(libname, pkgname) {
   isds_setup()
 }
@@ -8,7 +9,7 @@
 #'
 #' @description
 #' Define if the tutorial is an exam and if there is a max_attempt limit on quiz questions
-#'
+#' 
 #' @param isds_exam defaults to FALSE. If the tutorial is an exam with a lock button set to TRUE.
 #' @param max_attempt stop allowing submits if max_attempt is reached.
 #'
@@ -18,6 +19,9 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
   #setting global variables accessible to override_exercise and override_quiz
   isds_exam <<- isds_exam
   max_attempt <<- max_attempt
+  
+  # need to set.seed that changes every "reattempt"
+  
 }
 
 ################################################################################
@@ -84,6 +88,17 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
         learnr:::save_object(session, object_id = NS("time", id = "start"),
                              learnr:::tutorial_object("time",
                                                       list(time = start_time) ) )
+        
+        # get attempt number to set a seed; if no object then this is the first attempt
+        user_id <- learnr:::get_tutorial_info()$user_id
+        
+        tmp_seed <- ifelse(is.null(learnr:::get_object(session, NS("seed", id = "seed"))$data$seed),
+                              1, learnr:::get_object(session, NS("seed", id = "seed"))$data$seed)
+        learnr:::save_object(session, NS("seed", id = "seed"),
+                             learnr:::tutorial_object("seed",
+                                                      list(seed = as.numeric(tmp_seed)) ) )
+        newseed <<- paste0(user_id, tmp_seed)
+        print(newseed)
         
         #show download button if lock is pressed
         output$dwnld <- renderUI({
@@ -168,6 +183,7 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
               mutate(pts_possible = rep(1, length(label)),
                      eval = rep(NA, length(label)))
           }
+          print(rubric)
           #Set up rubric points complete
           #--------------------------------------------------------------------
           
@@ -187,7 +203,8 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
               if("answer_last" %in% colnames(store)){
                 store <- store %>%
                   dplyr::mutate(answer = answer_last,
-                                correct = correct_last) %>%
+                                correct = correct_last,
+                                partial_cred = NA) %>%
                                 #timestamp = time_last
                   dplyr::select(-c(answer_last, correct_last))
               }
@@ -205,16 +222,18 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
           if(rlang::is_empty(table)){
             return()
           }
-          
+          print(table)
           grades <- dplyr::left_join(rubric, table, by = "label") %>%
             dplyr::select(-attempt) %>%
             dplyr::mutate(eval = ifelse(!is.na(eval), eval,
                                         ifelse(!is.na(type), type, eval)),
-                          pts_earned = pts_possible *as.numeric(correct),
+                          partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
+                          #pts_earned = pts_possible *as.numeric(correct),
+                          pts_earned = pts_possible * as.numeric(partial_cred),
                           pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
                           #calculate time since exam start
                           time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2))
-          
+          print(grades)
           # need to get name before removing "excluded" questions
           # if there is a code chunk question labeled "Name" get the name
           user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
@@ -338,15 +357,20 @@ reset_server <- function(id) {
       observeEvent(input$reset, {
         ns <- getDefaultReactiveDomain()$ns
         
-        # Change lock identifier to "not pressed"
-        learnr:::save_object(session, NS("lock", id = "pressed"), 
-                             learnr:::tutorial_object("lock",
-                                                      list(lock = FALSE) ) )
-        
         # clear all question and exercise cache?
         #learnr:::clear_tutorial_cache()
-        #YES this resets everything
+        
+        # save seed globally before removing objects
+        tmp_seed <<- learnr:::get_object(session,  NS("seed", id = "seed"))$data$seed
+        
+        # YES this resets all questions and exercises
+        # this does NOT reset global variables
         learnr:::remove_all_objects(session)
+        
+        # add one to saved seed to count retry attempts
+        learnr:::save_object(session, NS("seed", id = "seed"),
+                             learnr:::tutorial_object("seed",
+                                                      list(seed = tmp_seed + 1) ) )
         
         # trigger a reload to resubmit questions and unlock
         session$reload()

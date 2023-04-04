@@ -242,3 +242,22 @@
 .shiny-input-container:not(.shiny-input-container-inline) {
   width: 100%;
 }
+
+/* added color for correct and incorrect to be the same so that in exam
+user will not know if they are correct or not*/
+
+.alert {
+  color: #4E2A84;
+  background-color: #e8e8e8;
+  background-image: none;
+  border: none;}
+
+.btn-warning {
+  color: #E4E0EE;
+  background-color: #404040;
+  background-image: none;
+  border: none;}
+  .btn-warning:hover {
+    color: #404040;
+    background-color: #E4E0EE;}
+

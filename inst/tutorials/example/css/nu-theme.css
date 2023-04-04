@@ -33,6 +33,7 @@ p {
 ul {
   line-height: 2em;
   list-style: disc outside none; }
+  
 .btn, .modal-content .btn+.btn {
   padding: 10px 20px;
   border-radius: 3px;
@@ -51,10 +52,10 @@ ul {
     background-color: #c8c8c8; }
   .btn-default:focus {
     background-color: #e0e0e0; }
+    
 
-/* TODO-barret add css for btn-warning */
-
-.btn-primary, .btn-success, .btn-info {
+/* test btn-warning */
+.btn-primary, .btn-success, .btn-danger, .btn-info {
   background-color: #4E2A84; /* #75aadb */
   background-image: none;
   border: none; }
@@ -95,6 +96,8 @@ code {
 .alert {
   width: fit-content;
 }
+
+
 
 /* .answers {
   padding-left: 25px;
