@@ -98,7 +98,7 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
                              learnr:::tutorial_object("seed",
                                                       list(seed = as.numeric(tmp_seed)) ) )
         newseed <<- paste0(user_id, tmp_seed)
-        print(newseed)
+        #print(newseed)
         
         #show download button if lock is pressed
         output$dwnld <- renderUI({
@@ -183,7 +183,6 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
               mutate(pts_possible = rep(1, length(label)),
                      eval = rep(NA, length(label)))
           }
-          print(rubric)
           #Set up rubric points complete
           #--------------------------------------------------------------------
           
@@ -222,7 +221,6 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
           if(rlang::is_empty(table)){
             return()
           }
-          print(table)
           grades <- dplyr::left_join(rubric, table, by = "label") %>%
             dplyr::select(-attempt) %>%
             dplyr::mutate(eval = ifelse(!is.na(eval), eval,
@@ -233,7 +231,7 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
                           pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
                           #calculate time since exam start
                           time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2))
-          print(grades)
+          
           # need to get name before removing "excluded" questions
           # if there is a code chunk question labeled "Name" get the name
           user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
