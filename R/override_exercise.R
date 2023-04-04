@@ -69,6 +69,14 @@ setup_exercise_handler <- function(exercise_rx, session) {
     # if it is pressed do NOT SAVE any more submits/run code
     isolate(val$lock <- ifelse(is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock),
                                FALSE, learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock))
+    # get last submitted answer and info
+    isolate(val$code <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                               0, learnr:::get_object(session, ns("ex_submit"))$data$code))
+    isolate(val$correct <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                                  FALSE, learnr:::get_object(session, ns("ex_submit"))$data$correct))
+    isolate(val$time <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$time),
+                               learnr:::timestamp_utc(), learnr:::get_object(session, ns("ex_submit"))$data$time))
+    #--------------------------------------------------
     #-----------------------------------
     
     # short circuit for restore (we restore some outputs like errors so that
@@ -93,6 +101,9 @@ setup_exercise_handler <- function(exercise_rx, session) {
           type = "exercise",
           answer = object$data$code,
           correct = NA, 
+          answer_last = isolate(val$code),
+          correct_last = isolate(val$correct),
+          time_last = isolate(val$time),
           attempt = isolate(val$numtry)
         )
         learnr:::set_tutorial_state(exercise$label, restored_state, session = session)
@@ -169,6 +180,10 @@ setup_exercise_handler <- function(exercise_rx, session) {
         id      = ex_id,
         code    = exercise$code,
         restore = exercise$restore,
+        #Store last submitted
+        answer_last = isolate(val$code),
+        correct_last = isolate(val$correct),
+        time_last = isolate(val$time),
         #NEW ADD TRACKER
         attempt = isolate(val$numtry)
       )

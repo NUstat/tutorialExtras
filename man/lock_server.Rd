@@ -6,6 +6,7 @@
 \usage{
 lock_server(
   id,
+  num_blanks = TRUE,
   graded = NULL,
   graded_pts = NULL,
   ex = NULL,
@@ -18,6 +19,8 @@ lock_server(
 }
 \arguments{
 \item{id}{ID matching ui with server}
+
+\item{num_blanks}{Set the number of points for a question equal to the number of blanks? Defualt TRUE.}
 
 \item{graded}{Either NULL or a vector containing the names of each question/exercise.}
 

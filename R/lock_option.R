@@ -58,6 +58,7 @@ lock_button_ui <- function(id, label = "lock exam") {
 # Define the server logic for a module to lock and grade exam
 #' @title Exam lock and grade server
 #' @param id ID matching ui with server
+#' @param num_blanks Set the number of points for a question equal to the number of blanks? Defualt TRUE.
 #' @param graded Either NULL or a vector containing the names of each question/exercise.
 #' @param graded_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in graded.
 #' @param ex Either NULL or a vector containing the names of each question/exercise.
@@ -67,7 +68,8 @@ lock_button_ui <- function(id, label = "lock exam") {
 #' @param exclude Either NULL or a vector containing the names of each question/exercise to exclude from grading.
 #' @param tz Time zone to display start time on report.
 #' @export
-lock_server <- function(id, graded = NULL, graded_pts = NULL, 
+lock_server <- function(id, num_blanks = TRUE,
+                        graded = NULL, graded_pts = NULL, 
                         ex = NULL, ex_pts = NULL, 
                         manual = NULL, manual_pts = NULL,
                         exclude = NULL, tz = Sys.timezone()) {
@@ -129,10 +131,6 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
         filename = function() {
           paste0("STAT_Exam_", Sys.time(),
                  ".html")
-          # paste0(tutorial_info$tutorial_id,
-          #        "-",
-          #        user_name,
-          #        ".html")
         },
         content = function(file) {
           ns <- getDefaultReactiveDomain()$ns
@@ -176,11 +174,11 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
           rubric_tmp <- tidyr::tibble(label = tutorial_info$items$label)
           
           if(!is.null(set_pts)){
-            rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label") %>%
-              mutate(pts_possible = ifelse(is.na(pts_possible), 1, pts_possible))
+            rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label") #%>%
+              #mutate(pts_possible = ifelse(is.na(pts_possible), 1, pts_possible))
           }else{
             rubric <- rubric_tmp %>%
-              mutate(pts_possible = rep(1, length(label)),
+              mutate(pts_possible = rep(NA, length(label)),
                      eval = rep(NA, length(label)))
           }
           #Set up rubric points complete
@@ -191,14 +189,22 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
           
           # organize submissions in a list
           table_list <- map(names(get_grades), function(x){
+            # handle multiple answer issues
+            get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
+            
             get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+            
+            # handle numeric 0 issues
+            if(get_grades[[x]]$type == "question"){
+            get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred == 0), 
+                                                   NA, get_grades[[x]]$partial_cred)
+            }
             
             store <- get_grades[[x]] %>%
               tidyr::as_tibble()
             
             store$label = x
             
-            print(store)
             if(store$type == "exercise"){
               #if this column exists proceed...
               if("answer_last" %in% colnames(store)){
@@ -210,7 +216,6 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
                   dplyr::select(-c(answer_last, correct_last))
               }
             }
-            print(store)
             # fix possible data typing errors
             store %>%
               dplyr::mutate(label = as.character(label),
@@ -224,16 +229,37 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
           if(rlang::is_empty(table)){
             return()
           }
+          
+          # merge rubric of all questions with table of submitted questions
           grades <- dplyr::left_join(rubric, table, by = "label") %>%
+            # not needed for exams
             dplyr::select(-attempt) %>%
+            # set question type for display
             dplyr::mutate(eval = ifelse(!is.na(eval), eval,
                                         ifelse(!is.na(type), type, eval)),
                           partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
-                          #pts_earned = pts_possible *as.numeric(correct),
-                          pts_earned = pts_possible * as.numeric(partial_cred),
-                          pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
                           #calculate time since exam start
                           time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2))
+          
+          # handle pts_possible 1) priority goes to manual setting 
+          # 2) then to num_blanks setting 3) then default to 1
+          if(isTRUE(num_blanks)){
+            grades <- grades %>% 
+              dplyr::mutate(
+                # set all question to number of blanks
+                pts_possible = ifelse(is.na(pts_possible), blanks, pts_possible),
+                pts_earned = pts_possible * as.numeric(partial_cred),
+                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
+              )
+          }else{
+            grades <- grades %>% 
+              dplyr::mutate(
+                # set all questions to 1 point
+                pts_possible = ifelse(is.na(pts_possible), 1, pts_possible),
+                pts_earned = pts_possible * as.numeric(partial_cred),
+                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
+              )
+          }
           
           # need to get name before removing "excluded" questions
           # if there is a code chunk question labeled "Name" get the name
@@ -322,7 +348,8 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
             }
           })
           
-          setup_string <- c("```{r setup, include = FALSE}",
+          setup_string <- c("```{r setup, include = FALSE, cache = FALSE}",
+                            "knitr::opts_chunk$set(error = TRUE)",
                             unlist(dataset_substring), "```")
           
           #--------------------------------------------------------------------
