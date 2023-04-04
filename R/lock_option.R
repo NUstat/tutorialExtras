@@ -197,6 +197,8 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
               tidyr::as_tibble()
             
             store$label = x
+            
+            print(store)
             if(store$type == "exercise"){
               #if this column exists proceed...
               if("answer_last" %in% colnames(store)){
@@ -208,6 +210,7 @@ lock_server <- function(id, graded = NULL, graded_pts = NULL,
                   dplyr::select(-c(answer_last, correct_last))
               }
             }
+            print(store)
             # fix possible data typing errors
             store %>%
               dplyr::mutate(label = as.character(label),
