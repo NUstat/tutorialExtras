@@ -308,7 +308,7 @@ lock_server <- function(id, num_blanks = TRUE,
             c(toString(paste0("### ", x$label, " - ", ifelse(isTRUE(x$correct), "Correct", "Needs Grading")) ), 
               toString(paste0("Time: ", x$time)),
               toString(paste0("```{r ", x$label, ", echo = TRUE}")), 
-              as.character(x$answer), "```")
+              as.character(x$answer), "```", " ")
           })
           
           exercise_substring <- unlist(exercise_substring)
