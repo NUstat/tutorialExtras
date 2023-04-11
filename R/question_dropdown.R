@@ -180,11 +180,8 @@ question_ui_try_again.dropdown <- function(question, value, ...) {
 #' @export
 #' @seealso question_dropdown
 question_is_correct.dropdown <- function(question, value, ...) {
-  print(question$answers)
+  
   for (ans in question$answers) {
-    print(ans$option)
-    print(ans$correct)
-    print(value)
     if (as.character(ans$option) == value) {
       return(learnr::mark_as(
         ans$correct,

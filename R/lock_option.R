@@ -228,7 +228,7 @@ lock_server <- function(id, num_blanks = TRUE,
           if(rlang::is_empty(table)){
             return()
           }
-          print(table$partial_cred)
+          
           # merge rubric of all questions with table of submitted questions
           grades <- dplyr::left_join(rubric, table, by = "label") %>%
             # not needed for exams
@@ -239,7 +239,7 @@ lock_server <- function(id, num_blanks = TRUE,
                           partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
                           #calculate time since exam start
                           time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2))
-          print(grades$partial_cred)
+          
           # handle pts_possible 1) priority goes to manual setting 
           # 2) then to num_blanks setting 3) then default to 1
           if(isTRUE(num_blanks)){
@@ -336,14 +336,12 @@ lock_server <- function(id, num_blanks = TRUE,
           file.copy("data", tmp_dir, recursive = TRUE)
           # Need to load required datasets and packages
           file_names <- list.files("data", full.names=FALSE)
-          dataset_substring <- map(file_names, function(x){
+          dataset_substring <- purrr::map(file_names, function(x){
             if(grepl(".csv", x, fixed = TRUE)){
-              paste0(gsub(".csv", "", x), " <- read.csv(", gsub("\\\\", "/", tmp_dir), "/data/", x, ")")
-            }
-            if(grepl(".rds", x, fixed = TRUE)){
-              paste0(gsub(".rds", "", x), " <- read.rds(", gsub("\\\\", "/", tmp_dir), "/data/", x, ")")
-            }
-            if(grepl(".rda", x, fixed = TRUE)){
+              paste0(gsub(".csv", "", x), " <- read.csv('", gsub("\\\\", "/", tmp_dir), "/data/", x, "')")
+            }else if(grepl(".rds", x, fixed = TRUE)){
+              paste0(gsub(".rds", "", x), " <- read_rds('", gsub("\\\\", "/", tmp_dir), "/data/", x, "')")
+            }else if(grepl(".rda", x, fixed = TRUE)){
               paste0("load('", gsub("\\\\", "/", tmp_dir), "/data/", x, "')")
             }
           })
