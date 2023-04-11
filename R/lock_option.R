@@ -85,7 +85,6 @@ lock_server <- function(id, num_blanks = TRUE,
         # if session restarted get original start time or set start time to now
         start_time <<- ifelse(is.null(learnr:::get_object(session, NS("time", id = "start"))$data$time),
                               learnr:::timestamp_utc(), learnr:::get_object(session, NS("time", id = "start"))$data$time)
-
         # save original start time as object for restart
         learnr:::save_object(session, object_id = NS("time", id = "start"),
                              learnr:::tutorial_object("time",
@@ -229,7 +228,7 @@ lock_server <- function(id, num_blanks = TRUE,
           if(rlang::is_empty(table)){
             return()
           }
-          
+          print(table$partial_cred)
           # merge rubric of all questions with table of submitted questions
           grades <- dplyr::left_join(rubric, table, by = "label") %>%
             # not needed for exams
@@ -240,7 +239,7 @@ lock_server <- function(id, num_blanks = TRUE,
                           partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
                           #calculate time since exam start
                           time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2))
-          
+          print(grades$partial_cred)
           # handle pts_possible 1) priority goes to manual setting 
           # 2) then to num_blanks setting 3) then default to 1
           if(isTRUE(num_blanks)){
@@ -251,7 +250,8 @@ lock_server <- function(id, num_blanks = TRUE,
                 pts_earned = pts_possible * as.numeric(partial_cred),
                 pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
               )
-          }else{
+          }
+          if(isFALSE(num_blanks)){
             grades <- grades %>% 
               dplyr::mutate(
                 # set all questions to 1 point
