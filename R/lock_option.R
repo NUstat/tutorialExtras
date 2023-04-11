@@ -195,7 +195,7 @@ lock_server <- function(id, num_blanks = TRUE,
             
             # handle numeric 0 issues
             if(get_grades[[x]]$type == "question"){
-            get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred == 0), 
+            get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
                                                    NA, get_grades[[x]]$partial_cred)
             }
             
