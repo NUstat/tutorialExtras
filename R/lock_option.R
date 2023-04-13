@@ -266,8 +266,7 @@ lock_server <- function(id, num_blanks = TRUE,
           tmp_name <- ifelse("Name" %in% grades$label, 
                              grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
                              NA)
-          print(tmp_name)
-          print(is.na(tmp_name))
+          
           user_name <- ifelse(is.na(tmp_name), 
                               tutorial_info$user_id,
                               tmp_name
