@@ -180,15 +180,21 @@ question_ui_try_again.dropdown <- function(question, value, ...) {
 #' @export
 #' @seealso question_dropdown
 question_is_correct.dropdown <- function(question, value, ...) {
+  # for some reason question_wordbank is sometimes being put in question_dropdown...
+  defaultW <- getOption("warn") 
+  options(warn = -1) 
   
   for (ans in question$answers) {
-    if (as.character(ans$option) == value) {
+    #if (as.character(ans$option) == value) {
+    if (identical(as.character(ans$option), as.character(value) ) ) {
+      options(warn = defaultW)
       return(learnr::mark_as(
         ans$correct,
         ans$message
       ))
     }
   }
+  options(warn = defaultW)
   learnr::mark_as(FALSE, NULL)
 }
 
