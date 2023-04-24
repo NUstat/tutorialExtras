@@ -163,6 +163,12 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
   table_list <- map(names(get_grades), function(x){
     get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
     
+    # handle numeric 0 issues
+    if(get_grades[[x]]$type == "question"){
+      get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
+                                             NA, get_grades[[x]]$partial_cred)
+    }
+    
     store <- get_grades[[x]] %>% 
       tidyr::as_tibble()
     
@@ -174,18 +180,21 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
         store <- store %>% 
           dplyr::mutate(answer = answer_last,
                         correct = correct_last,
-                        timestamp = time_last) %>% 
+                        partial_cred = NA) %>% 
           dplyr::select(-c(answer_last, correct_last, time_last))
       }
     }
     # fix possible data typing errors
-    store %>% 
+    store %>%
       dplyr::mutate(label = as.character(label),
                     answer = as.character(answer),
-                    attempt = as.numeric(attempt))
+                    attempt = as.numeric(attempt),
+                    timestamp = time_last) %>% 
+      dplyr::select(-time_last)
   })
   # turn table_list into tibble
   table <- dplyr::bind_rows(table_list) 
+  
   # catch error - if empty do not continue
   if(rlang::is_empty(table)){
     return()
