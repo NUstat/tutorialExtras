@@ -181,7 +181,7 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
           dplyr::mutate(answer = answer_last,
                         correct = correct_last,
                         partial_cred = NA) %>% 
-          dplyr::select(-c(answer_last, correct_last, time_last))
+          dplyr::select(-c(answer_last, correct_last))
       }
     }
     # fix possible data typing errors
