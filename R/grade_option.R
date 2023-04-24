@@ -100,7 +100,7 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
           
           tab_html <- grade$calc %>%
             as.data.frame() %>%
-            dplyr::select(-c(type, answer, timestamp, deduction, time_last, partial_cred)) %>% 
+            dplyr::select(-c(type, answer, timestamp, deduction, partial_cred)) %>% 
             tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
                                                         tz = "America/Chicago",
                                                         usetz = TRUE), " - ",
@@ -163,6 +163,7 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
   table_list <- map(names(get_grades), function(x){
     get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
     
+    
     # handle numeric 0 issues
     if(get_grades[[x]]$type == "question"){
       get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
@@ -184,6 +185,7 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
           dplyr::select(-c(answer_last, correct_last))
       }
     }
+    
     # fix possible data typing errors
     store %>%
       dplyr::mutate(label = as.character(label),
@@ -193,7 +195,7 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
       dplyr::select(-time_last)
   })
   # turn table_list into tibble
-  table <- dplyr::bind_rows(table_list) 
+  table <- dplyr::bind_rows(table_list)
   
   # catch error - if empty do not continue
   if(rlang::is_empty(table)){
