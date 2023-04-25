@@ -156,13 +156,16 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
                             pts_possible = rep(1, length(label)) )
   }
   
-  
+  ##################################################################
   #this will get number of attempts and if correct
   get_grades <- isolate(learnr::get_tutorial_state())
   # create a list of each question/exercise
   table_list <- map(names(get_grades), function(x){
-    get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
     
+    # handle multiple answer issues
+    get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
+    
+    get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
     
     # handle numeric 0 issues
     if(get_grades[[x]]$type == "question"){

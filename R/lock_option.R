@@ -55,6 +55,24 @@ lock_button_ui <- function(id, label = "lock exam") {
   )
 }
 
+
+#' @title View exam submission output
+#'
+#' @description
+#' Obtain output for exam.
+#' @param id ID matching ui with server
+#' @param label Label for view button
+#' @export
+exam_output_ui <- function(id, label = "View submissions") {
+  ns <- NS(id)
+  
+  tagList(
+    actionButton( ns("viewExam"), label = label), 
+    tableOutput(ns("tblExam"))
+  )
+  
+}
+
 # Define the server logic for a module to lock and grade exam
 #' @title Exam lock and grade server
 #' @param id ID matching ui with server
@@ -111,6 +129,26 @@ lock_server <- function(id, num_blanks = TRUE,
         })
       })
       
+      ########################################################################
+      ########################################################################
+      # View grade
+      observeEvent(input$viewExam, {
+        table <- get_grades()$table
+        print(table)
+        if(rlang::is_empty(table)){
+          return()
+        }
+        
+        output$tblExam <- renderTable({
+          table %>% 
+            dplyr::select(label, answer)
+        }, caption = paste0("Unsubmitted questions/exercises will receive a 0."))
+        
+      })
+      
+      ########################################################################
+      ########################################################################
+      # lock exam and show download button
       # register that lock was pressed and reload exam to lock all questions
       observeEvent(input$lock, {
         ns <- getDefaultReactiveDomain()$ns
@@ -124,6 +162,9 @@ lock_server <- function(id, num_blanks = TRUE,
         session$reload()
         
       }) #close observe event
+      
+      ########################################################################
+      ########################################################################
       
       # Download grade handler
       output$downloadExam <- downloadHandler(
@@ -184,46 +225,48 @@ lock_server <- function(id, num_blanks = TRUE,
           #--------------------------------------------------------------------
           
           # get and organize all user submission questions and exercises
-          get_grades <- isolate(learnr::get_tutorial_state())
+          # get_grades <- isolate(learnr::get_tutorial_state())
+          # 
+          # # organize submissions in a list
+          # table_list <- map(names(get_grades), function(x){
+          #   # handle multiple answer issues
+          #   get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
+          #   
+          #   get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+          #   
+          #   # handle numeric 0 issues
+          #   if(get_grades[[x]]$type == "question"){
+          #   get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
+          #                                          NA, get_grades[[x]]$partial_cred)
+          #   }
+          #   
+          #   store <- get_grades[[x]] %>%
+          #     tidyr::as_tibble()
+          #   
+          #   store$label = x
+          #   
+          #   if(store$type == "exercise"){
+          #     #if this column exists proceed...
+          #     if("answer_last" %in% colnames(store)){
+          #       store <- store %>%
+          #         dplyr::mutate(answer = answer_last,
+          #                       correct = correct_last,
+          #                       partial_cred = NA) %>%
+          #                       #timestamp = time_last
+          #         dplyr::select(-c(answer_last, correct_last))
+          #     }
+          #   }
+          #   # fix possible data typing errors
+          #   store %>%
+          #     dplyr::mutate(label = as.character(label),
+          #                   answer = as.character(answer),
+          #                   attempt = as.numeric(attempt),
+          #                   timestamp = time_last) %>% 
+          #     dplyr::select(-time_last)
+          # })
+          # table <- dplyr::bind_rows(table_list)
           
-          # organize submissions in a list
-          table_list <- map(names(get_grades), function(x){
-            # handle multiple answer issues
-            get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
-            
-            get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
-            
-            # handle numeric 0 issues
-            if(get_grades[[x]]$type == "question"){
-            get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
-                                                   NA, get_grades[[x]]$partial_cred)
-            }
-            
-            store <- get_grades[[x]] %>%
-              tidyr::as_tibble()
-            
-            store$label = x
-            
-            if(store$type == "exercise"){
-              #if this column exists proceed...
-              if("answer_last" %in% colnames(store)){
-                store <- store %>%
-                  dplyr::mutate(answer = answer_last,
-                                correct = correct_last,
-                                partial_cred = NA) %>%
-                                #timestamp = time_last
-                  dplyr::select(-c(answer_last, correct_last))
-              }
-            }
-            # fix possible data typing errors
-            store %>%
-              dplyr::mutate(label = as.character(label),
-                            answer = as.character(answer),
-                            attempt = as.numeric(attempt),
-                            timestamp = time_last) %>% 
-              dplyr::select(-time_last)
-          })
-          table <- dplyr::bind_rows(table_list)
+          table <- get_grades()$table
           # # catch error - if empty do not continue
           if(rlang::is_empty(table)){
             return()
@@ -435,6 +478,51 @@ reset_server <- function(id) {
 } #close main function
 
 
-
+# need to calculate outside of observe event so that it can apply to download handler
+get_grades <- function(){
+  # get and organize all user submission questions and exercises
+  get_grades <- isolate(learnr::get_tutorial_state())
+  
+  # organize submissions in a list
+  table_list <- map(names(get_grades), function(x){
+    # handle multiple answer issues
+    get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
+    
+    get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
+    
+    # handle numeric 0 issues
+    if(get_grades[[x]]$type == "question"){
+      get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
+                                             NA, get_grades[[x]]$partial_cred)
+    }
+    
+    store <- get_grades[[x]] %>%
+      tidyr::as_tibble()
+    
+    store$label = x
+    
+    if(store$type == "exercise"){
+      #if this column exists proceed...
+      if("answer_last" %in% colnames(store)){
+        store <- store %>%
+          dplyr::mutate(answer = answer_last,
+                        correct = correct_last,
+                        partial_cred = NA) %>%
+          #timestamp = time_last
+          dplyr::select(-c(answer_last, correct_last))
+      }
+    }
+    # fix possible data typing errors
+    store %>%
+      dplyr::mutate(label = as.character(label),
+                    answer = as.character(answer),
+                    attempt = as.numeric(attempt),
+                    timestamp = time_last) %>% 
+      dplyr::select(-time_last)
+  })
+  table <- dplyr::bind_rows(table_list)
+  
+  return(table = table)
+}
 
 
