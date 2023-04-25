@@ -30,11 +30,12 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r, context = "server"}
 
-lock_server("lock0", graded = c("Q-2", "E-3"), graded_pts = c(2, 3))
+lock_server("lock0")
 reset_server("reset")
 ```
 
 ```{r}
+exam_output_ui(id = "lock0")
 lock_button_ui(id = "lock0")
 reset_button_ui(id = "reset")
 ```

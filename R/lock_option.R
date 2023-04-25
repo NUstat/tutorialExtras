@@ -133,17 +133,65 @@ lock_server <- function(id, num_blanks = TRUE,
       ########################################################################
       # View grade
       observeEvent(input$viewExam, {
+        ns <- getDefaultReactiveDomain()$ns
+        
+        tutorial_info <- isolate(get_tutorial_info())
+        #--------------------------------------------------------------------
+        
+        #define rubric points
+        if(!is.null(graded)){
+          rubric_1 <- tidyr::tibble(label = graded,
+                                    pts_possible = graded_pts,
+                                    eval = rep("question", length(label)))
+        }else{rubric_1 <- NULL}
+        if(!is.null(ex)){
+          rubric_2 <- tidyr::tibble(label = ex,
+                                    pts_possible = ex_pts,
+                                    eval = rep("exercise", length(label)))
+        }else{rubric_2 <- NULL}
+        if(!is.null(manual)){
+          rubric_3 <- tidyr::tibble(label = manual,
+                                    pts_possible = manual_pts,
+                                    eval = rep("manual", length(label)) )
+        }else{rubric_3 <- NULL}
+        
+        set_pts <- rbind(rubric_1, rubric_2, rubric_3)
+        
+        rubric_tmp <- tidyr::tibble(label = tutorial_info$items$label)
+        
+        if(!is.null(set_pts)){
+          rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label") #%>%
+          #mutate(pts_possible = ifelse(is.na(pts_possible), 1, pts_possible))
+        }else{
+          rubric <- rubric_tmp %>%
+            mutate(pts_possible = rep(NA, length(label)),
+                   eval = rep(NA, length(label)))
+        }
+        #Set up rubric points complete
+        #--------------------------------------------------------------------
+        
         get_grades <- isolate(learnr::get_tutorial_state())
-        print("click happened")
-        table <- ISDSfunctions:::submissions(get_grades = get_grades)$table
-        print(table)
+        
+        table <- ISDSfunctions:::submissions(get_grades = get_grades)
+        
         if(rlang::is_empty(table)){
           return()
         }
         
+        # merge rubric of all questions with table of submitted questions
+        grades <- dplyr::left_join(rubric, table, by = "label") %>%
+          # set question type for display
+          dplyr::mutate(eval = ifelse(!is.na(eval), eval,
+                                      ifelse(!is.na(type), type, eval)),
+                        partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
+                        #calculate time since exam start
+                        time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2)) %>% 
+          # view only unsubmitted
+          #filter(is.na(answer) | answer == "Not submitted" | is.na(eval)) %>% 
+          dplyr::select(label, answer)
+
         output$tblExam <- renderTable({
-          table %>% 
-            dplyr::select(label, answer)
+          grades
         }, caption = paste0("Unsubmitted questions/exercises will receive a 0."))
         
       })
@@ -225,10 +273,11 @@ lock_server <- function(id, num_blanks = TRUE,
           }
           #Set up rubric points complete
           #--------------------------------------------------------------------
-          print("click happened")
+          
           # get and organize all user submission questions and exercises
           get_grades <- isolate(learnr::get_tutorial_state())
-          table <- ISDSfunctions:::submissions(get_grades = get_grades)$table
+          table <- ISDSfunctions:::submissions(get_grades = get_grades)
+          
           # get_grades <- isolate(learnr::get_tutorial_state())
           # 
           # # organize submissions in a list
@@ -482,11 +531,8 @@ reset_server <- function(id) {
 
 
 # need to calculate outside of observe event so that it can apply to download handler
-submissions <- function(get_grades = NULL){
-  print("submission function triggered")
-  print(get_grades)
+submissions <- function(get_grades = list()){
   # get and organize all user submission questions and exercises
-  
   # organize submissions in a list
   table_list <- map(names(get_grades), function(x){
     # handle multiple answer issues

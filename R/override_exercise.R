@@ -71,7 +71,7 @@ setup_exercise_handler <- function(exercise_rx, session) {
                                FALSE, learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock))
     # get last submitted answer and info
     isolate(val$code <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$code),
-                               0, learnr:::get_object(session, ns("ex_submit"))$data$code))
+                               "Not Submitted", learnr:::get_object(session, ns("ex_submit"))$data$code))
     isolate(val$correct <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$correct),
                                   FALSE, learnr:::get_object(session, ns("ex_submit"))$data$correct))
     isolate(val$time <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$time),
@@ -217,7 +217,7 @@ setup_exercise_handler <- function(exercise_rx, session) {
         
         # get last submitted answer and info
         isolate(val$code <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$code),
-                                   0, learnr:::get_object(session, ns("ex_submit"))$data$code))
+                                   "Not Submitted", learnr:::get_object(session, ns("ex_submit"))$data$code))
         isolate(val$correct <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$correct),
                                    FALSE, learnr:::get_object(session, ns("ex_submit"))$data$correct))
         isolate(val$time <- ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$time),
