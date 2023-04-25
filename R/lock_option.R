@@ -133,7 +133,9 @@ lock_server <- function(id, num_blanks = TRUE,
       ########################################################################
       # View grade
       observeEvent(input$viewExam, {
-        table <- get_grades()$table
+        get_grades <- isolate(learnr::get_tutorial_state())
+        print("click happened")
+        table <- ISDSfunctions:::submissions(get_grades = get_grades)$table
         print(table)
         if(rlang::is_empty(table)){
           return()
@@ -223,8 +225,10 @@ lock_server <- function(id, num_blanks = TRUE,
           }
           #Set up rubric points complete
           #--------------------------------------------------------------------
-          
+          print("click happened")
           # get and organize all user submission questions and exercises
+          get_grades <- isolate(learnr::get_tutorial_state())
+          table <- ISDSfunctions:::submissions(get_grades = get_grades)$table
           # get_grades <- isolate(learnr::get_tutorial_state())
           # 
           # # organize submissions in a list
@@ -266,7 +270,6 @@ lock_server <- function(id, num_blanks = TRUE,
           # })
           # table <- dplyr::bind_rows(table_list)
           
-          table <- get_grades()$table
           # # catch error - if empty do not continue
           if(rlang::is_empty(table)){
             return()
@@ -479,9 +482,10 @@ reset_server <- function(id) {
 
 
 # need to calculate outside of observe event so that it can apply to download handler
-get_grades <- function(){
+submissions <- function(get_grades = NULL){
+  print("submission function triggered")
+  print(get_grades)
   # get and organize all user submission questions and exercises
-  get_grades <- isolate(learnr::get_tutorial_state())
   
   # organize submissions in a list
   table_list <- map(names(get_grades), function(x){
