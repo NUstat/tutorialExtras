@@ -291,20 +291,37 @@ lock_server <- function(id, num_blanks = TRUE,
           # get and organize all user submission questions and exercises
           get_grades <- isolate(learnr::get_tutorial_state())
           
+          print(get_grades)
           # for some reason sometimes it doesn't always grab exercises
           ex_names <- tutorial_info$items %>% 
             filter(type == "exercise") %>% 
             pull(label)
+          
+          print("all state objects")
+          print(isolate(learnr:::get_all_state_objects(session)))
+          add_ex <- list()
           for(ex in ex_names){
+            #print("get ex submission")
+            #print(isolate(learnr:::get_exercise_submission(session, ex)))
+            print("manually stored")
+            
             if(is.na(names(get_grades[ex]))){
               print("NA trigger")
               print(ex)
               # try to get it again and add to get_grades
-              get_grades[ex] <- isolate(learnr::get_tutorial_state(ex))
-              print(isolate(learnr::get_tutorial_state(ex)))
-              print(isolate(learnr:::get_exercise_submission(session, ex)))
+              ns <- NS(ex)
+              get_grades[ex] <- data.frame(type = "exercise",
+                           answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                           correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                           time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
+                           )
+              
+              #print(isolate(learnr::get_tutorial_state(ex)))
+              #print(isolate(learnr:::get_exercise_submission(session, ex)))
             }
           }
+          print('see if appended')
+          print(get_grades)
           
           table <- ISDSfunctions:::submissions(get_grades = get_grades)
           
