@@ -171,8 +171,24 @@ lock_server <- function(id, num_blanks = TRUE,
         #--------------------------------------------------------------------
         
         get_grades <- isolate(learnr::get_tutorial_state())
+        print("get grades")
+        print(get_grades)
+        
+        # for some reason sometimes it doesn't always grab exercises
+        ex_names <- tutorial_info$items %>% 
+          filter(type == "exercise") %>% 
+          pull(label)
+        for(ex in ex_names){
+          if(is.na(names(get_grades[ex]))){
+            # try to get it again and add to get_grades
+            get_grades[ex] <- isolate(learnr::get_tutorial_state(ex))
+          }
+        }
+        print("get grades again")
+        print(get_grades)
         
         table <- ISDSfunctions:::submissions(get_grades = get_grades)
+        
         
         if(rlang::is_empty(table)){
           return()
@@ -189,7 +205,7 @@ lock_server <- function(id, num_blanks = TRUE,
           # view only unsubmitted
           #filter(is.na(answer) | answer == "Not submitted" | is.na(eval)) %>% 
           dplyr::select(label, answer)
-
+        
         output$tblExam <- renderTable({
           grades
         }, caption = paste0("Unsubmitted questions/exercises will receive a 0."))
@@ -276,48 +292,21 @@ lock_server <- function(id, num_blanks = TRUE,
           
           # get and organize all user submission questions and exercises
           get_grades <- isolate(learnr::get_tutorial_state())
-          table <- ISDSfunctions:::submissions(get_grades = get_grades)
           
-          # get_grades <- isolate(learnr::get_tutorial_state())
-          # 
-          # # organize submissions in a list
-          # table_list <- map(names(get_grades), function(x){
-          #   # handle multiple answer issues
-          #   get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
-          #   
-          #   get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
-          #   
-          #   # handle numeric 0 issues
-          #   if(get_grades[[x]]$type == "question"){
-          #   get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
-          #                                          NA, get_grades[[x]]$partial_cred)
-          #   }
-          #   
-          #   store <- get_grades[[x]] %>%
-          #     tidyr::as_tibble()
-          #   
-          #   store$label = x
-          #   
-          #   if(store$type == "exercise"){
-          #     #if this column exists proceed...
-          #     if("answer_last" %in% colnames(store)){
-          #       store <- store %>%
-          #         dplyr::mutate(answer = answer_last,
-          #                       correct = correct_last,
-          #                       partial_cred = NA) %>%
-          #                       #timestamp = time_last
-          #         dplyr::select(-c(answer_last, correct_last))
-          #     }
-          #   }
-          #   # fix possible data typing errors
-          #   store %>%
-          #     dplyr::mutate(label = as.character(label),
-          #                   answer = as.character(answer),
-          #                   attempt = as.numeric(attempt),
-          #                   timestamp = time_last) %>% 
-          #     dplyr::select(-time_last)
-          # })
-          # table <- dplyr::bind_rows(table_list)
+          # for some reason sometimes it doesn't always grab exercises
+          ex_names <- tutorial_info$items %>% 
+            filter(type == "exercise") %>% 
+            pull(label)
+          for(ex in ex_names){
+            if(is.na(names(get_grades[ex]))){
+              # try to get it again and add to get_grades
+              get_grades[ex] <- isolate(learnr::get_tutorial_state(ex))
+            }
+          }
+          print("get grades again")
+          print(get_grades)
+          
+          table <- ISDSfunctions:::submissions(get_grades = get_grades)
           
           # # catch error - if empty do not continue
           if(rlang::is_empty(table)){
