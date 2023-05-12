@@ -301,6 +301,8 @@ lock_server <- function(id, num_blanks = TRUE,
               print(ex)
               # try to get it again and add to get_grades
               get_grades[ex] <- isolate(learnr::get_tutorial_state(ex))
+              print(isolate(learnr::get_tutorial_state(ex)))
+              print(isolate(learnr:::get_exercise_submission(session, ex)))
             }
           }
           
