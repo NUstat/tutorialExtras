@@ -291,19 +291,15 @@ lock_server <- function(id, num_blanks = TRUE,
           # get and organize all user submission questions and exercises
           get_grades <- isolate(learnr::get_tutorial_state())
           
-          print(get_grades)
           # for some reason sometimes it doesn't always grab exercises
           ex_names <- tutorial_info$items %>% 
             filter(type == "exercise") %>% 
             pull(label)
           
-          print("all state objects")
-          print(isolate(learnr:::get_all_state_objects(session)))
-          add_ex <- list()
+          #add_ex <- list()
           for(ex in ex_names){
             #print("get ex submission")
             #print(isolate(learnr:::get_exercise_submission(session, ex)))
-            print("manually stored")
             
             if(is.na(names(get_grades[ex]))){
               print("NA trigger")
