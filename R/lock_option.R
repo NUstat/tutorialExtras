@@ -171,8 +171,6 @@ lock_server <- function(id, num_blanks = TRUE,
         #--------------------------------------------------------------------
         
         get_grades <- isolate(learnr::get_tutorial_state())
-        print("get grades")
-        print(get_grades)
         
         # for some reason sometimes it doesn't always grab exercises
         ex_names <- tutorial_info$items %>% 
@@ -180,12 +178,12 @@ lock_server <- function(id, num_blanks = TRUE,
           pull(label)
         for(ex in ex_names){
           if(is.na(names(get_grades[ex]))){
+            print("NA trigger")
+            print(ex)
             # try to get it again and add to get_grades
             get_grades[ex] <- isolate(learnr::get_tutorial_state(ex))
           }
         }
-        print("get grades again")
-        print(get_grades)
         
         table <- ISDSfunctions:::submissions(get_grades = get_grades)
         
@@ -299,12 +297,12 @@ lock_server <- function(id, num_blanks = TRUE,
             pull(label)
           for(ex in ex_names){
             if(is.na(names(get_grades[ex]))){
+              print("NA trigger")
+              print(ex)
               # try to get it again and add to get_grades
               get_grades[ex] <- isolate(learnr::get_tutorial_state(ex))
             }
           }
-          print("get grades again")
-          print(get_grades)
           
           table <- ISDSfunctions:::submissions(get_grades = get_grades)
           
