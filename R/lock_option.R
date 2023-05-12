@@ -307,14 +307,14 @@ lock_server <- function(id, num_blanks = TRUE,
               print(isolate(learnr:::get_object(session, ns("ex_submit"))$data$code))
               # try to get it again and add to get_grades
               ns <- NS(ex)
-              ex <- list(type = "exercise",
+              add_ex <- list(type = "exercise",
                            answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
                            correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
                            time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
                            )
-              print(ex)
+              print(add_ex)
               
-              get_grades[ex]
+              get_grades[[ex]] <- add_ex
               #print(isolate(learnr::get_tutorial_state(ex)))
               #print(isolate(learnr:::get_exercise_submission(session, ex)))
             }
