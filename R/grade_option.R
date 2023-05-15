@@ -100,7 +100,8 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
           
           tab_html <- grade$calc %>%
             as.data.frame() %>%
-            dplyr::select(-c(type, answer, timestamp, deduction, partial_cred)) %>% 
+            #dplyr::select(-c(type, answer, timestamp, deduction, partial_cred)) %>% 
+            dplyr::select(label, pts_possible, correct, attempt, pts_earned) %>% 
             tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
                                                         tz = "America/Chicago",
                                                         usetz = TRUE), " - ",
