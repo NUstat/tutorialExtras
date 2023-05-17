@@ -310,7 +310,7 @@ lock_server <- function(id, num_blanks = TRUE,
                              answer = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
                              correct = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
                              time = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time),
-                             attempt = 1,
+                             attempt = isolate(learnr:::get_object(session, ns("count"))$data$numtry),
                              answer_last = answer,
                              correct_last = correct,
                              time_last = time
@@ -318,8 +318,7 @@ lock_server <- function(id, num_blanks = TRUE,
               print(add_ex)
               
               get_grades[[ex]] <- add_ex
-              #print(isolate(learnr::get_tutorial_state(ex)))
-              #print(isolate(learnr:::get_exercise_submission(session, ex)))
+              
             }
           }
           print('see if appended')
