@@ -304,14 +304,17 @@ lock_server <- function(id, num_blanks = TRUE,
             if(is.na(names(get_grades[ex]))){
               print("NA trigger")
               print(ex)
-              print(isolate(learnr:::get_object(session, ns("ex_submit"))$data$code))
               # try to get it again and add to get_grades
               ns <- NS(ex)
               add_ex <- list(type = "exercise",
-                           answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
-                           correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
-                           time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
-                           )
+                             answer = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                             correct = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                             time = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time),
+                             attempt = 1,
+                             answer_last = answer,
+                             correct_last = correct,
+                             time_last = time
+                            )
               print(add_ex)
               
               get_grades[[ex]] <- add_ex
