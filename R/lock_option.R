@@ -311,9 +311,9 @@ lock_server <- function(id, num_blanks = TRUE,
                              correct = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
                              time = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time),
                              attempt = isolate(learnr:::get_object(session, ns("count"))$data$numtry),
-                             answer_last = answer,
-                             correct_last = correct,
-                             time_last = time
+                             answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                             correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                             time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
                             )
               print(add_ex)
               
@@ -321,8 +321,6 @@ lock_server <- function(id, num_blanks = TRUE,
               
             }
           }
-          print('see if appended')
-          print(get_grades)
           
           table <- ISDSfunctions:::submissions(get_grades = get_grades)
           
