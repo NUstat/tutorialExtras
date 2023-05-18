@@ -186,10 +186,14 @@ lock_server <- function(id, num_blanks = TRUE,
             add_ex <- list(type = "exercise",
                            answer = 0,
                            correct = 0,
-                           attempt = isolate(learnr:::get_object(session, ns("count"))$data$numtry),
-                           answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
-                           correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
-                           time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
+                           attempt = isolate(ifelse(is.null(learnr:::get_object(session, ns("count"))$data$numtry),
+                                            0, learnr:::get_object(session, ns("count"))$data$numtry)),
+                           answer_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                                                        "Not Submitted", learnr:::get_object(session, ns("ex_submit"))$data$code)),
+                           correct_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                                                         FALSE, learnr:::get_object(session, ns("ex_submit"))$data$correct)),
+                           time_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$time),
+                                                      learnr:::timestamp_utc(), learnr:::get_object(session, ns("ex_submit"))$data$time))
             )
             get_grades[[ex]] <- add_ex
             
@@ -311,19 +315,21 @@ lock_server <- function(id, num_blanks = TRUE,
           
           for(ex in ex_names){
             if(is.na(names(get_grades[ex]))){
-              print("NA trigger")
-              print(ex)
               # if ex submission is not in get_grades
               # manually grab submission and add to get_grades
               ns <- NS(ex)
               add_ex <- list(type = "exercise",
                              answer = 0,
                              correct = 0,
-                             attempt = isolate(learnr:::get_object(session, ns("count"))$data$numtry),
-                             answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
-                             correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
-                             time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
-                            )
+                             attempt = isolate(ifelse(is.null(learnr:::get_object(session, ns("count"))$data$numtry),
+                                                      0, learnr:::get_object(session, ns("count"))$data$numtry)),
+                             answer_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                                                          "Not Submitted", learnr:::get_object(session, ns("ex_submit"))$data$code)),
+                             correct_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                                                           FALSE, learnr:::get_object(session, ns("ex_submit"))$data$correct)),
+                             time_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$time),
+                                                        learnr:::timestamp_utc(), learnr:::get_object(session, ns("ex_submit"))$data$time))
+              )
               get_grades[[ex]] <- add_ex
               
             }
