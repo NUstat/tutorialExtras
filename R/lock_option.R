@@ -172,21 +172,33 @@ lock_server <- function(id, num_blanks = TRUE,
         
         get_grades <- isolate(learnr::get_tutorial_state())
         
-        # for some reason sometimes it doesn't always grab exercises
+        #---------------------------------------------
+        # for some reason sometimes doesn't always grab exercises
         ex_names <- tutorial_info$items %>% 
           filter(type == "exercise") %>% 
           pull(label)
+        
         for(ex in ex_names){
           if(is.na(names(get_grades[ex]))){
-            print("NA trigger")
-            print(ex)
-            # try to get it again and add to get_grades
-            get_grades[ex] <- isolate(learnr::get_tutorial_state(ex))
+            # if ex submission is not in get_grades
+            # manually grab submission and add to get_grades
+            ns <- NS(ex)
+            add_ex <- list(type = "exercise",
+                           answer = 0,
+                           correct = 0,
+                           attempt = isolate(learnr:::get_object(session, ns("count"))$data$numtry),
+                           answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                           correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                           time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
+            )
+            get_grades[[ex]] <- add_ex
+            
           }
         }
+        # End grab exercise fix
+        #---------------------------------------------
         
         table <- ISDSfunctions:::submissions(get_grades = get_grades)
-        
         
         if(rlang::is_empty(table)){
           return()
@@ -222,7 +234,7 @@ lock_server <- function(id, num_blanks = TRUE,
                              learnr:::tutorial_object("lock",
                                                       list(lock = TRUE) ) )
         
-        # trigger a reload to resubmit questions and lock
+        # trigger a reload to resubmit questions forcing the lock
         session$reload()
         
       }) #close observe event
@@ -291,36 +303,33 @@ lock_server <- function(id, num_blanks = TRUE,
           # get and organize all user submission questions and exercises
           get_grades <- isolate(learnr::get_tutorial_state())
           
-          # for some reason sometimes it doesn't always grab exercises
+          #---------------------------------------------
+          # for some reason sometimes doesn't always grab exercises
           ex_names <- tutorial_info$items %>% 
             filter(type == "exercise") %>% 
             pull(label)
           
-          #add_ex <- list()
           for(ex in ex_names){
-            #print("get ex submission")
-            #print(isolate(learnr:::get_exercise_submission(session, ex)))
-            
             if(is.na(names(get_grades[ex]))){
               print("NA trigger")
               print(ex)
-              # try to get it again and add to get_grades
+              # if ex submission is not in get_grades
+              # manually grab submission and add to get_grades
               ns <- NS(ex)
               add_ex <- list(type = "exercise",
-                             answer = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
-                             correct = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
-                             time = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time),
+                             answer = 0,
+                             correct = 0,
                              attempt = isolate(learnr:::get_object(session, ns("count"))$data$numtry),
                              answer_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$code),
                              correct_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$correct),
                              time_last = isolate(learnr:::get_object(session, ns("ex_submit"))$data$time)
                             )
-              print(add_ex)
-              
               get_grades[[ex]] <- add_ex
               
             }
           }
+          # End grab exercise fix
+          #---------------------------------------------
           
           table <- ISDSfunctions:::submissions(get_grades = get_grades)
           
@@ -474,6 +483,8 @@ lock_server <- function(id, num_blanks = TRUE,
 } #close main function
 
 
+#################################################################
+#################################################################
 #---------------------------------------------------------------------------
 #---------------------------------------------------------------------------
 #' @title Tutorial reset button
@@ -533,8 +544,12 @@ reset_server <- function(id) {
       
     }) #close module server
 } #close main function
+#################################################################
+#################################################################
 
 
+#################################################################
+#################################################################
 # need to calculate outside of observe event so that it can apply to download handler
 submissions <- function(get_grades = list()){
   # get and organize all user submission questions and exercises
