@@ -43,7 +43,7 @@ determined based on the provided answers. Pass \code{"radio"} to indicate that
 even though multiple correct answers are specified that inputs which
 include only one correct answer are still correct. Pass \code{"checkbox"} to
 force the use of checkboxes (as opposed to radio buttons) even though only
-once correct answer was provided.}
+one correct answer was provided.}
 
 \item{correct}{For \code{question}, text to print for a correct answer (defaults
 to "Correct!"). For \code{answer}, a boolean indicating whether this answer is

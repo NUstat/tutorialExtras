@@ -8,7 +8,6 @@ output:
   ISDSfunctions::tutorial:
     progressive: false
     allow_skip: true
-    css: ["css/nu-theme.css"]
 runtime: shiny_prerendered
 description: >
   Learn the basics of Quarto.
@@ -24,12 +23,16 @@ gradethis_setup()
 
 isds_setup(isds_exam = TRUE)
 
+#exam_seed_ui(id = "seed")
+
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+```{r, context = "server-start"}
+#exam_seed_server(id = "seed")
+```
 
 ```{r, context = "server"}
-
 lock_server("lock0")
 reset_server("reset")
 ```
@@ -48,6 +51,11 @@ knit_hooks$set lets you create custom code chunk arguments
 **Exercise 1:**
 
 A code chunk can be used as a calculator. Try typing 2+2 into the code chunk and running the code.
+
+```{r, context = "render"}
+print(rnorm(1))
+```
+
 
 ```{r Ex1, exercise = TRUE, exercise.eval = TRUE}
 

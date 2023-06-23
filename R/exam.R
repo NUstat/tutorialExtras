@@ -42,31 +42,3 @@ exam <- function(..., caption = rlang::missing_arg(),
   class(ret) <- "tutorial_quiz"
   ret
 }
-
-# Does not work
-# empty ui for server to match and set the seed
-# exam_seed_ui <- function(id){
-#   
-# }
-# 
-# # server for initializing seed
-# exam_seed_server <- function(id) {
-#   moduleServer(
-#     id,
-#     function(input, output, session) {
-#       observeEvent(
-#         req(session$userData$learnr_state() == "restored"),{
-#           ns <- getDefaultReactiveDomain()$ns
-#           
-#           tutorial_info <- isolate(get_tutorial_info())
-#           attempt <- learnr:::get_object(session,  NS("seed", id = "seed"))$data$seed
-#           print(attempt)
-#           
-#           #print(paste0(tutorial_info$user_id, attempt))
-#           
-#           TeachingDemos::char2seed(paste0(tutorial_info$user_id, attempt))
-#           newseed <<- paste0(tutorial_info$user_id, attempt)
-#           #return(paste0(tutorial_info$user_id, attempt))
-#         })
-#     })
-# }
