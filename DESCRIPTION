@@ -23,6 +23,7 @@ Imports:
     rmarkdown (>= 1.12.0),
     shiny (>= 1.0),
     sortable,
+    stringi,
     stringr,
     tableHTML,
     TeachingDemos,
