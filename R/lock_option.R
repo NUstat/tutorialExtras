@@ -419,17 +419,21 @@ lock_server <- function(id, num_blanks = TRUE,
           
           score <- ifelse(nrow(graded) == 0, 0, sum(graded$pts_earned))
           
+          graded <- graded %>% select(-pts_earned) #remove pts earned
+          
           exercises <- grades %>%
             dplyr::filter(eval == "exercise") %>%
             transpose()
           
           manual <- grades %>%
             dplyr::filter(eval == "manual") %>%
-            dplyr::select(label, answer, time, pts_earned) 
+            dplyr::select(label, answer, time) 
+            #dplyr::select(label, answer, time, pts_earned) 
           
           incomplete <- grades %>%
             dplyr::filter(is.na(eval)) %>%
-            dplyr::select(label, answer, time, pts_earned) 
+            dplyr::select(label, answer, time) 
+          #dplyr::select(label, answer, time, pts_earned)
           
           #--------------------------------------------------------------------
           # Create string of each section header
@@ -565,6 +569,26 @@ reset_server <- function(id) {
         init.seed <- Sys.info()["user"]
         TeachingDemos::char2seed(paste0(init.seed, attempt))
         
+        #script <- list.files(pattern = "\\.Rmd$", full.names = TRUE)
+        #print(script)
+        
+        #print(file.path(rappdirs::user_data_dir(), "R", "learnr", "tutorial", "storage", Sys.info()["user"], learnr:::get_tutorial_info()$tutorial_id))
+        
+        # temp_directory <- tempdir()
+        # tutorial_storage_directory <- file.path(temp_directory, ".learnr")
+        # 
+        # script <- list.files(tutorial_storage_directory, full.names = TRUE)
+        # print(script)
+        # 
+        # 
+        # script2 <- list.files(file.path(rappdirs::user_data_dir(), "R", "learnr", "tutorial", "storage"), full.names = TRUE)
+        # print(script2)
+        # 
+        # 
+        # print(list.files(withr::local_tempdir()))
+        # NEED TO CLEAR PRERENDERED OUTPUT AND RERUN
+        
+        #learnr:::run_clean_tutorial_prerendered(tmp)
         session$reload()
         
       }) #close observe event

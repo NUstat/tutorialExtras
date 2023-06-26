@@ -5,7 +5,7 @@ tutorial:
   version: 0.1
   
 output:
-  ISDSfunctions::tutorial:
+  learnr::tutorial:
     progressive: false
     allow_skip: true
 runtime: shiny_prerendered
@@ -19,7 +19,12 @@ library(tidyverse)
 library(ISDSfunctions)
 library(gradethis)
 
-gradethis_setup()
+gradethis_setup(pass = "Submitted",
+                fail = "Submitted",
+                error_checker.message = "Submitted",
+                fail.hint = FALSE
+                )
+
 
 isds_setup(isds_exam = TRUE)
 
@@ -76,6 +81,8 @@ quiz(
            answer("18", correct = TRUE),
            answer("21"),
            allow_retry = TRUE,
+           correct = "Submitted",
+           incorrect = "Submitted",
            random_answer_order = TRUE) 
 )
 ```

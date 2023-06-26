@@ -1,6 +1,6 @@
 ---
 title: "Tutorial"
-output: masteryExams::tutorial
+output: ISDSfunctions::tutorial
 runtime: shiny_prerendered
 ---
 
