@@ -29,17 +29,12 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
                     stringi::stri_locate_last_fixed(tmp_dir, "\\")[,1])
   mod_dir <- stringr::str_sub(tmp_dir, end = end_dir)
   
-  print("load work?")
+  # get attempt if it exists
   if(file.exists(paste0(mod_dir,"attempt.RData"))){
     load(file = paste0(mod_dir,"attempt.RData"))
   }
   
-  
   attempt <<- ifelse(exists("attempt"), attempt, 1)
-  print("setting seed")
-  print(init.seed)
-  print(attempt)
-  print(tempdir())
   
   TeachingDemos::char2seed(paste0(init.seed, attempt))
   
@@ -552,33 +547,26 @@ reset_server <- function(id) {
         # clear all question and exercise cache?
         #learnr:::clear_tutorial_cache()
         
-        # save seed globally before removing objects
-        tmp_seed <<- learnr:::get_object(session,  NS("seed", id = "seed"))$data$seed
-        print(tmp_seed)
         # YES this resets all questions and exercises
         # this does NOT reset global variables
         learnr:::remove_all_objects(session)
         
-        # add one to saved seed to count retry attempts
-        # learnr:::save_object(session, NS("seed", id = "seed"),
-        #                      learnr:::tutorial_object("seed",
-        #                                               list(seed = tmp_seed + 1) ) )
-        #
         attempt <<- attempt + 1
         tmp_dir <- tempdir()
-        end_dir <- ifelse(!is.na(stringi::stri_locate_last_fixed(myString, "/")[,1]),
-                          stringi::stri_locate_last_fixed(myString, "/")[,1],
-                          stringi::stri_locate_last_fixed(myString, "\\")[,1])
+        end_dir <- ifelse(!is.na(stringi::stri_locate_last_fixed(tmp_dir, "/")[,1]),
+                          stringi::stri_locate_last_fixed(tmp_dir, "/")[,1],
+                          stringi::stri_locate_last_fixed(tmp_dir, "\\")[,1])
         mod_dir <- stringr::str_sub(tmp_dir, end = end_dir)
         
         save(attempt, file = paste0(mod_dir,"attempt.RData"))
-        print("retry clicked")
-        print(attempt)
         # trigger a reload to resubmit questions and unlock
+        
+        #set new seed
+        init.seed <- Sys.info()["user"]
+        TeachingDemos::char2seed(paste0(init.seed, attempt))
+        
         session$reload()
         
-        print("session reload")
-        print(attempt)
       }) #close observe event
       
       

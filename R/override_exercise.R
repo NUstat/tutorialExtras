@@ -837,7 +837,7 @@ install_knitr_hooks <- function() {
 # override exercise initial start
 .onAttach <- function(libname, pkgname) {
   install_knitr_hooks()
-  initialize_seed() # test below
+  #initialize_seed()
 }
 
 ################################################################################
@@ -846,38 +846,25 @@ install_knitr_hooks <- function() {
 ################################################################################
 ################################################################################
 
-#' Initialize tutorial R Markdown extensions
-#' @export
-initialize_seed <- function() {
-  # helper function for one time initialization
-  print("knitr.in.progress?")
-  print(isTRUE(getOption("knitr.in.progress")))
-  print("tutorial not initialized?")
-  print(!isTRUE(knitr::opts_knit$get("tutorial.initialized")))
-  # need to retrigger tutorial not initialized and knitr.in.progress
-  if (isTRUE(getOption("knitr.in.progress")) &&
-       !isTRUE(knitr::opts_knit$get("tutorial.initialized"))) {
-    
-    rmarkdown::shiny_prerendered_chunk(
-      'server',
-      'ISDSfunctions:::prepare_seed(session)',
-      singleton = TRUE
-    )
-  }
-}
+# Initialize tutorial R Markdown extensions
+# @export
+# initialize_seed <- function() {
+#   # helper function for one time initialization
+#   print("knitr.in.progress?")
+#   print(isTRUE(getOption("knitr.in.progress")))
+#   print("tutorial not initialized?")
+#   print(!isTRUE(knitr::opts_knit$get("tutorial.initialized")))
+#   # need to retrigger tutorial not initialized and knitr.in.progress
+#   if (isTRUE(getOption("knitr.in.progress")) &&
+#        !isTRUE(knitr::opts_knit$get("tutorial.initialized"))) {
+#     
+#     rmarkdown::shiny_prerendered_chunk(
+#       'server',
+#       'ISDSfunctions:::prepare_seed(session)',
+#       singleton = TRUE
+#     )
+#   }
+# }
 
 
-prepare_seed <- function(session) {
-  user_id <- learnr:::get_tutorial_info()$user_id
-  print(user_id)
-  val <- reactiveValues(
-    attempt = 1
-  )
-  # restore attempt counter
-  isolate(val$attempt <- ifelse(is.null(learnr:::get_object(session,  NS("seed", id = "seed"))$data$seed),
-                               1, learnr:::get_object(session,  NS("seed", id = "seed"))$data$seed))
-  
-  # set seed!
-  TeachingDemos::char2seed(paste0(user_id, isolate(val$attempt)), set = TRUE)
-}
     
