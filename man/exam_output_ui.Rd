@@ -4,7 +4,7 @@
 \alias{exam_output_ui}
 \title{View exam submission output}
 \usage{
-exam_output_ui(id, label = "View submissions")
+exam_output_ui(id, label = "Check submissions")
 }
 \arguments{
 \item{id}{ID matching ui with server}
