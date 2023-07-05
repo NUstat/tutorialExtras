@@ -79,7 +79,7 @@ lock_button_ui <- function(id, label = "lock exam") {
 #' @param id ID matching ui with server
 #' @param label Label for view button
 #' @export
-exam_output_ui <- function(id, label = "View submissions") {
+exam_output_ui <- function(id, label = "Check submissions") {
   ns <- NS(id)
   
   tagList(
@@ -124,18 +124,6 @@ lock_server <- function(id, num_blanks = TRUE,
                              learnr:::tutorial_object("time",
                                                       list(time = start_time) ) )
         
-        # get attempt number to set a seed; if no object then this is the first attempt
-        # user_id <- learnr:::get_tutorial_info()$user_id
-        # 
-        # tmp_seed <- ifelse(is.null(learnr:::get_object(session, NS("seed", id = "seed"))$data$seed),
-        #                       1, learnr:::get_object(session, NS("seed", id = "seed"))$data$seed)
-        # learnr:::save_object(session, NS("seed", id = "seed"),
-        #                      learnr:::tutorial_object("seed",
-        #                                               list(seed = as.numeric(tmp_seed)) ) )
-        # newseed <<- paste0(user_id, tmp_seed)
-        # print("seed working?")
-        # print(learnr:::get_object(session,  NS("seed", id = "seed"))$data$seed)
-         
         #show download button if lock is pressed
         output$dwnld <- renderUI({
           if(is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock)){
@@ -146,8 +134,10 @@ lock_server <- function(id, num_blanks = TRUE,
         })
       })
       
-      ########################################################################
-      ########################################################################
+########################################################################
+########################################################################
+########################################################################
+########################################################################
       # View grade
       observeEvent(input$viewExam, {
         ns <- getDefaultReactiveDomain()$ns
@@ -232,14 +222,20 @@ lock_server <- function(id, num_blanks = TRUE,
                                       ifelse(!is.na(type), type, eval)),
                         partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
                         #calculate time since exam start
-                        time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2)) %>% 
-          # view only unsubmitted
-          #filter(is.na(answer) | answer == "Not submitted" | is.na(eval)) %>% 
+                        time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2)) %>%
           dplyr::select(label, answer)
         
+        # only print unsubmitted
+        unsubmitted <- grades %>% 
+          filter(is.na(answer) | answer == "Not Submitted")
+        
+        caption <- ifelse(nrow(unsubmitted) == 0,
+                      "All questions and exercises have been submitted",
+                      "Unsubmitted questions/exercises will receive a 0.")
+        
         output$tblExam <- renderTable({
-          grades
-        }, caption = paste0("Unsubmitted questions/exercises will receive a 0."))
+          unsubmitted
+        }, caption = caption)
         
       })
       
