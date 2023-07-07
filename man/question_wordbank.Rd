@@ -35,8 +35,9 @@ If NULL then the wordbank will be set equal to the answer choices.}
 \item{box}{a number between 1 and 11, inclusive, indicating the width of the 'choices' box.
 The default is 6 which corresponds to 50\% of the page width.}
 
-\item{arrange}{either 'random' or 'ordered'; default is random. Set equal to ordered if
-you want the wordbank list to appear alphabetically.}
+\item{arrange}{either  'random', 'ordered' or 'none,; default is random. Set equal to ordered if
+you want the wordbank list to appear alphabetically. Set equal to none for the wordbank to appear exactly
+as provided.}
 
 \item{type}{Type of quiz question. Typically this can be automatically
 determined based on the provided answers. Pass \code{"radio"} to indicate that

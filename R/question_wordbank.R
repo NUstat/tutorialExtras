@@ -24,8 +24,9 @@
 #' @param choices a vector of choices that will remain stationary in the left column.
 #' @param wordbank a vector of choices to be placed into the blanks when providing more options than answers.
 #' If NULL then the wordbank will be set equal to the answer choices.
-#' @param arrange either 'random' or 'ordered'; default is random. Set equal to ordered if
-#' you want the wordbank list to appear alphabetically.
+#' @param arrange either  'random', 'ordered' or 'none,; default is random. Set equal to ordered if
+#' you want the wordbank list to appear alphabetically. Set equal to none for the wordbank to appear exactly
+#' as provided.
 #' @param box a number between 1 and 11, inclusive, indicating the width of the 'choices' box.
 #' The default is 6 which corresponds to 50% of the page width.
 #' @param ... parameters passed onto learnr answer.
@@ -129,8 +130,8 @@ wordbank_question <- function(
     stop("Box must be a number between 1 to 11, inclusive.")
   }
   # ensure arrange is correct
-  if (! arrange %in% c("random", "ordered")) {
-    stop("arrange must be either 'random' or 'ordered' ")
+  if (! arrange %in% c("random", "ordered", "none")) {
+    stop("arrange must be either 'random', 'ordered', or 'none' ")
   }
   # all correct answers must be an option in wordbank
   if (!all( answers[[1]]$option %in% c(wordbank,"answer","dummy","placeholder") ) ) {
@@ -217,8 +218,10 @@ question_ui_initialize.wordbank <- function(question, value, ...) {
   options <- question$wordbank
   if(question$arrange == "ordered"){
     labels <- sort(options)
-  }else{
+  } else if(question$arrange == "random"){
     labels <- sample(options, length(options))
+  } else{
+    labels <- options
   }
 
   num_bank = length(labels)
@@ -365,8 +368,10 @@ question_ui_completed.wordbank <- function(question, value, ...) {
   options <- question$wordbank
   if(question$arrange == "ordered"){
     labels <- sort(options)
-  }else{
+  } else if(question$arrange == "random"){
     labels <- sample(options, length(options))
+  } else{
+    labels <- options
   }
 
   num_bank = length(labels)

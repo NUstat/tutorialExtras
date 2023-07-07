@@ -4,7 +4,7 @@
 \alias{exam}
 \title{Tutorial exam}
 \usage{
-exam(..., caption = rlang::missing_arg(), shuffle = FALSE, randomize = FALSE)
+exam(..., caption = rlang::missing_arg(), shuffle = FALSE)
 }
 \arguments{
 \item{...}{One or more questions or answers}
@@ -12,8 +12,6 @@ exam(..., caption = rlang::missing_arg(), shuffle = FALSE, randomize = FALSE)
 \item{caption}{Optional quiz caption (defaults to "Quiz")}
 
 \item{shuffle}{Randomly shuffle the questions within quiz}
-
-\item{randomize}{Randomly select 1 question from each group}
 }
 \description{
 Add interactive exam questions to a tutorial.

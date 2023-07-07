@@ -6,17 +6,58 @@
 #' @param ... One or more questions or answers
 #' @param caption Optional quiz caption (defaults to "Quiz")
 #' @param shuffle Randomly shuffle the questions within quiz
-#' @param randomize Randomly select 1 question from each group
 #' @rdname quiz
 #' @export
 exam <- function(..., caption = rlang::missing_arg(), 
-                 shuffle = FALSE, randomize = FALSE) {
+                 shuffle = FALSE) {
   
   q_list <- list(...)
   
-  if(shuffle == TRUE){
-    q_list <- sample(q_list, length(q_list))
-  }
+  ###############################################################
+  # organize data to find which have multi_part and group options
+  ###############################################################
+  j <- 0
+  #figure out which questions need to be kept together.
+    multi_part <- lapply(q_list, function(x){
+      j <<- j+1
+      ifelse(!is.null(x[["options"]]$multi_part), x[["options"]]$multi_part, paste0("unique",j))
+    }
+    )
+    group <- lapply(q_list, function(x){
+      j <<- j+1
+      ifelse(!is.null(x[["options"]]$group), x[["options"]]$group, paste0("unique",j))
+    }
+    )
+    
+    df <- data.frame(q_list = I(q_list),
+                     multi_part = unlist(multi_part),
+                     group = unlist(group))
+    
+    
+    ############################
+    # sample 1 from each "group"
+    ############################
+    df <- df %>% 
+      group_by(group) %>% 
+      sample_n(1) %>% 
+      ungroup()
+    
+    q_list <- df$q_list
+    
+    ###########################################################
+    # shuffle the display order of questions
+    # keep multi-part questions next to each other
+    if(shuffle == TRUE){
+      #split data based on multi_part groups
+      grouped_df <- split(df, df$multi_part)
+      # Shuffle the groups
+      shuffled_groups <- sample(grouped_df)
+      # Combine the shuffled groups back into a single dataset
+      df <- do.call(rbind, shuffled_groups) 
+      #overwrite df so that we can set q_list regardless of shuffle
+    }
+    # set the q_list to the new order
+    q_list <- df$q_list
   
   # create table rows from questions
   index <- 1
