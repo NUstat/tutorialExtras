@@ -92,7 +92,8 @@ exam_output_ui <- function(id, label = "Check submissions") {
 # Define the server logic for a module to lock and grade exam
 #' @title Exam lock and grade server
 #' @param id ID matching ui with server
-#' @param num_blanks Set the number of points for a question equal to the number of blanks? Defualt TRUE.
+#' @param num_blanks TRUE/FALSE: Set the number of points for a question equal to the number of blanks. Default TRUE.
+#' @param show_correct TRUE/FALSE: Whether or not to show points for each question in grade output. Default TRUE.
 #' @param graded Either NULL or a vector containing the names of each question/exercise.
 #' @param graded_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in graded.
 #' @param ex Either NULL or a vector containing the names of each question/exercise.
@@ -102,7 +103,7 @@ exam_output_ui <- function(id, label = "Check submissions") {
 #' @param exclude Either NULL or a vector containing the names of each question/exercise to exclude from grading.
 #' @param tz Time zone to display start time on report.
 #' @export
-lock_server <- function(id, num_blanks = TRUE,
+lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                         graded = NULL, graded_pts = NULL, 
                         ex = NULL, ex_pts = NULL, 
                         manual = NULL, manual_pts = NULL,
@@ -239,8 +240,8 @@ lock_server <- function(id, num_blanks = TRUE,
         
       })
       
-      ########################################################################
-      ########################################################################
+########################################################################
+########################################################################
       # lock exam and show download button
       # register that lock was pressed and reload exam to lock all questions
       observeEvent(input$lock, {
@@ -256,8 +257,8 @@ lock_server <- function(id, num_blanks = TRUE,
         
       }) #close observe event
       
-      ########################################################################
-      ########################################################################
+########################################################################
+########################################################################
       
       # Download grade handler
       output$downloadExam <- downloadHandler(
@@ -415,7 +416,9 @@ lock_server <- function(id, num_blanks = TRUE,
           
           score <- ifelse(nrow(graded) == 0, 0, sum(graded$pts_earned))
           
-          graded <- graded %>% select(-pts_earned) #remove pts earned
+          if(show_correct == FALSE){
+            graded <- graded %>% select(-pts_earned) #remove pts earned
+          }
           
           exercises <- grades %>%
             dplyr::filter(eval == "exercise") %>%

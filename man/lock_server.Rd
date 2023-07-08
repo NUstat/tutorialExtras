@@ -7,6 +7,7 @@
 lock_server(
   id,
   num_blanks = TRUE,
+  show_correct = FALSE,
   graded = NULL,
   graded_pts = NULL,
   ex = NULL,
@@ -20,7 +21,9 @@ lock_server(
 \arguments{
 \item{id}{ID matching ui with server}
 
-\item{num_blanks}{Set the number of points for a question equal to the number of blanks? Defualt TRUE.}
+\item{num_blanks}{TRUE/FALSE: Set the number of points for a question equal to the number of blanks. Default TRUE.}
+
+\item{show_correct}{TRUE/FALSE: Whether or not to show points for each question in grade output. Default TRUE.}
 
 \item{graded}{Either NULL or a vector containing the names of each question/exercise.}
 
