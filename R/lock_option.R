@@ -273,14 +273,15 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           
           #error checking for label names provided
           #check if exclude list is valid
-          all_labels <- c(graded, ex, manual, exclude)
-          if(!is.null(all_labels)){
-            purrr::map(all_labels, function(x){
-              if(!(x %in% tutorial_info$items$label)){
-                stop(paste0(x, " is not a name of a question or exercise."))
-              }
-            })
-          }
+          #remove error checking because added random question selection
+          # all_labels <- c(graded, ex, manual, exclude)
+          # if(!is.null(all_labels)){
+          #   purrr::map(all_labels, function(x){
+          #     if(!(x %in% tutorial_info$items$label)){
+          #       stop(paste0(x, " is not a name of a question or exercise."))
+          #     }
+          #   })
+          # }
           # add error checking that length names match length points
           
           # Error checking complete
@@ -412,7 +413,9 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           # Divide into subsections for rendered report
           graded <- grades %>%
             dplyr::filter(eval == "question") %>%
-            dplyr::select(label, answer, time, pts_earned)
+            dplyr::select(answer, time, pts_earned)
+            #remove label for now because of shuffle option
+            #dplyr::select(label, answer, time, pts_earned)
           
           score <- ifelse(nrow(graded) == 0, 0, sum(graded$pts_earned))
           
