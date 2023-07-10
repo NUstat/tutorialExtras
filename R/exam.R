@@ -15,17 +15,17 @@ exam <- function(..., caption = rlang::missing_arg(),
   
   # label before shuffling so that you can set gradebook labels
   # create table rows from questions
-  index <- 1
-  q_list <- lapply(q_list, function(question) {
-    if (!is.null(question$label)) {
-      label <- paste(question$label, index, sep="-")
-      question$label <- label
-      question$ids$answer <- NS(label)("answer")
-      question$ids$question <- label
-      index <<- index + 1
-    }
-    question
-  })
+  # index <- 1
+  # q_list <- lapply(q_list, function(question) {
+  #   if (!is.null(question$label)) {
+  #     label <- paste(question$label, index, sep="-")
+  #     question$label <- label
+  #     question$ids$answer <- NS(label)("answer")
+  #     question$ids$question <- label
+  #     index <<- index + 1
+  #   }
+  #   question
+  # })
   
   ###############################################################
   # organize data to find which have multi_part and group options
@@ -70,20 +70,27 @@ exam <- function(..., caption = rlang::missing_arg(),
     }
     
     # set the question list to the new order
-    questions <- df$q_list
+    #questions <- df$q_list
   
-  # create table rows from questions
-  # index <- 1
-  # questions <- lapply(q_list, function(question) {
-  #   if (!is.null(question$label)) {
-  #     label <- paste(question$label, index, sep="-")
-  #     question$label <- label
-  #     question$ids$answer <- NS(label)("answer")
-  #     question$ids$question <- label
-  #     index <<- index + 1
-  #   }
-  #   question
-  # })
+    #create alt label for questions based on display order
+    index <- 1
+    questions <- lapply(df$q_list, function(question) {
+      # custom labels required if setting manual points for shuffled exam
+      if( !is.null(question$options$label)){
+          label <- paste(question$options$label)
+          question$label <- label
+          question$ids$answer <- NS(label)("answer")
+          question$ids$question <- label
+          index <<- index + 1
+      }else if (!is.null(question$label)) {
+          label <- paste(question$label, index, sep="-")
+          question$label <- label
+          question$ids$answer <- NS(label)("answer")
+          question$ids$question <- label
+          index <<- index + 1
+      }
+      question
+    })
   
   caption <-
     if (rlang::is_missing(caption)) {

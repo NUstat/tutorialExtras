@@ -412,10 +412,9 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           
           # Divide into subsections for rendered report
           graded <- grades %>%
-            dplyr::filter(eval == "question") %>%
-            dplyr::select(answer, time, pts_earned)
-            #remove label for now because of shuffle option
-            #dplyr::select(label, answer, time, pts_earned)
+            dplyr::filter(eval == "question") %>% 
+            dplyr::select(label, answer, time, pts_earned)
+            
           
           score <- ifelse(nrow(graded) == 0, 0, sum(graded$pts_earned))
           

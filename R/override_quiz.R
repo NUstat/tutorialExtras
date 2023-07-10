@@ -363,7 +363,6 @@ question_module_server_impl <- function(
       #Only record time when submitting - do not want to update every restart
       time_last = time_last,
       partial_cred = question$partial_cred
-      #partial_cred = partial_cred
     )
     question_state(current_answer_state)
   })
