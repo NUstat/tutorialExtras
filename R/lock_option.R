@@ -556,43 +556,12 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         # clear all question and exercise cache?
         # this does not work
         #print("clear tutorial cache?")
-        learnr:::clear_tutorial_cache()
-        
-        tutorial_info <- isolate(get_tutorial_info())
-        print(tutorial_info)
+        #learnr:::clear_tutorial_cache()
         
         # YES this resets all questions and exercises
         # this does NOT reset global variables
         # why doesn't this work for Posit Cloud?
         learnr:::remove_all_objects(session)
-        
-        
-        # attempting fix for posit cloud
-        # get the path to storage (ensuring that the directory exists)
-        # helpers to transform ids into valid filesystem paths
-        id_to_filesystem_path <- function(id) {
-          id <- gsub("..", "", id, fixed = TRUE)
-          utils::URLencode(id, reserved = TRUE, repeated = TRUE)
-        }
-        id_from_filesystem_path <- function(path) {
-          utils::URLdecode(path)
-        }
-        dir <- learnr:::get_tutorial_path(file_name, package_name)
-        storage_path <- function(tutorial_id, tutorial_version, user_id) {
-          path <- file.path(dir,
-                            id_to_filesystem_path(user_id),
-                            id_to_filesystem_path(tutorial_id),
-                            id_to_filesystem_path(tutorial_version))
-          if (!utils::file_test("-d", path))
-            dir.create(path, recursive = TRUE)
-          path
-        }
-        print("storage path")
-        objects_path <- storage_path(tutorial_info$tutorial_id, 
-                                     tutorial_info$tutorial_version, 
-                                     tutorial_info$user_id)
-        unlink(objects_path, recursive = TRUE)
-        print("unlink complete")
         
         
         # update attempt to set new seed
@@ -633,7 +602,7 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         
         # open new tutorial with everything cleared and pre-rendered!
         onSessionEnded(function() {
-          #window.close()
+          window.close()
           rstudioapi::jobRunScript(path = tmp_file)
           })
         # FINALLY!
