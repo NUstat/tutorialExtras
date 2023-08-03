@@ -11,7 +11,7 @@ reset_server(id, file_name = NULL, package_name = NULL)
 
 \item{file_name}{Name of the .Rmd file (not the tutorial id)}
 
-\item{package}{Name of the package with tutorial.}
+\item{package_name}{Name of the package with tutorial.}
 }
 \description{
 Tutorial reset server

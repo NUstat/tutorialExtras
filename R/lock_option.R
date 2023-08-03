@@ -546,7 +546,7 @@ reset_button_ui <- function(id, label = "retry exam") {
 #' @title Tutorial reset server
 #' @param id ID matching ui with server
 #' @param file_name Name of the .Rmd file (not the tutorial id)
-#' @param package Name of the package with tutorial.
+#' @param package_name Name of the package with tutorial.
 #' @export
 reset_server <- function(id, file_name = NULL, package_name = NULL) {
   moduleServer(
