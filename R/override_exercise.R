@@ -566,7 +566,7 @@ tutorial_knitr_options <- function() {
     if (exercise_chunk) {
       
       # one time tutor initialization
-      learnr:::initialize_tutorial()
+      learnr::initialize_tutorial()
       
       options$echo <- TRUE
       options$include <- TRUE

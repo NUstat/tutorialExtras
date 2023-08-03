@@ -586,9 +586,9 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         # we need this to clear the pre-rendered chunks.
         rmarkdown::shiny_prerendered_clean(files)
         
-        # can't runapp within an app
-        # workaround is to write a run_tutorial function in a .R script
-        # and run the script on session end
+        # can't run app within an app
+        # workaround is to write the run_tutorial function in a .R script
+        # and call the script on session end
         tmp_file <- tempfile(tmpdir = tmp_dir, fileext = ".R")
         # write to R file
         writeLines(paste0("learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"')"),
