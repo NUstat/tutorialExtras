@@ -558,22 +558,42 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         #print("clear tutorial cache?")
         learnr:::clear_tutorial_cache()
         
-        #tutorial_info <- isolate(get_tutorial_info())
+        tutorial_info <- isolate(get_tutorial_info())
+        print(tutorial_info)
         
         # YES this resets all questions and exercises
         # this does NOT reset global variables
         # why doesn't this work for Posit Cloud?
         learnr:::remove_all_objects(session)
         
-        objects_path <- learnr:::storage_path(tutorial_info$tutorial_id, 
+        
+        # attempting fix for posit cloud
+        # get the path to storage (ensuring that the directory exists)
+        # helpers to transform ids into valid filesystem paths
+        id_to_filesystem_path <- function(id) {
+          id <- gsub("..", "", id, fixed = TRUE)
+          utils::URLencode(id, reserved = TRUE, repeated = TRUE)
+        }
+        id_from_filesystem_path <- function(path) {
+          utils::URLdecode(path)
+        }
+        dir <- learnr:::get_tutorial_path(file_name, package_name)
+        storage_path <- function(tutorial_id, tutorial_version, user_id) {
+          path <- file.path(dir,
+                            id_to_filesystem_path(user_id),
+                            id_to_filesystem_path(tutorial_id),
+                            id_to_filesystem_path(tutorial_version))
+          if (!utils::file_test("-d", path))
+            dir.create(path, recursive = TRUE)
+          path
+        }
+        print("storage path")
+        objects_path <- storage_path(tutorial_info$tutorial_id, 
                                      tutorial_info$tutorial_version, 
                                      tutorial_info$user_id)
         unlink(objects_path, recursive = TRUE)
+        print("unlink complete")
         
-        # maybe this for cloud? no this is called by the main session
-        # leanr:::remove_all_objects(tutorial_info$tutorial_id, 
-        #                            tutorial_info$tutorial_version, 
-        #                            tutorial_info$user_id)
         
         # update attempt to set new seed
         attempt <<- attempt + 1
@@ -612,7 +632,10 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         session$close()
         
         # open new tutorial with everything cleared and pre-rendered!
-        onSessionEnded(rstudioapi::jobRunScript(path = tmp_file))
+        onSessionEnded(function() {
+          #window.close()
+          rstudioapi::jobRunScript(path = tmp_file)
+          })
         # FINALLY!
         
       }) #close observe event
