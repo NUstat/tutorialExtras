@@ -4,7 +4,7 @@
 \alias{reset_server}
 \title{Tutorial reset server}
 \usage{
-reset_server(id, file_name = NULL, package = NULL)
+reset_server(id, file_name = NULL, package_name = NULL)
 }
 \arguments{
 \item{id}{ID matching ui with server}
