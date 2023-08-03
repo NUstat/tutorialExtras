@@ -1,7 +1,7 @@
 # load isds_setup on load to prevent errors
 # user can define the options in setup
-# don't think we need this?
 .onLoad <- function(libname, pkgname) {
+  print("on load triggered")
   isds_setup()
 }
 
@@ -22,8 +22,6 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
   
   # need to set.seed that changes every "reattempt"
   init.seed <<- Sys.info()["user"]
-  print(Sys.info())
-  print(init.seed)
   
   tmp_dir <- tempdir()
   end_dir <- ifelse(!is.na(stringi::stri_locate_last_fixed(tmp_dir, "/")[,1]),
@@ -38,7 +36,7 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
   
   attempt <<- ifelse(exists("attempt"), attempt, 1)
   
-  print(attempt)
+  print(paste0(init.seed, attempt))
   
   TeachingDemos::char2seed(paste0(init.seed, attempt))
   
@@ -557,10 +555,12 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         
         # clear all question and exercise cache?
         # this does not work
-        #learnr:::clear_tutorial_cache()
+        print("clear tutorial cache?")
+        learnr:::clear_tutorial_cache()
         
         # YES this resets all questions and exercises
         # this does NOT reset global variables
+        # why doesn't this work for Posit Cloud?
         learnr:::remove_all_objects(session)
         
         # update attempt to set new seed
@@ -577,6 +577,8 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         #set new seed
         init.seed <- Sys.info()["user"]
         TeachingDemos::char2seed(paste0(init.seed, attempt))
+        
+        print(paste0(init.seed, attempt))
         
         # NEED TO CLEAR PRERENDERED OUTPUT AND RERUN
         # get tutorial path
