@@ -22,6 +22,8 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
   
   # need to set.seed that changes every "reattempt"
   init.seed <<- Sys.info()["user"]
+  print(Sys.info())
+  print(init.seed)
   
   tmp_dir <- tempdir()
   end_dir <- ifelse(!is.na(stringi::stri_locate_last_fixed(tmp_dir, "/")[,1]),
@@ -570,8 +572,12 @@ reset_server <- function(id) {
         init.seed <- Sys.info()["user"]
         TeachingDemos::char2seed(paste0(init.seed, attempt))
         
-        #script <- list.files(pattern = "\\.Rmd$", full.names = TRUE)
-        #print(script)
+        print(Sys.info())
+        
+        print(rappdirs::user_data_dir())
+        
+        script <- list.files(path = "rappdirs::user_data_dir()", full.names = TRUE)
+        print(script)
         
         #print(file.path(rappdirs::user_data_dir(), "R", "learnr", "tutorial", "storage", Sys.info()["user"], learnr:::get_tutorial_info()$tutorial_id))
         
