@@ -555,13 +555,19 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         
         # clear all question and exercise cache?
         # this does not work
-        print("clear tutorial cache?")
-        learnr:::clear_tutorial_cache()
+        #print("clear tutorial cache?")
+        #learnr:::clear_tutorial_cache()
+        
+        tutorial_info <- isolate(get_tutorial_info())
         
         # YES this resets all questions and exercises
         # this does NOT reset global variables
         # why doesn't this work for Posit Cloud?
         learnr:::remove_all_objects(session)
+        # maybe this for cloud?
+        leanr:::remove_all_objects(tutorial_info$tutorial_id, 
+                                   tutorial_info$tutorial_version, 
+                                   tutorial_info$user_id)
         
         # update attempt to set new seed
         attempt <<- attempt + 1
