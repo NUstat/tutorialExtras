@@ -4,10 +4,14 @@
 \alias{reset_server}
 \title{Tutorial reset server}
 \usage{
-reset_server(id)
+reset_server(id, file_name = NULL, package = NULL)
 }
 \arguments{
 \item{id}{ID matching ui with server}
+
+\item{file_name}{Name of the .Rmd file (not the tutorial id)}
+
+\item{package}{Name of the package with tutorial.}
 }
 \description{
 Tutorial reset server

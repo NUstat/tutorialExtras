@@ -38,6 +38,8 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
   
   attempt <<- ifelse(exists("attempt"), attempt, 1)
   
+  print(attempt)
+  
   TeachingDemos::char2seed(paste0(init.seed, attempt))
   
 }
@@ -543,8 +545,10 @@ reset_button_ui <- function(id, label = "retry exam") {
 # Define the server logic for a module to lock exam
 #' @title Tutorial reset server
 #' @param id ID matching ui with server
+#' @param file_name Name of the .Rmd file (not the tutorial id)
+#' @param package Name of the package with tutorial.
 #' @export
-reset_server <- function(id) {
+reset_server <- function(id, file_name = NULL, package_name = NULL) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -552,12 +556,14 @@ reset_server <- function(id) {
         ns <- getDefaultReactiveDomain()$ns
         
         # clear all question and exercise cache?
+        # this does not work
         #learnr:::clear_tutorial_cache()
         
         # YES this resets all questions and exercises
         # this does NOT reset global variables
         learnr:::remove_all_objects(session)
         
+        # update attempt to set new seed
         attempt <<- attempt + 1
         tmp_dir <- tempdir()
         end_dir <- ifelse(!is.na(stringi::stri_locate_last_fixed(tmp_dir, "/")[,1]),
@@ -565,38 +571,35 @@ reset_server <- function(id) {
                           stringi::stri_locate_last_fixed(tmp_dir, "\\")[,1])
         mod_dir <- stringr::str_sub(tmp_dir, end = end_dir)
         
-        save(attempt, file = paste0(mod_dir,"attempt.RData"))
+        save(attempt, file = paste0(mod_dir, "attempt.RData"))
         # trigger a reload to resubmit questions and unlock
         
         #set new seed
         init.seed <- Sys.info()["user"]
         TeachingDemos::char2seed(paste0(init.seed, attempt))
         
-        print(Sys.info())
-        
-        print(rappdirs::user_data_dir())
-        
-        script <- list.files(path = "rappdirs::user_data_dir()", full.names = TRUE)
-        print(script)
-        
-        #print(file.path(rappdirs::user_data_dir(), "R", "learnr", "tutorial", "storage", Sys.info()["user"], learnr:::get_tutorial_info()$tutorial_id))
-        
-        # temp_directory <- tempdir()
-        # tutorial_storage_directory <- file.path(temp_directory, ".learnr")
-        # 
-        # script <- list.files(tutorial_storage_directory, full.names = TRUE)
-        # print(script)
-        # 
-        # 
-        # script2 <- list.files(file.path(rappdirs::user_data_dir(), "R", "learnr", "tutorial", "storage"), full.names = TRUE)
-        # print(script2)
-        # 
-        # 
-        # print(list.files(withr::local_tempdir()))
         # NEED TO CLEAR PRERENDERED OUTPUT AND RERUN
+        # get tutorial path
+        rmd_path <- learnr:::get_tutorial_path(file_name, package_name)
+        files <- list.files(rmd_path, pattern = "\\.Rmd$", full.names = TRUE)
         
-        #learnr:::run_clean_tutorial_prerendered(tmp)
-        session$reload()
+        # we need this to clear the pre-rendered chunks.
+        rmarkdown::shiny_prerendered_clean(files)
+        
+        # can't runapp within an app
+        # workaround is to write a run_tutorial function in a .R script
+        # and run the script on session end
+        tmp_file <- tempfile(tmpdir = tmp_dir, fileext = ".R")
+        # write to R file
+        writeLines(paste0("learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"')"),
+                   con = tmp_file)
+        
+        # close the session
+        session$close()
+        
+        # open new tutorial with everything cleared and pre-rendered!
+        onSessionEnded(rstudioapi::jobRunScript(path = tmp_file))
+        # FINALLY!
         
       }) #close observe event
       

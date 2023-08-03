@@ -39,7 +39,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r, context = "server"}
 lock_server("lock0")
-reset_server("reset")
+reset_server("reset", file_name = "example", package_name = "ISDSfunctions")
 ```
 
 ```{r}
