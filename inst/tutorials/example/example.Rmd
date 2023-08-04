@@ -25,6 +25,11 @@ gradethis_setup(pass = "Submitted",
                 fail.hint = FALSE
                 )
 
+tutorial_options(
+  exercise.timelimit = 10,
+  exercise.diagnostics = FALSE
+)
+
 
 isds_setup(isds_exam = TRUE)
 

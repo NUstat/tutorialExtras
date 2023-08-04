@@ -557,11 +557,14 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         # this does not work
         #print("clear tutorial cache?")
         #learnr:::clear_tutorial_cache()
+        location <- learnr:::read_request(session, "tutorial.http_location")
+        print(learnr:::is_localhost(location))
         
         # YES this resets all questions and exercises
         # this does NOT reset global variables
         # why doesn't this work for Posit Cloud?
         learnr:::remove_all_objects(session)
+        #  tutorial.startOver() js code could help
         
         # update attempt to set new seed
         attempt <<- attempt + 1
