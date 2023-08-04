@@ -563,7 +563,6 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         # why doesn't this work for Posit Cloud?
         learnr:::remove_all_objects(session)
         
-        
         # update attempt to set new seed
         attempt <<- attempt + 1
         tmp_dir <- tempdir()
@@ -591,24 +590,25 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         
         # can't run app within an app
         # workaround is to write the run_tutorial function in a .R script
-        # and call the script on session end
+        # and call the script to run on session end
         tmp_file <- tempfile(tmpdir = tmp_dir, fileext = ".R")
         # write to R file
         writeLines(paste0("learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"')"),
                    con = tmp_file)
-        
+        ##############################################################
         # close the session
         session$close()
         
         # open new tutorial with everything cleared and pre-rendered!
         onSessionEnded(function() {
-          window.close()
-          rstudioapi::jobRunScript(path = tmp_file)
-          })
+           rstudioapi::jobRunScript(path = tmp_file)
+            # stop the old session after new one is open
+            Sys.sleep(15)
+            stopApp()
+        })
         # FINALLY!
         
       }) #close observe event
-      
       
     }) #close module server
 } #close main function
