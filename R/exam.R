@@ -1,31 +1,26 @@
 #' Tutorial exam
 #'
 #' @description
-#' Add interactive exam questions to a tutorial.
+#' Add interactive exam questions to a tutorial. The `exam()` function is copied from learnr::quiz
+#' and provides the same functionality with additional features. 
+#' 
+#' An optional shuffle argument allows for the questions to be displayed in a random order. 
+#' If a `question()` contains the argument `options(list(multi_part = "name")`, where "name" is any
+#' string identifier that groups multiple questions together, then the questions of the same "name" will be 
+#' displayed next to each other when shuffled.
+#' If a `question()` contains the argument `options(list(group = "name")` where "name" is any
+#' string identifier that groups multiple questions together, then 1 question will be randomly selected from
+#' the group set of type "name" allowing for varying exams/tutorials.
 #' 
 #' @param ... One or more questions or answers
 #' @param caption Optional quiz caption (defaults to "Quiz")
-#' @param shuffle Randomly shuffle the questions within quiz
+#' @param shuffle Randomly shuffle the questions within exam
 #' @rdname quiz
 #' @export
 exam <- function(..., caption = rlang::missing_arg(), 
                  shuffle = FALSE) {
   
   q_list <- list(...)
-  
-  # label before shuffling so that you can set gradebook labels
-  # create table rows from questions
-  # index <- 1
-  # q_list <- lapply(q_list, function(question) {
-  #   if (!is.null(question$label)) {
-  #     label <- paste(question$label, index, sep="-")
-  #     question$label <- label
-  #     question$ids$answer <- NS(label)("answer")
-  #     question$ids$question <- label
-  #     index <<- index + 1
-  #   }
-  #   question
-  # })
   
   ###############################################################
   # organize data to find which have multi_part and group options

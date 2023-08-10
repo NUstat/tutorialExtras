@@ -1,14 +1,17 @@
 #' @title Tutorial grade button
 #'
 #' @description
-#' Obtain grade on all question and exercise submissions for a user.
-#'
+#' View current grade and submission attempt on all question and exercises for a user.
+#' This is used so users can check their progress when working on a tutorial 
+#' that allows for multiple attempts, immediate feedback, and deductions after x attempts. 
+#' The user can download their grade to an html by including the `grade_print_ui()` function.
+#' 
 #' Shiny ui and server logic for the grade computation.
 #'
 #' Note that when including these functions in a learnr Rmd document it is necessary that
 #' the server function, `grade_server()`, be included in an R chunk where `context="server"` as
 #' they interact with the underlying Shiny functionality. Conversely, the ui function,
-#' `grade_ui()`, must *not* be included in an R chunk with a `context`.
+#' `grade_button_ui()`, must *not* be included in an R chunk with a `context`.
 #'
 #' @param id ID matching ui with server
 #' @param label Label to appear on the submit grade button
@@ -19,13 +22,23 @@
 grade_button_ui <- function(id, label = "View grade") {
   ns <- NS(id)
   tagList(
-    actionButton( ns("button"), label = label)
+    actionButton( ns("button"), label = label),
+    
+    tableOutput(ns("grade"))
   )
 }
 
 #' @title Tutorial print grade
 #' @description
-#' Obtain grade on all question and exercise submissions for a user.
+#' Download an html grade of the user's tutorial.
+#'
+#' Shiny ui and server logic for the grade computation.
+#'
+#' Note that when including these functions in a learnr Rmd document it is necessary that
+#' the server function, `grade_server()`, be included in an R chunk where `context="server"` as
+#' they interact with the underlying Shiny functionality. Conversely, the ui function,
+#' `grade_print_ui()`, must *not* be included in an R chunk with a `context`.
+#' 
 #' @param id ID matching ui with server
 #' @param label Label to appear on the button
 #' @export
@@ -33,25 +46,24 @@ grade_print_ui <- function(id, label = "Download Grade") {
   ns <- NS(id)
 
   tagList(
-    #actionButton( ns("printGrade"), label = "Download Grade"),
     downloadButton(ns("downloadHTML"), label)
   )
 }
 
-#' @title Tutorial grade output
-#'
-#' @description
-#' Obtain grade on all question and exercise submissions for a user.
-#' @param id ID matching ui with server
-#' @export
-grade_output_ui <- function(id) {
-  ns <- NS(id)
-
-  tagList(
-    tableOutput(ns("grade"))
-  )
-
-}
+# #' @title Tutorial grade output
+# #'
+# #' @description
+# #' Obtain grade on all question and exercise submissions for a user.
+# #' @param id ID matching ui with server
+# #' @export
+# grade_output_ui <- function(id) {
+#   ns <- NS(id)
+# 
+#   tagList(
+#     tableOutput(ns("grade"))
+#   )
+# 
+# }
 
 # Define the server logic for a module to compute grade
 #' @title Tutorial grade server
@@ -61,19 +73,20 @@ grade_output_ui <- function(id) {
 #' @param num_try Number of tries allowed before grade deduction on that question. Default is 3.
 #' @param deduction The percent (as a decimal) to be deducted for each additional incorrect attempt after num_try. Default is 0.1.
 #' @param exclude Either NULL or a vector of names of questions/exercises to exclude.
+#' @param tz Time zone to display start time on report.
 #'
 #' @export
-grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduction = 0.1, exclude = NULL ) {
+grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduction = 0.1, exclude = NULL, tz = Sys.timezone() ) {
   moduleServer(
     id,
     function(input, output, session) {
     # View grade
     observeEvent(input$button, {
-      grade <- grade_calc(id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
+      grade <- grade_calc(session = session, id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
       
       output$grade <- renderTable({
         grade$calc %>% 
-          dplyr::select(label, pts_possible, correct, attempt, pts_earned)
+          dplyr::select(label, pts_possible, attempt, pts_earned)
       }, caption = paste0('<span style=\"font-size:30px; font-weight:normal; color:red\">',
                           grade$scaled, "/10"))
       
@@ -92,7 +105,7 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
         content = function(file) {
           ns <- getDefaultReactiveDomain()$ns
           
-          grade <- grade_calc(id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
+          grade <- grade_calc(session = session, id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
           
           if(is.null(grade)){
             return()
@@ -100,10 +113,10 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
           
           tab_html <- grade$calc %>%
             as.data.frame() %>%
-            #dplyr::select(-c(type, answer, timestamp, deduction, partial_cred)) %>% 
-            dplyr::select(label, pts_possible, correct, attempt, pts_earned) %>% 
+            dplyr::select(label, pts_possible, attempt, pts_earned) %>% 
             tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
-                                                        tz = "America/Chicago",
+                                                        #tz = "America/Chicago",
+                                                        tz = tz,
                                                         usetz = TRUE), " - ",
                                                  #tutorial_info$user_id,
                                                  grade$user_name),
@@ -125,8 +138,12 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
     }) #close module server
   } #close main grade server
 
+
+#####################################################################################
+#####################################################################################
 # need to calculate outside of observe event so that it can apply to download handler
-grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduction = 0.1, exclude = NULL){
+grade_calc <- function(session = session, id, label = NULL, pts_possible = NULL, 
+                       num_try = 3, deduction = 0.1, exclude = NULL){
   ns <- getDefaultReactiveDomain()$ns
   
   tutorial_info <- isolate(get_tutorial_info())
@@ -160,52 +177,46 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
   ##################################################################
   #this will get number of attempts and if correct
   get_grades <- isolate(learnr::get_tutorial_state())
-  # create a list of each question/exercise
-  table_list <- map(names(get_grades), function(x){
-    
-    # handle multiple answer issues
-    get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
-    
-    get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
-    
-    # handle numeric 0 issues
-    if(get_grades[[x]]$type == "question"){
-      get_grades[[x]]$partial_cred <- ifelse(length(get_grades[[x]]$partial_cred) == 0, 
-                                             NA, get_grades[[x]]$partial_cred)
+  
+  #---------------------------------------------
+  # for some reason sometimes doesn't always grab exercises
+  # manually grab exercises just in case
+  ex_names <- tutorial_info$items %>% 
+    filter(type == "exercise") %>% 
+    pull(label)
+  
+  for(ex in ex_names){
+    if(is.na(names(get_grades[ex]))){
+      # if ex submission is not in get_grades
+      # manually grab submission and add to get_grades
+      ns <- NS(ex)
+      add_ex <- list(type = "exercise",
+                     answer = 0,
+                     correct = 0,
+                     attempt = isolate(ifelse(is.null(learnr:::get_object(session, ns("count"))$data$numtry),
+                                              0, learnr:::get_object(session, ns("count"))$data$numtry)),
+                     answer_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$code),
+                                                  "Not Submitted", learnr:::get_object(session, ns("ex_submit"))$data$code)),
+                     correct_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$correct),
+                                                   FALSE, learnr:::get_object(session, ns("ex_submit"))$data$correct)),
+                     time_last = isolate(ifelse(is.null(learnr:::get_object(session, ns("ex_submit"))$data$time),
+                                                learnr:::timestamp_utc(), learnr:::get_object(session, ns("ex_submit"))$data$time))
+      )
+      get_grades[[ex]] <- add_ex
+      
     }
-    
-    store <- get_grades[[x]] %>% 
-      tidyr::as_tibble()
-    
-    store$label = x
-    
-    if(store$type == "exercise"){
-      #if this column exists proceed...
-      if("answer_last" %in% colnames(store)){
-        store <- store %>% 
-          dplyr::mutate(answer = answer_last,
-                        correct = correct_last,
-                        partial_cred = NA) %>% 
-          dplyr::select(-c(answer_last, correct_last))
-      }
-    }
-    
-    # fix possible data typing errors
-    store %>%
-      dplyr::mutate(label = as.character(label),
-                    answer = as.character(answer),
-                    attempt = as.numeric(attempt),
-                    timestamp = time_last) %>% 
-      dplyr::select(-time_last)
-  })
-  # turn table_list into tibble
-  table <- dplyr::bind_rows(table_list)
+  }
+  # End grab exercise fix
+  #---------------------------------------------
+  
+  table <- ISDSfunctions:::submissions(get_grades = get_grades)
   
   # catch error - if empty do not continue
   if(rlang::is_empty(table)){
     return()
   }
   
+  # merge rubric of all questions with table of submitted questions
   grades <- dplyr::left_join(rubric, table, by = "label")
   
   calc <- grades %>% 
@@ -214,15 +225,17 @@ grade_calc <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduc
                   pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
                   pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
   
-  #if there is a code chunk question labeled "Name" get the name
+  # if there is a code chunk question labeled "Name" get the name
   user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
                       tutorial_info$user_id)
   
+  # exclude specified questions
   if(!is.null(exclude)){
     calc <- calc %>% 
       dplyr::filter(!(label %in% exclude))
   }
   
+  # grade out of 10
   scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
   
   return(list(calc = calc, scaled = scaled, 

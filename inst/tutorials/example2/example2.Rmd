@@ -23,7 +23,6 @@ library(gradethis)
 
 gradethis_setup()
 
-isds_setup(isds_exam = TRUE)
 
 knitr::opts_chunk$set(echo = FALSE)
 
@@ -31,22 +30,23 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r, context = "server"}
-
-lock_server("lock0", graded = c("Q-2", "E-3"), graded_pts = c(2, 3))
-reset_server("reset")
+grade_server("grade")
 ```
+
+<!-- ```{r, context = "server"} -->
+
+<!-- lock_server("lock0", graded = c("Q-2", "E-3"), graded_pts = c(2, 3)) -->
+<!-- reset_server("reset") -->
+<!-- ``` -->
 
 ```{r}
-# grade_button_ui(id = "grade")
+grade_button_ui(id = "grade")
+grade_print_ui(id = "grade")
 # grade_output_ui(id = "grade")
-
-lock_button_ui(id = "lock0")
-reset_button_ui(id = "reset")
+# 
+# lock_button_ui(id = "lock0")
+# reset_button_ui(id = "reset")
 ```
-
-<!-- ```{r Ex1b, context = "render", echo= TRUE, exercise = FALSE} -->
-<!-- 1+2 -->
-<!-- ``` -->
 
 ```{r, Name}
 question_blank("Name: ___",

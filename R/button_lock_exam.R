@@ -1,61 +1,14 @@
-# load isds_setup on load to prevent errors
-# user can define the options in setup
-.onLoad <- function(libname, pkgname) {
-  print("on load triggered")
-  isds_setup()
-}
-
-#' @title ISDS setup variables
-#'
-#' @description
-#' Define if the tutorial is an exam and if there is a max_attempt limit on quiz questions
-#' 
-#' @param isds_exam defaults to FALSE. If the tutorial is an exam with a lock button set to TRUE.
-#' @param max_attempt stop allowing submits if max_attempt is reached.
-#'
-#' @export
-isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
-  #hacky less than optimal solution
-  #setting global variables accessible to override_exercise and override_quiz
-  isds_exam <<- isds_exam
-  max_attempt <<- max_attempt
-  
-  # storage must be local for reset option to work
-  options(tutorial.storage = "local")
-  
-  # need to set.seed that changes every "reattempt"
-  init.seed <<- Sys.info()["user"]
-  
-  tmp_dir <- tempdir()
-  end_dir <- ifelse(!is.na(stringi::stri_locate_last_fixed(tmp_dir, "/")[,1]),
-                    stringi::stri_locate_last_fixed(tmp_dir, "/")[,1],
-                    stringi::stri_locate_last_fixed(tmp_dir, "\\")[,1])
-  mod_dir <- stringr::str_sub(tmp_dir, end = end_dir)
-  
-  # get attempt if it exists
-  if(file.exists(paste0(mod_dir,"attempt.RData"))){
-    load(file = paste0(mod_dir,"attempt.RData"))
-  }
-  
-  attempt <<- ifelse(exists("attempt"), attempt, 1)
-  
-  print(paste0(init.seed, attempt))
-  
-  TeachingDemos::char2seed(paste0(init.seed, attempt))
-  
-}
-
-################################################################################
-################################################################################
-################################################################################
-################################################################################
-################################################################################
-
 #' @title Tutorial lock button
 #'
 #' @description
-#' Lock all "submit" buttons.
+#' Lock all "submit" buttons. This is used when the user can re-try questions and will
+#' not receive feedback until they submit the entire tutorial. This will not technically
+#' "lock" the exercise submit buttons, however, it does prevent the saving of any further 
+#' exercise attempts. Once the tutorial is locked a download option will appear.
 #'
+#' It is recommended that 'exam_check_ui()' is included before the lock button so users
+#' can check if they forgot to submit any questions or exercises.
+#' 
 #' Shiny ui and server logic for the lock computation.
 #'
 #' Note that when including these functions in a learnr Rmd document it is necessary that
@@ -66,7 +19,6 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
 #' @param id ID matching ui with server
 #' @param label Label to appear on the submit grade button
 #'
-#'
 #' @export
 lock_button_ui <- function(id, label = "lock exam") {
   ns <- NS(id)
@@ -76,15 +28,14 @@ lock_button_ui <- function(id, label = "lock exam") {
   )
 }
 
-
-#' @title View exam submission output
+#' @title Check Exam Submission
 #'
 #' @description
-#' Obtain output for exam.
-#' @param id ID matching ui with server
+#' View if any questions or exercises have not been submitted prior to locking the exam.
+#' @param id ID matching ui with "lock_server()"
 #' @param label Label for view button
 #' @export
-exam_output_ui <- function(id, label = "Check submissions") {
+exam_check_ui <- function(id, label = "Check submissions") {
   ns <- NS(id)
   
   tagList(
@@ -123,13 +74,22 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         ns <- getDefaultReactiveDomain()$ns
         
         # if session restarted get original start time or set start time to now
-        start_time <<- ifelse(is.null(learnr:::get_object(session, NS("time", id = "start"))$data$time),
-                              learnr:::timestamp_utc(), learnr:::get_object(session, NS("time", id = "start"))$data$time)
+        # if user clicks "start over" we do not want time to restart
+        #start_time <<- ifelse(is.null(learnr:::get_object(session, NS("time", id = "start"))$data$time),
+        #                      learnr:::timestamp_utc(), learnr:::get_object(session, NS("time", id = "start"))$data$time)
         # save original start time as object for restart
-        learnr:::save_object(session, object_id = NS("time", id = "start"),
-                             learnr:::tutorial_object("time",
-                                                      list(time = start_time) ) )
+        #learnr:::save_object(session, object_id = NS("time", id = "start"),
+        #                     learnr:::tutorial_object("time",
+        #                                              list(time = start_time) ) )
         
+        # get time if it exists
+        if(file.exists(paste0(mod_dir,"time.RData"))){
+          load(file = paste0(mod_dir,"time.RData"))
+        }
+        start_time <<- ifelse(exists("start_time"), start_time, learnr:::timestamp_utc())
+        save(start_time, file = paste0(mod_dir, "time.RData"))
+        
+        ###################################################################################
         #show download button if lock is pressed
         output$dwnld <- renderUI({
           if(is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock)){
@@ -187,6 +147,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
         #---------------------------------------------
         # for some reason sometimes doesn't always grab exercises
+        # manually grab exercises just in case
         ex_names <- tutorial_info$items %>% 
           filter(type == "exercise") %>% 
           pull(label)
@@ -231,7 +192,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                         time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2)) %>%
           dplyr::select(label, answer)
         
-        # only print unsubmitted
+        # only print unsubmitted questions/exercises
         unsubmitted <- grades %>% 
           filter(is.na(answer) | answer == "Not Submitted")
         
@@ -513,115 +474,6 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
       
     }) #close module server
 } #close main function
-
-
-#################################################################
-#################################################################
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
-#' @title Tutorial reset button
-#'
-#' @description
-#' Reset the entire exam to allow another attempt.
-#'
-#' Shiny ui and server logic for the lock computation.
-#'
-#' Note that when including these functions in a learnr Rmd document it is necessary that
-#' the server function, `reset_server()`, be included in an R chunk where `context="server"` as
-#' they interact with the underlying Shiny functionality. Conversely, the ui function,
-#' `reset_button_ui()`, must *not* be included in an R chunk with a `context`.
-#'
-#' @param id ID matching ui with server
-#' @param label Label to appear on the submit grade button
-#'
-#'
-#' @export
-reset_button_ui <- function(id, label = "Retry Exam") {
-  ns <- NS(id)
-  tagList(
-    #actionButton( ns("reset2"), label = label),
-    tags$button(
-      id = ns('reset'),
-      type = "button",
-      class = "btn action-button",
-      onclick = "setTimeout(function(){window.close();},5000);",  # close browser
-      label
-    )
-  )
-}
-
-# Define the server logic for a module to lock exam
-#' @title Tutorial reset server
-#' @param id ID matching ui with server
-#' @param file_name Name of the .Rmd file (not the tutorial id)
-#' @param package_name Name of the package with tutorial.
-#' @export
-reset_server <- function(id, file_name = NULL, package_name = NULL) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      observeEvent(input$reset, {
-        ns <- getDefaultReactiveDomain()$ns
-        
-        ##########################################################
-        # YES this resets all questions and exercises
-        # this does NOT reset global variables
-        # must have storage set to LOCAL or won't work on Posit Cloud/Shiny.io
-        learnr:::remove_all_objects(session)
-        
-        # update attempt to set new seed
-        attempt <<- attempt + 1
-        tmp_dir <- tempdir()
-        end_dir <- ifelse(!is.na(stringi::stri_locate_last_fixed(tmp_dir, "/")[,1]),
-                          stringi::stri_locate_last_fixed(tmp_dir, "/")[,1],
-                          stringi::stri_locate_last_fixed(tmp_dir, "\\")[,1])
-        mod_dir <- stringr::str_sub(tmp_dir, end = end_dir)
-        
-        save(attempt, file = paste0(mod_dir, "attempt.RData"))
-        # trigger a reload to resubmit questions and unlock
-        
-        #set new seed
-        init.seed <- Sys.info()["user"]
-        TeachingDemos::char2seed(paste0(init.seed, attempt))
-        
-        print(paste0(init.seed, attempt))
-        
-        # NEED TO CLEAR PRERENDERED OUTPUT AND RERUN
-        # get tutorial path
-        rmd_path <- learnr:::get_tutorial_path(file_name, package_name)
-        files <- list.files(rmd_path, pattern = "\\.Rmd$", full.names = TRUE)
-        
-        # we need this to clear the pre-rendered chunks.
-        rmarkdown::shiny_prerendered_clean(files)
-        
-        # can't run app within an app
-        # workaround is to write the run_tutorial function in a .R script
-        # and call the script to run on session end
-        tmp_file <- tempfile(tmpdir = tmp_dir, fileext = ".R")
-        # write to R file
-        writeLines(paste0("learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"')"),
-                   con = tmp_file)
-        #writeLines(paste0("job::job(learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"'))"),
-        #           con = tmp_file)
-        ##############################################################
-        # close the session
-        session$close()
-        
-        # open new tutorial with everything cleared and pre-rendered!
-        onSessionEnded(function() {
-           rstudioapi::jobRunScript(path = tmp_file)
-            # stop the old session after new one is open
-            Sys.sleep(10)
-            stopApp()
-        })
-        # FINALLY!
-        
-      }) #close observe event
-      
-    }) #close module server
-} #close main function
-#################################################################
-#################################################################
 
 
 #################################################################

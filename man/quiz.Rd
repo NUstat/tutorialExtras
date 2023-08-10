@@ -11,8 +11,17 @@ exam(..., caption = rlang::missing_arg(), shuffle = FALSE)
 
 \item{caption}{Optional quiz caption (defaults to "Quiz")}
 
-\item{shuffle}{Randomly shuffle the questions within quiz}
+\item{shuffle}{Randomly shuffle the questions within exam}
 }
 \description{
-Add interactive exam questions to a tutorial.
+Add interactive exam questions to a tutorial. The \code{exam()} function is copied from learnr::quiz
+and provides the same functionality with additional features.
+
+An optional shuffle argument allows for the questions to be displayed in a random order.
+If a \code{question()} contains the argument \verb{options(list(multi_part = "name")}, where "name" is any
+string identifier that groups multiple questions together, then the questions of the same "name" will be
+displayed next to each other when shuffled.
+If a \code{question()} contains the argument \verb{options(list(group = "name")} where "name" is any
+string identifier that groups multiple questions together, then 1 question will be randomly selected from
+the group set of type "name" allowing for varying exams/tutorials.
 }
