@@ -561,41 +561,42 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         #print(learnr:::is_localhost(location))
         
         #############################################
+        # NOPE
         #objects_path <- storage_path(tutorial_id, tutorial_version, user_id)
         #unlink(objects_path, recursive = TRUE)
         
-        tutorial_info <- isolate(get_tutorial_info())
-        tutorial_id <- tutorial_info$tutorial_id
-        
-        tutorial_version <- tutorial_info$tutorial_version
-        
-        tutorial_context_id <- function(tutorial_id, tutorial_version) {
-          paste(tutorial_id, tutorial_version, sep = "-")
-        }
-        object_store <- function(context_id) {
-          
-          # create session objects on demand
-          session_objects <- learnr:::read_request(session, "tutorial.session_objects")
-          if (is.null(session_objects)) {
-            session_objects <- new.env(parent = emptyenv())
-            learnr:::write_request(session, "tutorial.session_objects", session_objects)
-          }
-          
-          # create entry for this context on demand
-          if (!exists(context_id, envir = session_objects))
-            assign(context_id, new.env(parent = emptyenv()), envir = session_objects)
-          store <- get(context_id, envir = session_objects)
-          
-          # return reference to the store
-          store
-        }
-        
-        context_id <- tutorial_context_id(tutorial_id, tutorial_version)
-        store <- object_store(context_id)
-        print(context_id)
-        print(store)
-        
-        rm(list = ls(store), envir = store)
+        # tutorial_info <- isolate(get_tutorial_info())
+        # tutorial_id <- tutorial_info$tutorial_id
+        # 
+        # tutorial_version <- tutorial_info$tutorial_version
+        # 
+        # tutorial_context_id <- function(tutorial_id, tutorial_version) {
+        #   paste(tutorial_id, tutorial_version, sep = "-")
+        # }
+        # object_store <- function(context_id) {
+        #   
+        #   # create session objects on demand
+        #   session_objects <- learnr:::read_request(session, "tutorial.session_objects")
+        #   if (is.null(session_objects)) {
+        #     session_objects <- new.env(parent = emptyenv())
+        #     learnr:::write_request(session, "tutorial.session_objects", session_objects)
+        #   }
+        #   
+        #   # create entry for this context on demand
+        #   if (!exists(context_id, envir = session_objects))
+        #     assign(context_id, new.env(parent = emptyenv()), envir = session_objects)
+        #   store <- get(context_id, envir = session_objects)
+        #   
+        #   # return reference to the store
+        #   store
+        # }
+        # 
+        # context_id <- tutorial_context_id(tutorial_id, tutorial_version)
+        # store <- object_store(context_id)
+        # print(context_id)
+        # print(store)
+        # 
+        # rm(list = ls(store), envir = store)
         
         ##########################################################
         
