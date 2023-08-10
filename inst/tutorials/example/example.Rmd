@@ -30,7 +30,6 @@ tutorial_options(
   exercise.diagnostics = FALSE
 )
 
-
 isds_setup(isds_exam = TRUE)
 
 #exam_seed_ui(id = "seed")

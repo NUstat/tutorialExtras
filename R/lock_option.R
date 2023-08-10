@@ -20,6 +20,9 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = NULL){
   isds_exam <<- isds_exam
   max_attempt <<- max_attempt
   
+  # storage must be local for reset option to work
+  options(tutorial.storage = "local")
+  
   # need to set.seed that changes every "reattempt"
   init.seed <<- Sys.info()["user"]
   
@@ -533,10 +536,17 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
 #'
 #'
 #' @export
-reset_button_ui <- function(id, label = "retry exam") {
+reset_button_ui <- function(id, label = "Retry Exam") {
   ns <- NS(id)
   tagList(
-    actionButton( ns("reset"), label = label)
+    #actionButton( ns("reset2"), label = label),
+    tags$button(
+      id = ns('reset'),
+      type = "button",
+      class = "btn action-button",
+      onclick = "setTimeout(function(){window.close();},5000);",  # close browser
+      label
+    )
   )
 }
 
@@ -553,58 +563,11 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
       observeEvent(input$reset, {
         ns <- getDefaultReactiveDomain()$ns
         
-        # clear all question and exercise cache?
-        # this does not work
-        #print("clear tutorial cache?")
-        #learnr:::clear_tutorial_cache()
-        #location <- learnr:::read_request(session, "tutorial.http_location")
-        #print(learnr:::is_localhost(location))
-        
-        #############################################
-        # NOPE
-        #objects_path <- storage_path(tutorial_id, tutorial_version, user_id)
-        #unlink(objects_path, recursive = TRUE)
-        
-        # tutorial_info <- isolate(get_tutorial_info())
-        # tutorial_id <- tutorial_info$tutorial_id
-        # 
-        # tutorial_version <- tutorial_info$tutorial_version
-        # 
-        # tutorial_context_id <- function(tutorial_id, tutorial_version) {
-        #   paste(tutorial_id, tutorial_version, sep = "-")
-        # }
-        # object_store <- function(context_id) {
-        #   
-        #   # create session objects on demand
-        #   session_objects <- learnr:::read_request(session, "tutorial.session_objects")
-        #   if (is.null(session_objects)) {
-        #     session_objects <- new.env(parent = emptyenv())
-        #     learnr:::write_request(session, "tutorial.session_objects", session_objects)
-        #   }
-        #   
-        #   # create entry for this context on demand
-        #   if (!exists(context_id, envir = session_objects))
-        #     assign(context_id, new.env(parent = emptyenv()), envir = session_objects)
-        #   store <- get(context_id, envir = session_objects)
-        #   
-        #   # return reference to the store
-        #   store
-        # }
-        # 
-        # context_id <- tutorial_context_id(tutorial_id, tutorial_version)
-        # store <- object_store(context_id)
-        # print(context_id)
-        # print(store)
-        # 
-        # rm(list = ls(store), envir = store)
-        
         ##########################################################
-        
         # YES this resets all questions and exercises
         # this does NOT reset global variables
-        # why doesn't this work for Posit Cloud?
+        # must have storage set to LOCAL or won't work on Posit Cloud/Shiny.io
         learnr:::remove_all_objects(session)
-        #  tutorial.startOver() js code could help
         
         # update attempt to set new seed
         attempt <<- attempt + 1
@@ -638,6 +601,8 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         # write to R file
         writeLines(paste0("learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"')"),
                    con = tmp_file)
+        #writeLines(paste0("job::job(learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"'))"),
+        #           con = tmp_file)
         ##############################################################
         # close the session
         session$close()
@@ -646,7 +611,7 @@ reset_server <- function(id, file_name = NULL, package_name = NULL) {
         onSessionEnded(function() {
            rstudioapi::jobRunScript(path = tmp_file)
             # stop the old session after new one is open
-            Sys.sleep(15)
+            Sys.sleep(10)
             stopApp()
         })
         # FINALLY!
