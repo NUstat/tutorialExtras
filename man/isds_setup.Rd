@@ -4,14 +4,21 @@
 \alias{isds_setup}
 \title{ISDS setup variables}
 \usage{
-isds_setup(isds_exam = FALSE, max_attempt = NULL, max_retry = NULL)
+isds_setup(
+  isds_exam = FALSE,
+  max_attempt = NULL,
+  max_retry = NULL,
+  retry_cooldown = 24
+)
 }
 \arguments{
 \item{isds_exam}{defaults to FALSE. If the tutorial is an exam with a lock button set to TRUE.}
 
 \item{max_attempt}{stop allowing submits if max_attempt is reached.}
 
-\item{max_retry}{stop allowing re-attempts when max_attempt is reached.}
+\item{max_retry}{stop allowing re-attempts when max_retry is reached.}
+
+\item{retry_cooldown}{length of time after lock is pressed until retry becomes available (in hours). Default = 24}
 }
 \description{
 Define if the tutorial is an exam and if there is a max_attempt limit on quiz questions

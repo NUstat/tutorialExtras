@@ -4,7 +4,7 @@
 \alias{reset_server}
 \title{Tutorial reset server}
 \usage{
-reset_server(id, file_name = NULL, package_name = NULL)
+reset_server(id, file_name = NULL, package_name = NULL, tz = Sys.timezone())
 }
 \arguments{
 \item{id}{ID matching ui with server}
@@ -12,6 +12,8 @@ reset_server(id, file_name = NULL, package_name = NULL)
 \item{file_name}{Name of the .Rmd file (not the tutorial id)}
 
 \item{package_name}{Name of the package with tutorial.}
+
+\item{tz}{Time zone to display retry time.}
 }
 \description{
 Tutorial reset server

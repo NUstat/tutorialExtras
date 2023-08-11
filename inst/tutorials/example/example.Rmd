@@ -37,17 +37,13 @@ isds_setup(isds_exam = TRUE)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-```{r, context = "server-start"}
-#exam_seed_server(id = "seed")
-```
-
 ```{r, context = "server"}
 lock_server("lock0")
 reset_server("reset", file_name = "example", package_name = "ISDSfunctions")
 ```
 
 ```{r}
-exam_output_ui(id = "lock0")
+exam_check_ui(id = "lock0")
 lock_button_ui(id = "lock0")
 reset_button_ui(id = "reset")
 ```

@@ -216,7 +216,8 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         # Change global lock identifier to "pressed"
         learnr:::save_object(session, NS("lock", id = "pressed"), 
                              learnr:::tutorial_object("lock",
-                                                      list(lock = TRUE) ) )
+                                                      list(lock = TRUE,
+                                                           time = learnr:::timestamp_utc()) ) )
         
         # trigger a reload to resubmit questions forcing the lock
         session$reload()
