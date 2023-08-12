@@ -24,6 +24,7 @@ reset_button_ui <- function(id, label = "Retry Exam") {
       onclick = "setTimeout(function(){window.close();},5000);",  # close browser
       label
     ),
+    #text output not working?!
     textOutput(ns("response"))
   )
   

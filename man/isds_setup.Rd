@@ -6,8 +6,8 @@
 \usage{
 isds_setup(
   isds_exam = FALSE,
-  max_attempt = NULL,
-  max_retry = NULL,
+  max_attempt = Inf,
+  max_retry = Inf,
   retry_cooldown = 24
 )
 }
