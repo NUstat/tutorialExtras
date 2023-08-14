@@ -30,7 +30,7 @@ tutorial_options(
   exercise.diagnostics = FALSE
 )
 
-isds_setup(isds_exam = TRUE)
+isds_setup(isds_exam = TRUE, max_attempt = 3, retry_cooldown = 0)
 
 #exam_seed_ui(id = "seed")
 

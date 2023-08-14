@@ -144,7 +144,7 @@ question_module_server_impl <- function(
     # find out if answer is right
     ret <- question_is_correct(question, submitted_answer())
     
-    # get partial credit for wordbank and blank
+    # new: get partial credit for wordbank and blank
     if(question$type == "wordbank"){
       partial_cred <- as.numeric(ret$messages)
       # then remove partial credit message output
@@ -165,7 +165,7 @@ question_module_server_impl <- function(
                          learnr:::tutorial_object("count",
                                                   list(numtry = isolate(val$numtry)) ) )
     # ===============================
-    
+   
     if (!inherits(ret, "learnr_mark_as")) {
       stop("`question_is_correct(question, input$answer)` must return a result from `correct`, `incorrect`, or `mark_as`")
     }
@@ -175,6 +175,10 @@ question_module_server_impl <- function(
   # should present all messages?
   is_done <- reactive(label = "is_done", {
     if (is.null(is_correct_info())) return(NULL)
+    
+    # new if number of try is greater then max attempt do not allow more submissions.
+    if (isTRUE(isolate(val$numtry) >= max_attempt)) return(TRUE)
+    
     (!isTRUE(question$allow_retry)) || is_correct_info()$correct
   })
   
@@ -193,7 +197,8 @@ question_module_server_impl <- function(
         "correct"
       } else {
         # not correct
-        if (isTRUE(question$allow_retry)) {
+        # new add check for numtry < max_attempt
+        if (isTRUE(isolate(val$numtry)<max_attempt)&isTRUE(question$allow_retry)) {
           # not correct, but may try again
           "try_again"
         } else {

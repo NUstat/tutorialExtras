@@ -17,14 +17,8 @@
 reset_button_ui <- function(id, label = "Retry Exam") {
   ns <- NS(id)
   tagList(
-    tags$button(
-      id = ns('reset'),
-      type = "button",
-      class = "btn action-button",
-      onclick = "setTimeout(function(){window.close();},5000);",  # close browser
-      label
-    ),
-    #text output not working?!
+    actionButton(ns('reset'), label = label,
+                 onclick = "setTimeout(function(){window.close();},5000);"),
     textOutput(ns("response"))
   )
   
@@ -50,7 +44,7 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           
           lock_time <- learnr:::get_object(session, NS("lock", id = "pressed"))$data$time
           
-          wait_time <- round(as.numeric(difftime(lock_time, learnr:::timestamp_utc(), units="hours")), 2)
+          wait_time <- round(as.numeric(difftime(learnr:::timestamp_utc(), lock_time, units="hours")), 2)
           
           retry_time <- as.POSIXct(lock_time, tz = "UTC") + lubridate::hours(retry_cooldown)
           
@@ -68,8 +62,12 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           }
         }
         
+        print(attempt)
         # check if max_attempt is reached
         if(attempt > max_retry){
+          output$response <- renderText({
+            paste0("You have used your ", max_retry, " retry attempts.")
+          })
           return()
         }
         
