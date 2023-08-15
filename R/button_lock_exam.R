@@ -6,7 +6,7 @@
 #' "lock" the exercise submit buttons, however, it does prevent the saving of any further 
 #' exercise attempts. Once the tutorial is locked a download option will appear.
 #'
-#' It is recommended that 'exam_check_ui()' is included before the lock button so users
+#' It is recommended that 'lock_check_ui()' is included before the lock button so users
 #' can check if they forgot to submit any questions or exercises.
 #' 
 #' Shiny ui and server logic for the lock computation.
@@ -35,7 +35,7 @@ lock_button_ui <- function(id, label = "lock exam") {
 #' @param id ID matching ui with "lock_server()"
 #' @param label Label for view button
 #' @export
-exam_check_ui <- function(id, label = "Check submissions") {
+lock_check_ui <- function(id, label = "Check submissions") {
   ns <- NS(id)
   
   tagList(
@@ -344,7 +344,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                 # set all question to number of blanks
                 pts_possible = ifelse(is.na(pts_possible), blanks, pts_possible),
                 pts_earned = pts_possible * as.numeric(partial_cred),
-                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
+                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned)
               )
           }
           if(isFALSE(num_blanks)){
@@ -353,20 +353,23 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                 # set all questions to 1 point
                 pts_possible = ifelse(is.na(pts_possible), 1, pts_possible),
                 pts_earned = pts_possible * as.numeric(partial_cred),
-                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned),
+                pts_earned = ifelse(is.na(pts_earned), 0, pts_earned)
               )
           }
           
           # need to get name before removing "excluded" questions
           # if there is a code chunk question labeled "Name" get the name
-          tmp_name <- ifelse("Name" %in% grades$label, 
-                             grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
-                             NA)
+          # tmp_name <- ifelse("Name" %in% grades$label, 
+          #                    grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+          #                    NA)
+          # 
+          # user_name <- ifelse(is.na(tmp_name), 
+          #                     tutorial_info$user_id,
+          #                     tmp_name
+          #                     )
           
-          user_name <- ifelse(is.na(tmp_name), 
-                              tutorial_info$user_id,
-                              tmp_name
-                              )
+          user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+                              tutorial_info$user_id)
           
           # exclude questions if listed
           if(!is.null(exclude)){

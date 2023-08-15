@@ -1,0 +1,153 @@
+---
+title: "Custom question types for learnr tutorials"
+tutorial:
+  id: "ex_03"
+  version: 0.1
+  
+output:
+  learnr::tutorial:
+    progressive: false
+    allow_skip: true
+    css: ["css/nu-theme.css"]
+runtime: shiny_prerendered
+description: >
+  This tutorial is for educators to demonstrate how to use word bank, drop down, and fill in the blank questions in learnr tutorials.
+---
+
+
+## Introduction
+
+The `ISDSfunctions` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
+
+1. shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions
+1. grade tutorials, deduct points based on attempt, and download an html output for submissions.
+1. create new question types such as `question_wordbank()`, `question_dropdown()`, and `question_blank()`
+
+This tutorial demonstrates how to **create new question types such as `question_wordbank()`, `question_dropdown()`, and `question_blank()`.**
+
+
+<br>
+
+Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/) and `gradethis` (https://github.com/rstudio/gradethis) packages which these functions are derived from. Many thanks to the author of the `sortable` (https://github.com/rstudio/sortable) package and a solution thread by "stefan's on Jun 01, 2022" (...I cannot seem to find again to properly cite) which helped with the code to develop the word bank question type.
+
+## Set up
+
+```{r setup, message = FALSE, warning = FALSE, echo = TRUE}
+library(learnr)
+library(tidyverse)
+library(ISDSfunctions)
+library(gradethis)
+
+gradethis_setup()
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+## question_blank
+
+To insert a question with one or more blanks into a `learnr` quiz, use `question_blank()`.
+
+You must provide the correct answers, using the `learnr` `answer()` function. The first blank should correspond to the first `answer()` and so forth. If there are multiple correct answers for a blank then this can be defined in an `answer_fn()`.
+
+The user must have all blanks in a question correct in order for the question to be marked correct.
+
+```{r A, echo = TRUE}
+quiz(caption = NULL,
+    question_blank("The explanatory variable goes on the ___ axis and the response variable goes on the ___ axis",
+    answer_fn(function(value){if (value %in% c("x", "X") ) {
+                                return(mark_as(TRUE))}
+                              return(mark_as(FALSE) )
+                              }),
+    answer_fn(function(value){if (value %in% c("y", "Y") ) {
+                                return(mark_as(TRUE))}
+                              return(mark_as(FALSE) )
+                              }),
+    allow_retry = TRUE
+  ),
+  question_blank(
+     "3 + ___ = 5 <br/>
+      ___ - 4 = 4 <br/>
+      12 / 2 = ___",
+     learnr::answer("2", correct = TRUE),
+     learnr::answer("8", correct = TRUE),
+     learnr::answer("6", correct = TRUE),
+     allow_retry = TRUE
+   )
+)
+
+```
+
+
+## question_wordbank
+
+To insert a wordbank question into a `learnr` quiz, use `question_wordbank()`.
+
+`choices` should be a vector of statements to be matched with.
+
+`answer()` should contain a vector that corresponds to the answers for `choices`. The first answer here "median" matches the first `choices` argument "The center of a list of numbers", and so forth. Be sure to set `correct = TRUE`.
+
+```{r B, echo = TRUE}
+quiz(caption = NULL,
+    question_wordbank("Match the following words with their definitions.",
+            choices = c("The center of a list of numbers", 
+                        "The sum of a list of numbers, divided by the number of elements in the list.",  
+                        "The most common (frequent) value."),
+            answer(c("median", "mean", "mode"), correct = TRUE),
+            allow_retry = TRUE )
+)
+```
+
+
+`wordbank` is an optional parameter that allows you to add more selection options to the wordbank than possible answers. At a minimum the `wordbank` must contain the correct answers. The arguments in the `wordbank` will be displayed randomly by default.
+
+```{r C, echo = TRUE}
+quiz(caption = NULL,
+    question_wordbank("Match the following words with their definitions.",
+            choices = c("The center of a list of numbers", 
+                        "The sum of a list of numbers, divided by the number of elements in the list",  
+                        "The most common (frequent) value"),
+            wordbank = c("mean", "standard deviation", "median", "mode", "IQR", "range"),
+            answer(c("median", "mean", "mode"), correct = TRUE), 
+            allow_retry = TRUE )
+)
+```
+
+If you would like the `wordbank` to appear in alphabetical order add the argument `arrange = "ordered"`. This can be useful so the `wordbank` does not accidentally randomly appear in the correct answer order if there are very few choices.
+
+Or if you set `arrange = "none"`, the `wordbank` will remain in the order you define.
+
+```{r D, echo = TRUE}
+quiz(caption = NULL,
+    question_wordbank("Match the following words with their definitions.",
+            choices = c("The center of a list of numbers",
+                        "The sum of a list of numbers, divided by the number of elements in the list", 
+                        "The most common (frequent) value"),
+            wordbank = c("mean", "standard deviation", "median", "mode", "IQR", "range"),
+            arrange = "ordered",
+            answer(c("median", "mean", "mode"), correct = TRUE), 
+            allow_retry = TRUE )
+)
+```
+
+
+## question_dropdown
+
+To insert a question with one or more blanks into a `learnr` quiz, use `question_dropdown()`.
+
+This question style is equivalent to `question_radio()` but allows for a more condensed display. This choice may be preferred when there are a lot of choices to save space, or if you do not want the user to see all of the possible answer choices after the question is submitted.
+
+```{r E, echo = TRUE}
+question_dropdown(
+  "Pick the letter B",
+  learnr::answer("A"),
+  learnr::answer("B", correct = TRUE),
+  learnr::answer("C"),
+  learnr::answer("D"),
+  learnr::answer("E"),
+  learnr::answer("F"),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+

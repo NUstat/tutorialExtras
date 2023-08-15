@@ -6,8 +6,9 @@
 \usage{
 grade_server(
   id,
-  label = NULL,
-  pts_possible = NULL,
+  num_blanks = FALSE,
+  graded = NULL,
+  graded_pts = NULL,
   num_try = 3,
   deduction = 0.1,
   exclude = NULL,
@@ -17,9 +18,11 @@ grade_server(
 \arguments{
 \item{id}{ID matching ui with server}
 
-\item{label}{Either NULL or a vector containing the names of each question/exercise.}
+\item{num_blanks}{TRUE/FALSE: Set the number of points for a question equal to the number of blanks for question_wordbank and question_blank. Default FALSE.}
 
-\item{pts_possible}{Either NULL or a vector containing the number of points corresponding to each question/exercise in label.}
+\item{graded}{Either NULL or a vector containing the names of each question/exercise that require custom points.}
+
+\item{graded_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise specified in "graded".}
 
 \item{num_try}{Number of tries allowed before grade deduction on that question. Default is 3.}
 

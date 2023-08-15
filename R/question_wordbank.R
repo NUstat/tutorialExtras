@@ -24,7 +24,7 @@
 #' @param choices a vector of choices that will remain stationary in the left column.
 #' @param wordbank a vector of choices to be placed into the blanks when providing more options than answers.
 #' If NULL then the wordbank will be set equal to the answer choices.
-#' @param arrange either  'random', 'ordered' or 'none,; default is random. Set equal to ordered if
+#' @param arrange either  'random', 'ordered' or 'none'; default is random. Set equal to ordered if
 #' you want the wordbank list to appear alphabetically. Set equal to none for the wordbank to appear exactly
 #' as provided.
 #' @param box a number between 1 and 11, inclusive, indicating the width of the 'choices' box.

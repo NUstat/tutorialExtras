@@ -1,0 +1,280 @@
+---
+title: "Downloadable Exam Example"
+tutorial:
+  id: "ex_01"
+  version: 0.1
+  
+output:
+  learnr::tutorial:
+    progressive: false
+    allow_skip: true
+    css: ["css/nu-theme.css"]
+runtime: shiny_prerendered
+description: >
+  This tutorial is for educators to demonstrate how to add ISDS functions for exam formatting, grading, and downloading.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(ISDSfunctions)
+library(palmerpenguins)
+library(gradethis)
+
+tutorial_options(
+  exercise.timelimit = 10,
+  exercise.diagnostics = FALSE
+)
+
+isds_setup(isds_exam = TRUE, max_retry = 3, retry_cooldown = 24)
+
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r, context = "server"}
+lock_server("lock",
+            ex = c("App1"), 
+            ex_pts = c(1),
+            manual = c("App1-desc"),
+            manual_pts = c(1))
+reset_server("reset", file_name = "exam_ex", package_name = "ISDSfunctions")
+```
+
+```{r Name}
+# student name
+question_text("Name:",
+              answer_fn(function(value){
+                              if(length(value) >= 1 ) {
+                                return(mark_as(TRUE))
+                                }
+                              return(mark_as(FALSE) )
+                              }),
+              correct = "Submitted",
+              incorrect = "Submitted",
+              allow_retry = FALSE)
+```
+
+## Introduction
+
+The `ISDSfunctions` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
+
+1. shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions
+1. grade tutorials, deduct points based on attempt, and download an html output for submissions.
+1. create new question types such as `question_wordbank()`, `question_dropdown()`, and `question_blank()`
+
+This tutorial demonstrates how to **shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions.**
+
+<br>
+
+Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/) and `gradethis` (https://github.com/rstudio/gradethis) packages which these functions are derived from.
+
+Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/. doi:
+10.5281/zenodo.3960218.
+
+
+## Set up
+
+In order to set up your tutorial you will want to include the `ISDSfunctions` package and specify your desired settings in the `isds_setup()` function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
+
+````markdown
+`r ''```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(ISDSfunctions)
+library(gradethis)
+
+isds_setup(isds_exam = TRUE, 
+           max_retry = 3,     
+           retry_cooldown = 24)
+```
+````
+
+In a context = "server" code chunk you will need the `lock_server()` with an id that matches the `lock_button_ui()`. In the `lock_server()` you have the option to specify the names of any exercises and manually graded questions. These should be the name of your code chunk containing the exercise/question.
+
+The `reset_server()` is only needed if you would like to include a "retry button" that can reset and re-randomize the questions. This is useful if you are writing a proficiency exam that chooses from a set of random questions. In `isds_setup()`, the `retry_cooldown` determines how often the student can retry the exam and `max_retry` determines the number of re-attempts the student gets.
+
+````markdown
+`r ''````{r, context = "server"}
+lock_server(id = "lock",
+            show_correct = TRUE,
+            ex = c("App1"), 
+            ex_pts = c(1),
+            manual = c("App1-desc"),
+            manual_pts = c(1),
+            exclude = "Name")
+reset_server(id = "reset", 
+             file_name = "exam_ex", 
+             package_name = "ISDSfunctions")
+```
+````
+
+Somewhere in your exam tutorial you will need to include the `lock_button_ui()`. I recommend having the `lock_check_ui()` button with it, that way users can check if they forgot to submit any questions or exercises. The `reset_button_ui()` is only needed if you would like to include a "retry button". I recommend putting these buttons at the end of the exam tutorial in a section header "Submit". See the "Submit" section for an example of this setup.
+
+
+## Exercise Example
+
+The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.
+
+*Note: The below code chunk is named App1 with exercise = TRUE. There is also a corresponding App1-solution and App1-check code chunk to check the answer.*
+```{r App1, exercise=TRUE}
+
+```
+
+
+```{r App1-solution, exercise.reveal_solution = FALSE}
+ggplot(penguins, aes(x = species, y = flipper_length_mm)) +
+  geom_boxplot()
+```
+
+```{r App1-check, exercise.diagnostics = FALSE}
+grade_this_code(
+  correct = "Submitted",
+  incorrect = "Submitted"
+)
+```
+
+Compare and contrast the flipper length of each species.
+
+*Note: The below code chunk is named App1-desc and contains a single question_text()*
+
+```{r App1-desc}
+question_text("", incorrect = "submitted",
+              answer("ManuallyGradedEverythingWrong", 
+                     correct = TRUE),
+              allow_retry = TRUE,
+              rows = 5)
+```
+
+
+## Exam function
+
+The `exam()` function works the same way as the learnr `quiz()` function. Within the `exam()` you can specify any number of `question()`s.
+
+Additional features of `exam()` include
+
+  - `shuffle` argument that will randomly shuffle the questions
+  - multi-part question setting so specified questions can remain next to each other when shuffled
+  - random question selection out of a provided set
+
+
+In the example below, there are two questions with the argument `options = list(multi_part = "skim")`. This ensures that they remain next to each other when shuffled. Any questions defined with the same "multi_part" will remain together when shuffled. Here we called the question "skim"; this can be ANY string name you choose.
+
+There are three questions with the argument `options = list(group = "prob")` ("prob" could be any string name you choose). Only one of the questions defined with the same group will be randomly used.
+
+
+```{r Q, echo = TRUE}
+exam(
+  shuffle = TRUE,
+  caption = NULL,
+  question_wordbank(paste("Using the penguins dataset, a linear regression model was run to predict body_mass_g based on flipper_length_mm and species. <br>", htmltools::img(src="images/penguins_lm.png", height = 100, width = 400)),
+                    choices = c("What is the baseline/reference level?",
+                                "Which species is predicted to on average have the lightest body mass?",
+                                "Which species is predicted to on average have the heaviest body mass?"),
+           wordbank = c("Adelie", "Gentoo", "Chinstrap"),
+           answer(c("Adelie","Chinstrap","Gentoo"), correct = TRUE),
+           box = 8,
+           correct = "Correct",
+           incorrect = "Submitted",
+           allow_retry = TRUE,
+           random_answer_order = TRUE,
+           options = list(multi_part = "skim")),
+  question_numeric("You found a new penguin of the Gentoo species and a flipper length of 200mm. Using the regression output above, what is this penguins predicted body mass (round to 1 decimal place).",
+           answer(4376.4, correct = TRUE),
+           step = .1,
+           tolerance = 0.5,
+           allow_retry = TRUE,
+           correct = "Correct",
+           incorrect = "Submitted",
+           options = list(multi_part = "skim")),
+  question_dropdown("Which of the following is NOT an assumptions of linear models",
+           answer("The response variable is normally distributed", correct = TRUE), 
+           answer("The residuals are normally distributed"),
+           answer("All the observed units are independent from each other."),
+           answer("The relationship between the response variable and the predictors are linear"),
+           allow_retry = TRUE,
+           correct = "Submitted",
+           incorrect = "Submitted"),
+  question("A lolly bag contains 2 red, 3 green and 2 blue gum balls. What is the probability of selecting a green one?",
+           answer("2/7"), 
+           answer("5/7"),
+           answer("4/7"),
+           answer("3/7", correct = TRUE),
+           allow_retry = TRUE,
+           random_answer_order = TRUE,
+           correct = "Correct",
+           incorrect = "Submitted",
+           options = list(group = "prob")),
+  question("A lolly bag contains 2 red, 3 green and 2 blue gum balls. What is the probability of selecting a red one?",
+           answer("2/7", correct = TRUE), 
+           answer("5/7"),
+           answer("4/7"),
+           answer("3/7"),
+           allow_retry = TRUE,
+           random_answer_order = TRUE,
+           correct = "Correct",
+           incorrect = "Submitted",
+           options = list(group = "prob")),
+  question("A lolly bag contains 2 red, 3 green and 2 blue gum balls. What is the probability of selecting a red or blue one?",
+           answer("2/7"), 
+           answer("5/7"),
+           answer("4/7", correct = TRUE),
+           answer("3/7"),
+           allow_retry = TRUE,
+           random_answer_order = TRUE,
+           correct = "Correct",
+           incorrect = "Submitted",
+           options = list(group = "prob"))
+  
+  
+)
+```
+
+
+## Important Exam Tips
+
+Include a code chunk called "Name", ``{r Name}`, that includes a `question_text()` with `allow_retry = FALSE`, example shown below. This will ensure the student's name is on the downloaded exam! You can always set `exclude = c("Name")` in the `lock_server()` so that it will not be counted towards the points.
+
+```{r, echo = TRUE, eval = FALSE}
+question_text("Name:",
+              answer_fn(function(value){
+                              if(length(value) >= 1 ) {
+                                return(mark_as(TRUE))
+                                }
+                              return(mark_as(FALSE) )
+                              }),
+              correct = "Submitted",
+              incorrect = "Submitted",
+              allow_retry = FALSE)
+```
+
+The submitted answer will ALWAYS be marked incorrect when `isds_setup(exam = TRUE)`. This is so users can go back and change their answer within the exam time frame. Once the exam is locked, the exam will display the "correct" feedback if the answer was correct. If you do not want the correct answer to be displayed, set `correct = Submitted` (ie: whatever you defined `incorrect =` to be).
+
+The downloaded exam will have the number of minutes each question/exercise was submitted at in case it is a timed exam. There is no functionality that will end the tutorial at a given time or display the time, meaning it would be a self-timed exam.  
+
+If the tutorial is uploaded to shiny.io or Posit Cloud by the instructor the first shuffle will be identical for everyone because the seed is defined based on the "user" and the "same user" uploaded the tutorial.
+
+## Submit 
+
+Once you are finished:
+
+-   Click "Check submissions" to make sure all questions and exercises are submitted
+-   Click the 'lock exam' button. Once you click this you will not be able to make any changes to your exam!
+-   Once the lock is pressed a `Download Exam` option will become available,
+-   Download and **Check your HTML!**
+-   Upload the html to your assessment platform (ie: Canvas).
+
+````markdown
+`r ''````{r}
+lock_check_ui(id = "lock")
+lock_button_ui(id = "lock")
+reset_button_ui(id = "reset")
+```
+````
+
+```{r, echo = FALSE}
+lock_check_ui(id = "lock")
+lock_button_ui(id = "lock")
+reset_button_ui(id = "reset")
+```
+

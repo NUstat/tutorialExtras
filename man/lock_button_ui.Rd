@@ -17,7 +17,7 @@ not receive feedback until they submit the entire tutorial. This will not techni
 "lock" the exercise submit buttons, however, it does prevent the saving of any further
 exercise attempts. Once the tutorial is locked a download option will appear.
 
-It is recommended that 'exam_check_ui()' is included before the lock button so users
+It is recommended that 'lock_check_ui()' is included before the lock button so users
 can check if they forgot to submit any questions or exercises.
 
 Shiny ui and server logic for the lock computation.

@@ -50,39 +50,26 @@ grade_print_ui <- function(id, label = "Download Grade") {
   )
 }
 
-# #' @title Tutorial grade output
-# #'
-# #' @description
-# #' Obtain grade on all question and exercise submissions for a user.
-# #' @param id ID matching ui with server
-# #' @export
-# grade_output_ui <- function(id) {
-#   ns <- NS(id)
-# 
-#   tagList(
-#     tableOutput(ns("grade"))
-#   )
-# 
-# }
-
 # Define the server logic for a module to compute grade
 #' @title Tutorial grade server
 #' @param id ID matching ui with server
-#' @param label Either NULL or a vector containing the names of each question/exercise.
-#' @param pts_possible Either NULL or a vector containing the number of points corresponding to each question/exercise in label.
+#' @param num_blanks TRUE/FALSE: Set the number of points for a question equal to the number of blanks for question_wordbank and question_blank. Default FALSE.
+#' @param graded Either NULL or a vector containing the names of each question/exercise that require custom points.
+#' @param graded_pts Either NULL or a vector containing the number of points corresponding to each question/exercise specified in "graded".
 #' @param num_try Number of tries allowed before grade deduction on that question. Default is 3.
 #' @param deduction The percent (as a decimal) to be deducted for each additional incorrect attempt after num_try. Default is 0.1.
 #' @param exclude Either NULL or a vector of names of questions/exercises to exclude.
 #' @param tz Time zone to display start time on report.
 #'
 #' @export
-grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, deduction = 0.1, exclude = NULL, tz = Sys.timezone() ) {
+grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NULL, 
+                         num_try = 3, deduction = 0.1, exclude = NULL, tz = Sys.timezone() ) {
   moduleServer(
     id,
     function(input, output, session) {
     # View grade
     observeEvent(input$button, {
-      grade <- grade_calc(session = session, id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
+      grade <- grade_calc(session = session, id = id, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
       
       output$grade <- renderTable({
         grade$calc %>% 
@@ -105,7 +92,7 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
         content = function(file) {
           ns <- getDefaultReactiveDomain()$ns
           
-          grade <- grade_calc(session = session, id = id, label = label, pts_possible = pts_possible, num_try = num_try, deduction = deduction, exclude = exclude)
+          grade <- grade_calc(session = session, id = id, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
           
           if(is.null(grade)){
             return()
@@ -115,7 +102,6 @@ grade_server <- function(id, label = NULL, pts_possible = NULL, num_try = 3, ded
             as.data.frame() %>%
             dplyr::select(label, pts_possible, attempt, pts_earned) %>% 
             tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
-                                                        #tz = "America/Chicago",
                                                         tz = tz,
                                                         usetz = TRUE), " - ",
                                                  #tutorial_info$user_id,
@@ -148,7 +134,10 @@ grade_calc <- function(session = session, id, label = NULL, pts_possible = NULL,
   
   tutorial_info <- isolate(get_tutorial_info())
   
-  #check if exclude list is valid
+  #######################################################################
+  # ERROR CHECKING
+  #######################################################################
+  # check if exclude list is valid
   if(!is.null(exclude)){
     purrr::map(exclude, function(x){
       if(!(x %in% tutorial_info$items$label)){
@@ -157,10 +146,9 @@ grade_calc <- function(session = session, id, label = NULL, pts_possible = NULL,
     })
   }
   #check if label and pts_possible are valid
-  #names(isolate(learnr:::get_tutorial_cache())
   if(!is.null(label) || !is.null(pts_possible)){
     if (length(label) != length(pts_possible)) {
-      stop("Length of label must equal length of pts_possible.")
+      stop("Length of graded must equal length of graded_pts.")
     }
     map(label, function(x){
       if( !(x %in% tutorial_info$items$label)){
@@ -169,9 +157,20 @@ grade_calc <- function(session = session, id, label = NULL, pts_possible = NULL,
     })
     rubric <- tidyr::tibble(label = label, 
                             pts_possible = as.numeric(pts_possible))
+  }
+  #######################################################################
+  # ERROR CHECKING COMPLETE
+  ################################################################################################################################################
+  rubric_tmp <- tidyr::tibble(label = tutorial_info$items$label)
+  
+  if(!is.null(label)){
+    rubric_custom <- tidyr::tibble(label = label,
+                                   pts_possible = pts_possible)
+    
+    rubric <- dplyr::left_join(rubric_tmp, rubric_custom, by = "label")
   }else{
-    rubric <- tidyr::tibble(label = tutorial_info$items$label,
-                            pts_possible = rep(1, length(label)) )
+    rubric <- rubric_tmp %>%
+      mutate(pts_possible = rep(NA, length(label)) )
   }
   
   ##################################################################
@@ -217,28 +216,53 @@ grade_calc <- function(session = session, id, label = NULL, pts_possible = NULL,
   }
   
   # merge rubric of all questions with table of submitted questions
-  grades <- dplyr::left_join(rubric, table, by = "label")
-  
-  calc <- grades %>% 
+  grades <- dplyr::left_join(rubric, table, by = "label") %>% 
     dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
                   deduction = ifelse(deduction > 1, 1, deduction),
-                  pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
-                  pts_earned = ifelse(is.na(pts_earned), 0, pts_earned))
+                  partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
+                  #pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
+                  #pts_earned = ifelse(is.na(pts_earned), 0, pts_earned)
+                  )
+  
+  # handle pts_possible 1) priority goes to manual setting 
+  # 2) then to num_blanks setting 3) then default to 1
+  if(isTRUE(num_blanks)){
+    grades <- grades %>% 
+      dplyr::mutate(
+        # set all question to number of blanks
+        pts_possible = ifelse(is.na(pts_possible), blanks, pts_possible),
+        pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
+        pts_earned = ifelse(is.na(pts_earned), 0, pts_earned)
+      )
+  }
+  if(isFALSE(num_blanks)){
+    grades <- grades %>% 
+      dplyr::mutate(
+        # set all questions to 1 point
+        pts_possible = ifelse(is.na(pts_possible), 1, pts_possible),
+        pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
+        pts_earned = ifelse(is.na(pts_earned), 0, pts_earned)
+      )
+  }
+  
   
   # if there is a code chunk question labeled "Name" get the name
-  user_name <- ifelse("Name" %in% calc$label, calc %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+  user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
                       tutorial_info$user_id)
   
   # exclude specified questions
   if(!is.null(exclude)){
-    calc <- calc %>% 
+    grades <- grades %>% 
       dplyr::filter(!(label %in% exclude))
   }
   
-  # grade out of 10
-  scaled <- round(10*sum(calc$pts_earned)/sum(calc$pts_possible), 2)
+  # submission organization complete
+  #--------------------------------------------------------------------
   
-  return(list(calc = calc, scaled = scaled, 
+  # grade out of 10
+  scaled <- round(10*sum(grades$pts_earned)/sum(grades$pts_possible), 2)
+  
+  return(list(calc = grades, scaled = scaled, 
               user_name = user_name, tutorial_id = tutorial_info$tutorial_id))
 }
 
