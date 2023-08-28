@@ -1,0 +1,57 @@
+destination: reference
+
+url: https://nustat.github.io/ISDSfunctions/
+
+template:
+  bootstrap: 5
+  bslib:
+    primary: "#4E2A84"
+    navbar-background: "#4E2A84"
+    pkgdown-nav-height: 90px
+
+navbar:
+  background: "#4E2A84"
+  logo: "images/logo_isds.png"
+  align: center
+  title: false
+
+  left:
+  - text: Functions
+    href: reference/index.html
+  right:
+  #- text: ISDS Textbook
+  #  href: https://nustat.github.io/intro-stat-data-sci/
+
+reference:
+  - title: Functions
+  - subtitle: Questions
+    contents:
+    - '`question_blank`'
+    - '`question_dropdown`'
+    - '`question_wordbank`'
+  - subtitle: Grading and Printing
+    contents:
+    - '`grade_button_ui`'
+    - '`grade_print_ui`'
+    - '`grade_server`'
+    - '`lock_button_ui`'
+    - '`lock_check_ui`'
+    - '`lock_server`'
+    - '`reset_button_ui`'
+    - '`reset_server`'
+  - subtitle: Misc
+    contents:
+    - '`exam`'
+    - '`knit_print.tutorial_question`'
+    - '`isds_setup`'
+
+tutorials:
+# - name: exam_tutorial_example
+#   title: Preface & Chapter 1
+#   url: https://amkuyper.shinyapps.io/01_intro/
+# - name: grade_tutorial_example
+#   title: Chapter 2 Scatterplots
+#   url: https://amkuyper.shinyapps.io/02_ggplot1/
+# - name: new_question_types
+#   title: Chapter 2 Linegraphs and Histograms
+#   url: https://amkuyper.shinyapps.io/03_ggplot2/
