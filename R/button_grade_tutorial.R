@@ -19,7 +19,7 @@
 #' @import dplyr
 #' @import tidyr
 #' @export
-grade_button_ui <- function(id, label = "View grade") {
+grade_button_ui <- function(id, label = "View Grade") {
   ns <- NS(id)
   tagList(
     actionButton( ns("button"), label = label),
@@ -69,7 +69,7 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
     function(input, output, session) {
     # View grade
     observeEvent(input$button, {
-      grade <- grade_calc(session = session, id = id, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
+      grade <- grade_calc(session = session, id = id, num_blanks = num_blanks, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
       
       output$grade <- renderTable({
         grade$calc %>% 
@@ -92,7 +92,7 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
         content = function(file) {
           ns <- getDefaultReactiveDomain()$ns
           
-          grade <- grade_calc(session = session, id = id, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
+          grade <- grade_calc(session = session, id = id, num_blanks = num_blanks, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
           
           if(is.null(grade)){
             return()
@@ -128,7 +128,7 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
 #####################################################################################
 #####################################################################################
 # need to calculate outside of observe event so that it can apply to download handler
-grade_calc <- function(session = session, id, label = NULL, pts_possible = NULL, 
+grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, pts_possible = NULL, 
                        num_try = 3, deduction = 0.1, exclude = NULL){
   ns <- getDefaultReactiveDomain()$ns
   

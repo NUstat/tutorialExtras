@@ -38,7 +38,8 @@ lock_server("lock",
             ex_pts = c(1),
             manual = c("App1-desc"),
             manual_pts = c(1))
-reset_server("reset", file_name = "exam_ex", package_name = "ISDSfunctions")
+
+reset_server("reset", file_name = "ex_01", package_name = "ISDSfunctions")
 ```
 
 ```{r Name}
@@ -248,7 +249,8 @@ question_text("Name:",
               allow_retry = FALSE)
 ```
 
-The submitted answer will ALWAYS be marked incorrect when `isds_setup(exam = TRUE)`. This is so users can go back and change their answer within the exam time frame. Once the exam is locked, the exam will display the "correct" feedback if the answer was correct. If you do not want the correct answer to be displayed, set `correct = Submitted` (ie: whatever you defined `incorrect =` to be).
+The submitted answer will ALWAYS be marked incorrect when `isds_setup(exam = TRUE)`. This is so users can go back and change their answer within the exam time frame. Once the exam is locked, the exam will display the "correct" feedback if the answer was correct. If you do not want the correct answer to be displayed, set `correct = Submitted` (ie: whatever you defined `incorrect =` to be), you would also then need to change the css so the buttons are the same color.
+
 
 The downloaded exam will have the number of minutes each question/exercise was submitted at in case it is a timed exam. There is no functionality that will end the tutorial at a given time or display the time, meaning it would be a self-timed exam.  
 

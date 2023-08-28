@@ -4,7 +4,7 @@
 \alias{grade_button_ui}
 \title{Tutorial grade button}
 \usage{
-grade_button_ui(id, label = "View grade")
+grade_button_ui(id, label = "View Grade")
 }
 \arguments{
 \item{id}{ID matching ui with server}

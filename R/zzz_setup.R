@@ -4,7 +4,6 @@
   isds_setup()
 }
 
-
 #' @title ISDS setup variables
 #'
 #' @description
@@ -37,6 +36,7 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = Inf, max_retry = Inf, re
   
   # get time if it exists
   # this prevents time from being reset if "start over" is pressed
+  
   if(file.exists(paste0(mod_dir,"time.RData"))){
     load(file = paste0(mod_dir,"time.RData"))
   }

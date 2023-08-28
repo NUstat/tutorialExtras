@@ -4,7 +4,7 @@
 \alias{lock_check_ui}
 \title{Check Exam Submission}
 \usage{
-lock_check_ui(id, label = "Check submissions")
+lock_check_ui(id, label = "Check Submissions")
 }
 \arguments{
 \item{id}{ID matching ui with "lock_server()"}

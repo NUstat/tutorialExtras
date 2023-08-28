@@ -4,7 +4,7 @@
 \alias{lock_button_ui}
 \title{Tutorial lock button}
 \usage{
-lock_button_ui(id, label = "lock exam")
+lock_button_ui(id, label = "Lock Exam")
 }
 \arguments{
 \item{id}{ID matching ui with server}

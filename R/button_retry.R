@@ -51,9 +51,7 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           
           #do not allow retry until cooldown is met.
           if(wait_time <  retry_cooldown){
-            print(paste0("Retry option available at ", format(retry_time, tz = tz, usetz=TRUE)))
             
-            #WHY is this not working???
             output$response <- renderText({
               paste0("Retry option available at ", format(retry_time, tz = tz, usetz=TRUE))
               })
@@ -62,7 +60,6 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           }
         }
         
-        print(attempt)
         # check if max_attempt is reached
         if(attempt > max_retry){
           output$response <- renderText({
@@ -70,7 +67,6 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           })
           return()
         }
-        
         
         ##########################################################
         # YES this resets all questions and exercises
@@ -103,13 +99,11 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
         # can't run app within an app
         # workaround is to write the run_tutorial function in a .R script
         # and call the script to run on session end
-        #tmp_file <- tempfile(tmpdir = tmp_dir, fileext = ".R")
-        tmp_file <- tempfile(tmpdir = mod_dir, fileext = ".R")
+        
         # write to R file
+        tmp_file <- tempfile(tmpdir = mod_dir, fileext = ".R")
         writeLines(paste0("learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"')"),
                    con = tmp_file)
-        #writeLines(paste0("job::job(learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"'))"),
-        #           con = tmp_file)
         ##############################################################
         # close the session
         session$close()

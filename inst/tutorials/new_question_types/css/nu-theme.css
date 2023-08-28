@@ -33,6 +33,7 @@ p {
 ul {
   line-height: 2em;
   list-style: disc outside none; }
+  
 .btn, .modal-content .btn+.btn {
   padding: 10px 20px;
   border-radius: 3px;
@@ -52,9 +53,32 @@ ul {
   .btn-default:focus {
     background-color: #e0e0e0; }
 
-/* TODO-barret add css for btn-warning */
 
-.btn-primary, .btn-success, .btn-info {
+/* added color for correct and incorrect to be the same so that in exam
+user will not know if they are correct or not*/
+
+.alert {
+  color: #4E2A84;
+  background-color: #e8e8e8;
+  background-image: none;
+  border: none;}
+
+.btn-warning {
+  color: #E4E0EE;
+  background-color: #404040;
+  background-image: none;
+  border: none;}
+  .btn-warning:hover {
+    color: #404040;
+    background-color: #E4E0EE;}   
+    
+    
+/* END added color for correct and incorrect to be the same so that in exam
+user will not know if they are correct or not*/
+
+
+/* test btn-warning */
+.btn-primary, .btn-success, .btn-danger, .btn-info {
   background-color: #4E2A84; /* #75aadb */
   background-image: none;
   border: none; }
@@ -95,6 +119,8 @@ code {
 .alert {
   width: fit-content;
 }
+
+
 
 /* .answers {
   padding-left: 25px;

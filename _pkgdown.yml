@@ -44,8 +44,6 @@ reference:
     - '`exam`'
     - '`knit_print.tutorial_question`'
     - '`isds_setup`'
-    - '`tutorial`'
-    - '`tutorial_html_dependency`'
 
 tutorials:
 # - name: exam_tutorial_example

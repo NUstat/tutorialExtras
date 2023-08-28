@@ -20,7 +20,7 @@
 #' @param label Label to appear on the submit grade button
 #'
 #' @export
-lock_button_ui <- function(id, label = "lock exam") {
+lock_button_ui <- function(id, label = "Lock Exam") {
   ns <- NS(id)
   tagList(
     actionButton( ns("lock"), label = label),
@@ -35,7 +35,7 @@ lock_button_ui <- function(id, label = "lock exam") {
 #' @param id ID matching ui with "lock_server()"
 #' @param label Label for view button
 #' @export
-lock_check_ui <- function(id, label = "Check submissions") {
+lock_check_ui <- function(id, label = "Check Submissions") {
   ns <- NS(id)
   
   tagList(
@@ -86,7 +86,8 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         if(file.exists(paste0(mod_dir,"time.RData"))){
           load(file = paste0(mod_dir,"time.RData"))
         }
-        start_time <<- ifelse(exists("start_time"), start_time, learnr:::timestamp_utc())
+        #start_time <<- ifelse(exists("start_time"), start_time, learnr:::timestamp_utc())
+        start_time <<- ifelse(exists("start_time") && start_time != 0, start_time, learnr:::timestamp_utc())
         save(start_time, file = paste0(mod_dir, "time.RData"))
         
         ###################################################################################
@@ -104,7 +105,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
 ########################################################################
 ########################################################################
 ########################################################################
-      # View grade
+      # View unsubmitted questions
       observeEvent(input$viewExam, {
         ns <- getDefaultReactiveDomain()$ns
         
@@ -189,7 +190,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                                       ifelse(!is.na(type), type, eval)),
                         partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
                         #calculate time since exam start
-                        time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2)) %>%
+                        time = round(as.numeric(difftime(time_stamp, start_time, units="mins")), 2)) %>%
           dplyr::select(label, answer)
         
         # only print unsubmitted questions/exercises
@@ -334,7 +335,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                                         ifelse(!is.na(type), type, eval)),
                           partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
                           #calculate time since exam start
-                          time = round(as.numeric(difftime(timestamp, start_time, units="mins")), 2))
+                          time = round(as.numeric(difftime(time_stamp, start_time, units="mins")), 2))
           
           # handle pts_possible 1) priority goes to manual setting 
           # 2) then to num_blanks setting 3) then default to 1
@@ -359,17 +360,18 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           
           # need to get name before removing "excluded" questions
           # if there is a code chunk question labeled "Name" get the name
-          # tmp_name <- ifelse("Name" %in% grades$label, 
-          #                    grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
-          #                    NA)
-          # 
-          # user_name <- ifelse(is.na(tmp_name), 
-          #                     tutorial_info$user_id,
-          #                     tmp_name
-          #                     )
+          tmp_name <- ifelse("Name" %in% grades$label,
+                             grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+                             NA)
           
-          user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
-                              tutorial_info$user_id)
+          # handle unsubmitted names
+          user_name <- ifelse(is.na(tmp_name),
+                              tutorial_info$user_id,
+                              tmp_name
+                              )
+          
+          # user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+          #                     tutorial_info$user_id)
           
           # exclude questions if listed
           if(!is.null(exclude)){
@@ -399,12 +401,10 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           manual <- grades %>%
             dplyr::filter(eval == "manual") %>%
             dplyr::select(label, answer, time) 
-            #dplyr::select(label, answer, time, pts_earned) 
           
           incomplete <- grades %>%
             dplyr::filter(is.na(eval)) %>%
             dplyr::select(label, answer, time) 
-          #dplyr::select(label, answer, time, pts_earned)
           
           #--------------------------------------------------------------------
           # Create string of each section header
@@ -412,9 +412,25 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                            toString(paste0("title: ", tutorial_info$tutorial_id)), 
                            toString(paste0("author: ", user_name)),
                            toString(paste0("date: ", format(as.POSIXct(start_time, tz = "UTC"), tz = tz, usetz=TRUE)) ), "---")
+          
+          # if we are counting attempts let's print it after yaml
+          if(max_retry != Inf && exists("attempt")){
+            
+            #attempt_string <- c(toString(paste0("# Attempt  #", attempt)))
+            yaml_string <- c("---", 
+                             toString(paste0("title: ", tutorial_info$tutorial_id)), 
+                             toString(paste0("subtitle: Attempt ", attempt)), 
+                             toString(paste0("author: ", user_name)),
+                             toString(paste0("date: ", format(as.POSIXct(start_time, tz = "UTC"), tz = tz, usetz=TRUE)) ), "---")
+            
+            #yaml_string <- c(yaml_string, attempt_string)
+          }
          
           graded_string <- c(toString(paste0("# Concept  ", score)), "```{r concept, echo=FALSE}", "graded %>% knitr::kable()", "```")
           
+          if(nrow(graded) == 0){
+            graded_string <- c(" ", paste0("# Concept  ", score), "No concept questions graded.", " ")
+          }
           
           exercise_substring <- map(exercises, function(x){
             c(toString(paste0("### ", x$label, " - ", ifelse(isTRUE(x$correct), "Correct", "Needs Grading")) ), 
@@ -515,7 +531,6 @@ submissions <- function(get_grades = list()){
           dplyr::mutate(answer = answer_last,
                         correct = correct_last,
                         partial_cred = NA) %>%
-          #timestamp = time_last
           dplyr::select(-c(answer_last, correct_last))
       }
     }
@@ -524,8 +539,8 @@ submissions <- function(get_grades = list()){
       dplyr::mutate(label = as.character(label),
                     answer = as.character(answer),
                     attempt = as.numeric(attempt),
-                    timestamp = time_last) %>% 
-      dplyr::select(-time_last)
+                    time_stamp = time_last) #%>% 
+      #dplyr::select(-time_last)
   })
   
   table <- dplyr::bind_rows(table_list)
