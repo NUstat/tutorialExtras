@@ -18,40 +18,44 @@ navbar:
   left:
   - text: Functions
     href: reference/index.html
-  right:
+  - text: Tutorials
+    href: tutorials/index.html
+  # right:
   #- text: ISDS Textbook
   #  href: https://nustat.github.io/intro-stat-data-sci/
 
 reference:
   - title: Functions
-  - subtitle: Questions
+  - subtitle: Question Types
     contents:
     - '`question_blank`'
     - '`question_dropdown`'
     - '`question_wordbank`'
-  - subtitle: Grading and Printing
-    contents:
-    - '`grade_button_ui`'
-    - '`grade_print_ui`'
-    - '`grade_server`'
+  - subtitle: Exam Features
+    - '`exam`'
     - '`lock_button_ui`'
     - '`lock_check_ui`'
     - '`lock_server`'
     - '`reset_button_ui`'
     - '`reset_server`'
-  - subtitle: Misc
+  - subtitle: Tutorial Grading
     contents:
-    - '`exam`'
-    - '`knit_print.tutorial_question`'
+    - '`grade_button_ui`'
+    - '`grade_print_ui`'
+    - '`grade_server`'
+  - subtitle: Setup
+    contents:
     - '`isds_setup`'
+    #- '`knit_print.tutorial_question`'
+    
 
 tutorials:
-# - name: exam_tutorial_example
-#   title: Preface & Chapter 1
-#   url: https://amkuyper.shinyapps.io/01_intro/
-# - name: grade_tutorial_example
-#   title: Chapter 2 Scatterplots
-#   url: https://amkuyper.shinyapps.io/02_ggplot1/
-# - name: new_question_types
-#   title: Chapter 2 Linegraphs and Histograms
-#   url: https://amkuyper.shinyapps.io/03_ggplot2/
+ - name: exam_tutorial_example
+   title: Exam Shuffle, Lock, Retry, Download Functions Example
+   url: https://amkuyper.shinyapps.io/exam_tutorial_example/
+ - name: grade_tutorial_example
+   title: Tutorial Grade and Download Functions Example
+   url: https://amkuyper.shinyapps.io/grade_tutorial_example/
+ - name: new_question_types
+   title: Word Bank, Drop Down, Fill in the Blank Question Type Examples
+   url: https://amkuyper.shinyapps.io/new_question_types/

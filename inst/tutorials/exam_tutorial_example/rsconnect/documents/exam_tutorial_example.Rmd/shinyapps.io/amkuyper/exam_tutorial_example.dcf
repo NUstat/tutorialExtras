@@ -1,0 +1,12 @@
+name: exam_tutorial_example
+title: exam_tutorial_example
+username: amkuyper
+account: amkuyper
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9702110
+bundleId: 7621170
+url: https://amkuyper.shinyapps.io/exam_tutorial_example/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

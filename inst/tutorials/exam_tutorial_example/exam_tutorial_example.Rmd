@@ -39,7 +39,7 @@ lock_server("lock",
             manual = c("App1-desc"),
             manual_pts = c(1))
 
-reset_server("reset", file_name = "ex_01", package_name = "ISDSfunctions")
+reset_server("reset", file_name = "exam_tutorial_example", package_name = "ISDSfunctions")
 ```
 
 ```{r Name}
@@ -260,8 +260,8 @@ If the tutorial is uploaded to shiny.io or Posit Cloud by the instructor the fir
 
 Once you are finished:
 
--   Click "Check submissions" to make sure all questions and exercises are submitted
--   Click the 'lock exam' button. Once you click this you will not be able to make any changes to your exam!
+-   Click "Check Submissions" to make sure all questions and exercises are submitted
+-   Click the 'Lock Exam' button. Once you click this you will not be able to make any changes to your exam!
 -   Once the lock is pressed a `Download Exam` option will become available,
 -   Download and **Check your HTML!**
 -   Upload the html to your assessment platform (ie: Canvas).
