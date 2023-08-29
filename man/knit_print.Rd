@@ -17,3 +17,4 @@ the references below.}
 \code{knitr::\link[knitr]{knit_print}} methods for \code{\link{question}} and
 \code{\link{quiz}}
 }
+\keyword{internal}
