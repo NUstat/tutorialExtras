@@ -32,6 +32,7 @@ reference:
     - '`question_dropdown`'
     - '`question_wordbank`'
   - subtitle: Exam Features
+    contents:
     - '`exam`'
     - '`lock_button_ui`'
     - '`lock_check_ui`'
