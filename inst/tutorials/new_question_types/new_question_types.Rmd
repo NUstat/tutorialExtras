@@ -28,7 +28,7 @@ This tutorial demonstrates how to **create new question types such as `question_
 
 <br>
 
-Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/) and `gradethis` (https://github.com/rstudio/gradethis) packages which these functions are derived from. Many thanks to the author of the `sortable` (https://github.com/rstudio/sortable) package and a solution thread by "stefan's on Jun 01, 2022" which helped with the code to develop the word bank question type.
+Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/)  package which these functions are derived from. Many thanks to the author of the `sortable` (https://github.com/rstudio/sortable) package and a solution thread by "stefan's on Jun 01, 2022" which helped with the code to develop the word bank question type.
 
 ## Set up
 

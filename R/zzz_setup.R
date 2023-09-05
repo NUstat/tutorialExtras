@@ -16,8 +16,30 @@
 #'
 #' @export
 isds_setup <- function(isds_exam = FALSE, max_attempt = Inf, max_retry = Inf, retry_cooldown = 24){
-  #hacky less than optimal solution
-  #setting global variables accessible to override_exercise and override_quiz
+  # hacky less than optimal solution
+  
+  # error checking
+  # ensure max_attempt is either inf or an integer
+  if (max_attempt != Inf) {
+    if(max_attempt%%1 != 0){
+      stop("max_attempt must be either an integer or Inf.")
+    }
+  }
+  
+  # ensure max_retry is either inf or an integer
+  if (max_retry != Inf) {
+    if(max_retry%%1 != 0){
+      stop("max_retry must be either an integer or Inf.")
+    }
+  }
+  
+  # ensure retry_cooldown is either 0 or an integer
+  if(retry_cooldown%%1 != 0){
+    stop("retry_cooldown must be an integer.")
+  }
+  
+  
+  # setting global variables accessible to override_exercise and override_quiz
   isds_exam <<- isds_exam
   max_attempt <<- max_attempt
   max_retry <<- max_retry

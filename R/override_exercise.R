@@ -840,31 +840,4 @@ install_knitr_hooks <- function() {
   #initialize_seed()
 }
 
-################################################################################
-################################################################################
-# TEST
-################################################################################
-################################################################################
-
-# Initialize tutorial R Markdown extensions
-# @export
-# initialize_seed <- function() {
-#   # helper function for one time initialization
-#   print("knitr.in.progress?")
-#   print(isTRUE(getOption("knitr.in.progress")))
-#   print("tutorial not initialized?")
-#   print(!isTRUE(knitr::opts_knit$get("tutorial.initialized")))
-#   # need to retrigger tutorial not initialized and knitr.in.progress
-#   if (isTRUE(getOption("knitr.in.progress")) &&
-#        !isTRUE(knitr::opts_knit$get("tutorial.initialized"))) {
-#     
-#     rmarkdown::shiny_prerendered_chunk(
-#       'server',
-#       'ISDSfunctions:::prepare_seed(session)',
-#       singleton = TRUE
-#     )
-#   }
-# }
-
-
     

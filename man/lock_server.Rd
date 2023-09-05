@@ -25,15 +25,15 @@ lock_server(
 
 \item{show_correct}{TRUE/FALSE: Whether or not to show points for each question in grade output. Default TRUE.}
 
-\item{graded}{Either NULL or a vector containing the names of each question/exercise.}
+\item{graded}{Either NULL or a vector containing the names of each question with custom points.}
 
-\item{graded_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in graded.}
+\item{graded_pts}{Either NULL or a vector containing the number of points corresponding to each question in graded.}
 
-\item{ex}{Either NULL or a vector containing the names of each question/exercise.}
+\item{ex}{Either NULL or a vector containing the names of exercises with custom points.}
 
-\item{ex_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in ex.}
+\item{ex_pts}{Either NULL or a vector containing the number of points corresponding to each exercise in ex.}
 
-\item{manual}{Either NULL or a vector containing the names of each question/exercise to be manually graded.}
+\item{manual}{Either NULL or a vector containing the names of each question to be manually graded.}
 
 \item{manual_pts}{Either NULL or a vector containing the number of points corresponding to each question/exercise in manual.}
 

@@ -9,9 +9,9 @@ reset_server(id, file_name = NULL, package_name = NULL, tz = Sys.timezone())
 \arguments{
 \item{id}{ID matching ui with server}
 
-\item{file_name}{Name of the .Rmd file (not the tutorial id)}
+\item{file_name}{Tutorial name (subdirectory within tutorials/directory of installed package)}
 
-\item{package_name}{Name of the package with tutorial.}
+\item{package_name}{Name of package with tutorial.}
 
 \item{tz}{Time zone to display retry time.}
 }

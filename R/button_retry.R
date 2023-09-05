@@ -1,7 +1,11 @@
 #' @title Tutorial reset button
 #'
 #' @description
-#' Reset the entire exam to allow another attempt.
+#' Reset the entire exam to allow another attempt. 
+#' The number of attempts and how often the retry option is available can be defined in 
+#' the `isds_setup()` function. 
+#' The tutorial must be available in a package for this button to work as the function requires 
+#' a name and package specification.
 #'
 #' Shiny ui and server logic for the lock computation.
 #'
@@ -27,8 +31,8 @@ reset_button_ui <- function(id, label = "Retry Exam") {
 # Define the server logic for a module to lock exam
 #' @title Tutorial reset server
 #' @param id ID matching ui with server
-#' @param file_name Name of the .Rmd file (not the tutorial id)
-#' @param package_name Name of the package with tutorial.
+#' @param file_name Tutorial name (subdirectory within tutorials/directory of installed package)
+#' @param package_name Name of package with tutorial.
 #' @param tz Time zone to display retry time.
 #' @export
 reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.timezone()) {
@@ -47,7 +51,6 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           wait_time <- round(as.numeric(difftime(learnr:::timestamp_utc(), lock_time, units="hours")), 2)
           
           retry_time <- as.POSIXct(lock_time, tz = "UTC") + lubridate::hours(retry_cooldown)
-          
           
           #do not allow retry until cooldown is met.
           if(wait_time <  retry_cooldown){
@@ -80,15 +83,13 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
         
         # update attempt to set new seed
         attempt <<- attempt + 1
-        
         save(attempt, file = paste0(mod_dir, "attempt.RData"))
-        # trigger a reload to resubmit questions and unlock
         
         #set new seed
         init.seed <- Sys.info()["user"]
         TeachingDemos::char2seed(paste0(init.seed, attempt))
         
-        # NEED TO CLEAR PRERENDERED OUTPUT AND RERUN
+        # NEED TO CLEAR PRERENDERED OUTPUT AND RERUN -----------------------
         # get tutorial path
         rmd_path <- learnr:::get_tutorial_path(file_name, package_name)
         files <- list.files(rmd_path, pattern = "\\.Rmd$", full.names = TRUE)
@@ -99,11 +100,10 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
         # can't run app within an app
         # workaround is to write the run_tutorial function in a .R script
         # and call the script to run on session end
-        
-        # write to R file
         tmp_file <- tempfile(tmpdir = mod_dir, fileext = ".R")
         writeLines(paste0("learnr::run_tutorial(name = '",file_name, "', package = '",package_name,"')"),
                    con = tmp_file)
+        
         ##############################################################
         # close the session
         session$close()

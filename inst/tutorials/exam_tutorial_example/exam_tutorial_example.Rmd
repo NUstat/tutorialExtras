@@ -34,6 +34,9 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r, context = "server"}
 lock_server("lock",
+            show_correct = TRUE,
+            graded = c("lm-calc"),
+            graded_pts = c(2),
             ex = c("App1"), 
             ex_pts = c(1),
             manual = c("App1-desc"),
@@ -68,7 +71,7 @@ This tutorial demonstrates how to **shuffle questions, randomly select questions
 
 <br>
 
-Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/) and `gradethis` (https://github.com/rstudio/gradethis) packages which these functions are derived from.
+Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/)  package which these functions are derived from.
 
 Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/. doi:
 10.5281/zenodo.3960218.
@@ -99,6 +102,8 @@ The `reset_server()` is only needed if you would like to include a "retry button
 `r ''````{r, context = "server"}
 lock_server(id = "lock",
             show_correct = TRUE,
+            graded = c("lm-calc"),
+            graded_pts = c(2),
             ex = c("App1"), 
             ex_pts = c(1),
             manual = c("App1-desc"),
@@ -164,6 +169,11 @@ In the example below, there are two questions with the argument `options = list(
 There are three questions with the argument `options = list(group = "prob")` ("prob" could be any string name you choose). Only one of the questions defined with the same group will be randomly used.
 
 
+It is important to understand the naming convention of a question is specifying manual points. If you have a `quiz()` or `exam()` with a set of questions, the label of the questions is the "chunkname-#". For example, if you name your code chunk "Q", ie: ``{r Q}`, then the first question is referenced by "Q-1" and the second question is "Q-2". If a question is not in a `quiz()` or `exam()`, then the label is simply the name of the code chunk. An exercise label is the name of the code chunk. 
+
+If you "shuffle" an `exam()` you cannot reference the questions by "chunkname-#" as the order will be random for each user. Instead, within the question you can specify `options = list(label = "string")` and reference the question based on your defined label. In the below example we defined a question with `label = "lm-calc"` and defined the custom points in the `lock_server` to demonstrate. 
+
+
 ```{r Q, echo = TRUE}
 exam(
   shuffle = TRUE,
@@ -187,7 +197,8 @@ exam(
            allow_retry = TRUE,
            correct = "Correct",
            incorrect = "Submitted",
-           options = list(multi_part = "skim")),
+           options = list(multi_part = "skim",
+                          label = "lm-calc")),
   question_dropdown("Which of the following is NOT an assumptions of linear models",
            answer("The response variable is normally distributed", correct = TRUE), 
            answer("The residuals are normally distributed"),
@@ -255,6 +266,7 @@ The submitted answer will ALWAYS be marked incorrect when `isds_setup(exam = TRU
 The downloaded exam will have the number of minutes each question/exercise was submitted at in case it is a timed exam. There is no functionality that will end the tutorial at a given time or display the time, meaning it would be a self-timed exam.  
 
 If the tutorial is uploaded to shiny.io or Posit Cloud by the instructor the first shuffle will be identical for everyone because the seed is defined based on the "user" and the "same user" uploaded the tutorial.
+
 
 ## Submit 
 

@@ -33,7 +33,7 @@ lock_button_ui <- function(id, label = "Lock Exam") {
 #' @description
 #' View if any questions or exercises have not been submitted prior to locking the exam.
 #' @param id ID matching ui with "lock_server()"
-#' @param label Label for view button
+#' @param label Label for button
 #' @export
 lock_check_ui <- function(id, label = "Check Submissions") {
   ns <- NS(id)
@@ -50,11 +50,11 @@ lock_check_ui <- function(id, label = "Check Submissions") {
 #' @param id ID matching ui with server
 #' @param num_blanks TRUE/FALSE: Set the number of points for a question equal to the number of blanks. Default TRUE.
 #' @param show_correct TRUE/FALSE: Whether or not to show points for each question in grade output. Default TRUE.
-#' @param graded Either NULL or a vector containing the names of each question/exercise.
-#' @param graded_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in graded.
-#' @param ex Either NULL or a vector containing the names of each question/exercise.
-#' @param ex_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in ex.
-#' @param manual Either NULL or a vector containing the names of each question/exercise to be manually graded.
+#' @param graded Either NULL or a vector containing the names of each question with custom points.
+#' @param graded_pts Either NULL or a vector containing the number of points corresponding to each question in graded.
+#' @param ex Either NULL or a vector containing the names of exercises with custom points.
+#' @param ex_pts Either NULL or a vector containing the number of points corresponding to each exercise in ex.
+#' @param manual Either NULL or a vector containing the names of each question to be manually graded.
 #' @param manual_pts Either NULL or a vector containing the number of points corresponding to each question/exercise in manual.
 #' @param exclude Either NULL or a vector containing the names of each question/exercise to exclude from grading.
 #' @param tz Time zone to display start time on report.
@@ -75,18 +75,9 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
         # if session restarted get original start time or set start time to now
         # if user clicks "start over" we do not want time to restart
-        #start_time <<- ifelse(is.null(learnr:::get_object(session, NS("time", id = "start"))$data$time),
-        #                      learnr:::timestamp_utc(), learnr:::get_object(session, NS("time", id = "start"))$data$time)
-        # save original start time as object for restart
-        #learnr:::save_object(session, object_id = NS("time", id = "start"),
-        #                     learnr:::tutorial_object("time",
-        #                                              list(time = start_time) ) )
-        
-        # get time if it exists
         if(file.exists(paste0(mod_dir,"time.RData"))){
           load(file = paste0(mod_dir,"time.RData"))
         }
-        #start_time <<- ifelse(exists("start_time"), start_time, learnr:::timestamp_utc())
         start_time <<- ifelse(exists("start_time") && start_time != 0, start_time, learnr:::timestamp_utc())
         save(start_time, file = paste0(mod_dir, "time.RData"))
         
@@ -102,17 +93,45 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
       })
       
 ########################################################################
-########################################################################
-########################################################################
-########################################################################
-      # View unsubmitted questions
+# VIEW UNSUBMITTED QUESTIONS: lock_check_ui  ------------------------------
       observeEvent(input$viewExam, {
         ns <- getDefaultReactiveDomain()$ns
         
         tutorial_info <- isolate(get_tutorial_info())
-        #--------------------------------------------------------------------
         
-        #define rubric points
+        print(learnr:::get_exercise_cache("Q3"))
+        # ERROR CHECKING START-----------------------------------------------------
+        
+        #error checking for label names provided
+        all_labels <- c(graded, ex, manual, exclude)
+        if(!is.null(all_labels)){
+          purrr::map(all_labels, function(x){
+            if(!(x %in% tutorial_info$items$label)){
+              stop(paste0(x, " is not a name of a question or exercise."))
+            }
+          })
+        }
+        # add error checking that length names match length points
+        if(!is.null(graded) || !is.null(graded_pts)){
+          if (length(graded) != length(graded_pts)) {
+            stop("Length of graded must equal length of graded_pts.")
+          }
+        }
+        if(!is.null(ex) || !is.null(ex_pts)){
+          if (length(ex) != length(ex_pts)) {
+            stop("Length of ex must equal length of ex_pts.")
+          }
+        }
+        if(!is.null(manual) || !is.null(manual_pts)){
+          if (length(manual) != length(manual_pts)) {
+            stop("Length of manual must equal length of manual_pts.")
+          }
+        }
+        
+        # ERROR CHECKING END ------------------------------------------------------
+        
+        # DEFINE RUBRIC POINTS ----------------------------------------------------
+
         if(!is.null(graded)){
           rubric_1 <- tidyr::tibble(label = graded,
                                     pts_possible = graded_pts,
@@ -134,20 +153,21 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         rubric_tmp <- tidyr::tibble(label = tutorial_info$items$label)
         
         if(!is.null(set_pts)){
-          rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label") #%>%
-          #mutate(pts_possible = ifelse(is.na(pts_possible), 1, pts_possible))
+          rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label") 
         }else{
           rubric <- rubric_tmp %>%
             mutate(pts_possible = rep(NA, length(label)),
                    eval = rep(NA, length(label)))
         }
-        #Set up rubric points complete
-        #--------------------------------------------------------------------
         
+        # RUBRIC POINTS COMPLETE ---------------------------------------------
+        
+        ################################################
+        #this will get submissions and if correct
         get_grades <- isolate(learnr::get_tutorial_state())
         
-        #---------------------------------------------
-        # for some reason sometimes doesn't always grab exercises
+        # Grab exercise fix start ----------------------------------------
+        # for some reason doesn't always grab exercises
         # manually grab exercises just in case
         ex_names <- tutorial_info$items %>% 
           filter(type == "exercise") %>% 
@@ -174,11 +194,11 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
             
           }
         }
-        # End grab exercise fix
-        #---------------------------------------------
+        # Grab exercise fix end -----------------------------------------------
         
         table <- ISDSfunctions:::submissions(get_grades = get_grades)
         
+        # catch error - if empty do not continue
         if(rlang::is_empty(table)){
           return()
         }
@@ -207,9 +227,9 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
       })
       
-########################################################################
-########################################################################
-      # lock exam and show download button
+      
+# LOCK EXAM ---------------------------------------------------------------
+      
       # register that lock was pressed and reload exam to lock all questions
       observeEvent(input$lock, {
         ns <- getDefaultReactiveDomain()$ns
@@ -225,10 +245,8 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
       }) #close observe event
       
-########################################################################
-########################################################################
-      
-      # Download grade handler
+# DOWNLOAD GRADE HANDLER --------------------------------------------------
+
       output$downloadExam <- downloadHandler(
         filename = function() {
           paste0("STAT_Exam_", Sys.time(),
@@ -239,23 +257,38 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           
           tutorial_info <- isolate(get_tutorial_info())
           
+          # ERROR CHECKING START-----------------------------------------------------
+          
           #error checking for label names provided
-          #check if exclude list is valid
-          #remove error checking because added random question selection
-          # all_labels <- c(graded, ex, manual, exclude)
-          # if(!is.null(all_labels)){
-          #   purrr::map(all_labels, function(x){
-          #     if(!(x %in% tutorial_info$items$label)){
-          #       stop(paste0(x, " is not a name of a question or exercise."))
-          #     }
-          #   })
-          # }
+          all_labels <- c(graded, ex, manual, exclude)
+          if(!is.null(all_labels)){
+            purrr::map(all_labels, function(x){
+              if(!(x %in% tutorial_info$items$label)){
+                stop(paste0(x, " is not a name of a question or exercise."))
+              }
+            })
+          }
           # add error checking that length names match length points
+          if(!is.null(graded) || !is.null(graded_pts)){
+              if (length(graded) != length(graded_pts)) {
+                stop("Length of graded must equal length of graded_pts.")
+              }
+          }
+          if(!is.null(ex) || !is.null(ex_pts)){
+            if (length(ex) != length(ex_pts)) {
+              stop("Length of ex must equal length of ex_pts.")
+            }
+          }
+          if(!is.null(manual) || !is.null(manual_pts)){
+            if (length(manual) != length(manual_pts)) {
+              stop("Length of manual must equal length of manual_pts.")
+            }
+          }
           
-          # Error checking complete
-          #--------------------------------------------------------------------
+          # ERROR CHECKING END ------------------------------------------------------
           
-          #define rubric points
+          # DEFINE RUBRIC START -----------------------------------------------------
+
           if(!is.null(graded)){
             rubric_1 <- tidyr::tibble(label = graded,
                                       pts_possible = graded_pts,
@@ -277,21 +310,22 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           rubric_tmp <- tidyr::tibble(label = tutorial_info$items$label)
           
           if(!is.null(set_pts)){
-            rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label") #%>%
-              #mutate(pts_possible = ifelse(is.na(pts_possible), 1, pts_possible))
+            rubric <- dplyr::left_join(rubric_tmp, set_pts, by = "label")
           }else{
             rubric <- rubric_tmp %>%
               mutate(pts_possible = rep(NA, length(label)),
                      eval = rep(NA, length(label)))
           }
-          #Set up rubric points complete
-          #--------------------------------------------------------------------
           
-          # get and organize all user submission questions and exercises
+          # DEFINE RUBRIC END -----------------------------------------------------
+          
+          # SUBMISSION ORGANIZATION START ----------------------------------------
+          # get all user submission questions and exercises
           get_grades <- isolate(learnr::get_tutorial_state())
      
-          #---------------------------------------------
-          # for some reason sometimes doesn't always grab exercises
+          # Grab exercise fix start ----------------------------------------
+          # for some reason doesn't always grab exercises
+          # manually grab exercises just in case
           ex_names <- tutorial_info$items %>% 
             filter(type == "exercise") %>% 
             pull(label)
@@ -317,11 +351,11 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
               
             }
           }
-          # End grab exercise fix
-          #---------------------------------------------
+          # Grab exercise fix end -----------------------------------------------
+          
           table <- ISDSfunctions:::submissions(get_grades = get_grades)
           
-          # # catch error - if empty do not continue
+          # catch error - if empty do not continue
           if(rlang::is_empty(table)){
             return()
           }
@@ -370,18 +404,14 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
                               tmp_name
                               )
           
-          # user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
-          #                     tutorial_info$user_id)
-          
           # exclude questions if listed
           if(!is.null(exclude)){
             grades <- grades %>%
               dplyr::filter(!(label %in% exclude))
           }
-          
-          # submission organization complete
-          #--------------------------------------------------------------------
-          
+
+          # SUBMISSION ORGANIZATION COMPLETE ----------------------------------------
+
           # Divide into subsections for rendered report
           graded <- grades %>%
             dplyr::filter(eval == "question") %>% 
@@ -495,20 +525,18 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
     }) #close module server
 } #close main function
 
-
-#################################################################
-#################################################################
+# -------------------------------------------------------------------------
+# SUBMISSION FUNCTION -----------------------------------------------------
+# used for button_grade_tutorial AND button_lock_exam
 # need to calculate outside of observe event so that it can apply to download handler
 submissions <- function(get_grades = list()){
   # get and organize all user submission questions and exercises
-  # organize submissions in a list
   table_list <- map(names(get_grades), function(x){
     # handle multiple answer issues
     get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
-    
     get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)
     
-    #if empty set to FALSE
+    # if correct is empty then set to FALSE
     get_grades[[x]]$correct <- ifelse(rlang::is_empty(get_grades[[x]]$correct), 
                                       FALSE,
                                       get_grades[[x]]$correct)
@@ -539,8 +567,8 @@ submissions <- function(get_grades = list()){
       dplyr::mutate(label = as.character(label),
                     answer = as.character(answer),
                     attempt = as.numeric(attempt),
-                    time_stamp = time_last) #%>% 
-      #dplyr::select(-time_last)
+                    time_stamp = time_last) %>% 
+      dplyr::select(-time_last)
   })
   
   table <- dplyr::bind_rows(table_list)

@@ -9,7 +9,7 @@ lock_check_ui(id, label = "Check Submissions")
 \arguments{
 \item{id}{ID matching ui with "lock_server()"}
 
-\item{label}{Label for view button}
+\item{label}{Label for button}
 }
 \description{
 View if any questions or exercises have not been submitted prior to locking the exam.

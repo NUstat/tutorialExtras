@@ -77,7 +77,7 @@ This tutorial demonstrates how to **grade tutorials, deduct points based on atte
 
 <br>
 
-Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/) and `gradethis` (https://github.com/rstudio/gradethis) packages which these functions are derived from.
+Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/) package which these functions are derived from.
 
 Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/. doi:
 10.5281/zenodo.3960218.

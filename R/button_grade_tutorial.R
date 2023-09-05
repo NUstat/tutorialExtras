@@ -84,10 +84,6 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
         filename = function() {
           paste0("STAT_RC_", Sys.time(),
                  ".html")
-          # paste0(tutorial_info$tutorial_id,
-          #        "-",
-          #        user_name,
-          #        ".html")
         },
         content = function(file) {
           ns <- getDefaultReactiveDomain()$ns
@@ -125,18 +121,24 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
   } #close main grade server
 
 
-#####################################################################################
-#####################################################################################
+# Grade Calc Function -----------------------------------------------------
 # need to calculate outside of observe event so that it can apply to download handler
 grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, pts_possible = NULL, 
                        num_try = 3, deduction = 0.1, exclude = NULL){
   ns <- getDefaultReactiveDomain()$ns
   
   tutorial_info <- isolate(get_tutorial_info())
+
+  # ERROR CHECKING START-----------------------------------------------------
   
-  #######################################################################
-  # ERROR CHECKING
-  #######################################################################
+  # check that num_try is an integer
+  if(num_try%%1 != 0){
+    stop("num_try must be either an integer.")
+  }
+  # check that deduction is outside of 0 and 1
+  if(deduction < 0 | deduction > 1){
+    stop("deduction must be a probability.")
+  }
   # check if exclude list is valid
   if(!is.null(exclude)){
     purrr::map(exclude, function(x){
@@ -158,9 +160,9 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
     rubric <- tidyr::tibble(label = label, 
                             pts_possible = as.numeric(pts_possible))
   }
-  #######################################################################
-  # ERROR CHECKING COMPLETE
-  ################################################################################################################################################
+
+  # ERROR CHECKING END ------------------------------------------------------
+
   rubric_tmp <- tidyr::tibble(label = tutorial_info$items$label)
   
   if(!is.null(label)){
@@ -173,12 +175,12 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
       mutate(pts_possible = rep(NA, length(label)) )
   }
   
-  ##################################################################
+  ################################################
   #this will get number of attempts and if correct
   get_grades <- isolate(learnr::get_tutorial_state())
   
-  #---------------------------------------------
-  # for some reason sometimes doesn't always grab exercises
+  # Grab exercise fix start ----------------------------------------
+  # for some reason doesn't always grab exercises
   # manually grab exercises just in case
   ex_names <- tutorial_info$items %>% 
     filter(type == "exercise") %>% 
@@ -205,8 +207,7 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
       
     }
   }
-  # End grab exercise fix
-  #---------------------------------------------
+  # Grab exercise fix end -----------------------------------------------
   
   table <- ISDSfunctions:::submissions(get_grades = get_grades)
   
@@ -219,9 +220,7 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
   grades <- dplyr::left_join(rubric, table, by = "label") %>% 
     dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
                   deduction = ifelse(deduction > 1, 1, deduction),
-                  partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred),
-                  #pts_earned = pts_possible *as.numeric(correct)*(1-deduction),
-                  #pts_earned = ifelse(is.na(pts_earned), 0, pts_earned)
+                  partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred)
                   )
   
   # handle pts_possible 1) priority goes to manual setting 
@@ -245,10 +244,17 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
       )
   }
   
-  
+  # need to get name before removing "excluded" questions
   # if there is a code chunk question labeled "Name" get the name
-  user_name <- ifelse("Name" %in% grades$label, grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
-                      tutorial_info$user_id)
+  tmp_name <- ifelse("Name" %in% grades$label,
+                     grades %>% dplyr::filter(label == "Name") %>% dplyr::pull(answer),
+                     NA)
+  
+  # handle unsubmitted names
+  user_name <- ifelse(is.na(tmp_name),
+                      tutorial_info$user_id,
+                      tmp_name
+  )
   
   # exclude specified questions
   if(!is.null(exclude)){
