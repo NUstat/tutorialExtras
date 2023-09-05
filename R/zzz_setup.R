@@ -76,6 +76,6 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = Inf, max_retry = Inf, re
   
   TeachingDemos::char2seed(paste0(init.seed, attempt))
   
-  rand_int <<- runif(1, 0.01, 10)
+  rand_int <<- stats::runif(1, 0.01, 10)
   
 }
