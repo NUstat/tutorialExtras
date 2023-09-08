@@ -317,6 +317,8 @@ setup_exercise_handler <- function(exercise_rx, session) {
 # ONLY change is forcing ISDSfunctions:::exercise_server_chunk
 tutorial_knitr_options <- function() {
   
+  
+  
   # helper to check for runtime: shiny_prerendered being active
   is_shiny_prerendered_active <- function() {
     identical(knitr::opts_knit$get("rmarkdown.runtime"),"shiny_prerendered")

@@ -99,7 +99,6 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
         tutorial_info <- isolate(get_tutorial_info())
         
-        print(learnr:::get_exercise_cache("Q3"))
         # ERROR CHECKING START-----------------------------------------------------
         
         #error checking for label names provided
@@ -417,16 +416,14 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
             dplyr::filter(eval == "question") %>% 
             dplyr::select(label, answer, time, pts_earned)
             
-          
           score <- ifelse(nrow(graded) == 0, 0, sum(graded$pts_earned))
           
           if(show_correct == FALSE){
             graded <- graded %>% select(-pts_earned) #remove pts earned
           }
           
-          exercises <- grades %>%
-            dplyr::filter(eval == "exercise") %>%
-            transpose()
+          exercise_tmp <- grades %>%
+            dplyr::filter(eval == "exercise")
           
           manual <- grades %>%
             dplyr::filter(eval == "manual") %>%
@@ -437,23 +434,53 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
             dplyr::select(label, answer, time) 
           
           #--------------------------------------------------------------------
-          # Create string of each section header
+          # Get any text descriptions stored with text_ui/text_server
+          state_objects <- learnr:::get_all_state_objects(session, exercise_output = FALSE)
+          store_objects <- learnr:::filter_state_objects(state_objects, "store")
+          
+          if(length(store_objects) != 0){
+            descr <- list()
+            for(x in store_objects){
+              id <- gsub( pattern = "store-", replacement = "", x = x$id)
+              descr[[id]] <- as.character(x$data$store)
+            }
+            content_tmp <- unnest(enframe(descr, name = "label", value = "content"), content)
+            
+            # put text with corresponding exercises
+            ex_text <- full_join(exercise_tmp, content_tmp, by = "label")
+            
+          }else{
+            # otherwise define content variable so we don't get an error
+            ex_text <- exercise_tmp
+            ex_text$content <- rep(NA, length(ex_text$label))
+          }
+          
+          exercises <- ex_text %>%
+            dplyr::filter(eval == "exercise") %>%
+            dplyr::mutate(content = ifelse(is.na(content), "", content)) %>%
+            transpose()
+          
+          content <- ex_text %>%
+            dplyr::filter(is.na(eval)) %>%
+            select(label, content)
+          
+
+          # Create document content to render ---------------------------------------
+          #--------------------------------------------------------------------------
           yaml_string <- c("---", 
                            toString(paste0("title: ", tutorial_info$tutorial_id)), 
                            toString(paste0("author: ", user_name)),
                            toString(paste0("date: ", format(as.POSIXct(start_time, tz = "UTC"), tz = tz, usetz=TRUE)) ), "---")
           
-          # if we are counting attempts let's print it after yaml
+          # if we are counting attempts let's print it in subtitle of yaml
           if(max_retry != Inf && exists("attempt")){
             
-            #attempt_string <- c(toString(paste0("# Attempt  #", attempt)))
             yaml_string <- c("---", 
                              toString(paste0("title: ", tutorial_info$tutorial_id)), 
                              toString(paste0("subtitle: Attempt ", attempt)), 
                              toString(paste0("author: ", user_name)),
                              toString(paste0("date: ", format(as.POSIXct(start_time, tz = "UTC"), tz = tz, usetz=TRUE)) ), "---")
             
-            #yaml_string <- c(yaml_string, attempt_string)
           }
          
           graded_string <- c(toString(paste0("# Concept  ", score)), "```{r concept, echo=FALSE}", "graded %>% knitr::kable()", "```")
@@ -464,7 +491,8 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           
           exercise_substring <- map(exercises, function(x){
             c(toString(paste0("### ", x$label, " - ", ifelse(isTRUE(x$correct), "Correct", "Needs Grading")) ), 
-              toString(paste0("Time: ", x$time)),
+              toString(paste0("Time: ", x$time, " <br> <br> ")),
+              toString(paste0(x$content)),
               toString(paste0("```{r ", x$label, ", echo = TRUE}")), 
               as.character(x$answer), "```", " ")
           })
@@ -482,7 +510,12 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           dnf_string <- c("# Incomplete Problems", "```{r incomplete, echo=FALSE}", "incomplete %>% knitr::kable()", "```")
           
           if(nrow(incomplete) == 0){
-            dnf_string <- c("# Incomplete Problems", "No incomplete problems.")
+            dnf_string <- c("# Incomplete Problems", "No incomplete problems.", " ")
+          }
+          
+          content_string <- c("# Description Content", "```{r content, echo=FALSE}", "content %>% knitr::kable()", "```")
+          if(nrow(content) == 0){
+            content_string <- c(" ")
           }
           
           #--------------------------------------------------------------------
@@ -490,6 +523,8 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           tmp_dir <- tempdir()
           
           #--------------------------------------------------------------------
+          # write images folder to a temporary directory
+          file.copy("images", tmp_dir, recursive = TRUE)
           # write data folder to a temporary directory
           file.copy("data", tmp_dir, recursive = TRUE)
           # Need to load required datasets and packages
@@ -512,7 +547,8 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           tmp_file <- tempfile(tmpdir = tmp_dir, fileext = ".Rmd")
           # write to Rmd
           writeLines(c(yaml_string, setup_string, graded_string, 
-                       exercise_string, manual_string, dnf_string),
+                       exercise_string, manual_string, dnf_string,
+                       content_string),
                      con = tmp_file)
           # render to html
           output <- rmarkdown::render(tmp_file)
