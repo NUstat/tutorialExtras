@@ -17,7 +17,7 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-library(ISDSfunctions)
+library(tutorialExtras)
 library(palmerpenguins)
 library(gradethis)
 
@@ -42,7 +42,7 @@ lock_server("lock",
             manual = c("App1-desc"),
             manual_pts = c(1))
 
-reset_server("reset", file_name = "exam_tutorial_example", package_name = "ISDSfunctions")
+reset_server("reset", file_name = "exam_tutorial_example", package_name = "tutorialExtras")
 ```
 
 ```{r Name}
@@ -61,7 +61,7 @@ question_text("Name:",
 
 ## Introduction
 
-The `ISDSfunctions` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
+The `tutorialExtras` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
 
 1. shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions
 1. grade tutorials, deduct points based on attempt, and download an html output for submissions.
@@ -79,13 +79,13 @@ Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarct
 
 ## Set up
 
-In order to set up your tutorial you will want to include the `ISDSfunctions` package and specify your desired settings in the `isds_setup()` function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
+In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `isds_setup()` function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
 
 ````markdown
 `r ''```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-library(ISDSfunctions)
+library(tutorialExtras)
 library(gradethis)
 
 isds_setup(isds_exam = TRUE, 
@@ -111,7 +111,7 @@ lock_server(id = "lock",
             exclude = "Name")
 reset_server(id = "reset", 
              file_name = "exam_ex", 
-             package_name = "ISDSfunctions")
+             package_name = "tutorialExtras")
 ```
 ````
 

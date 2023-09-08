@@ -17,7 +17,7 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-library(ISDSfunctions)
+library(tutorialExtras)
 library(palmerpenguins)
 library(gradethis)
 
@@ -67,7 +67,7 @@ grade_button_ui("grade")
 
 ## Introduction
 
-The `ISDSfunctions` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
+The `tutorialExtras` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
 
 1. shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions
 1. grade tutorials, deduct points based on attempt, and download an html output for submissions.
@@ -85,13 +85,13 @@ Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarct
 
 ## Set up
 
-In order to set up your tutorial you will want to include the `ISDSfunctions` package and specify your desired settings in the `isds_setup()` function. By default, `isds_exam` is FALSE and `max_attempt` is set to Inf. If you do not need to change these settings then you do not need to load the function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
+In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `isds_setup()` function. By default, `isds_exam` is FALSE and `max_attempt` is set to Inf. If you do not need to change these settings then you do not need to load the function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
 
 ````markdown
 `r ''```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-library(ISDSfunctions)
+library(tutorialExtras)
 library(gradethis)
 
 # optional max_attempt arguement can be set in isds_setup()

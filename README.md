@@ -1,18 +1,18 @@
 
-# ISDSfunctions
+# tutorialExtras
 
-The ISDSfunctions package contains a variety of functions to help enhance learnr tutorials. The ISDSfunctions package is free and offered to support instructors who want to teach R.
+The tutorialExtras package contains a variety of functions to help enhance learnr tutorials. The tutorialExtras package is free and offered to support instructors who want to teach R.
 
 # Installation
 
-Install the latest version of ISDSfunctions from GitHub.
+Install the latest version of tutorialExtras from GitHub.
 
-devtools::install_github("NUstat/ISDSfunctions", dependencies = TRUE)
+devtools::install_github("NUstat/tutorialExtras", dependencies = TRUE)
 
 Currently not available on CRAN.
 
 
-# Features of ISDSfunctions
+# Features of tutorialExtras
 
  - 3 new question types including: fill in the blank, radio drop-down, and word bank.
  - tutorial grading and printing options
@@ -29,7 +29,7 @@ The following tutorials demonstrate how to use the functions within this package
 - grade_tutorial_example
 - new_question_types
 
-Tutorials can be run by typing the following line in the R console: `learnr::run_tutorial("new_question_types", package = "ISDSfunctions")`. Alternatively, in Version 1.3 onwards after having executed `library(ISDSfunctions)`, a list of tutorials appears in a tutorial tab (by default it will be in the upper-right pane).
+Tutorials can be run by typing the following line in the R console: `learnr::run_tutorial("new_question_types", package = "tutorialExtras")`. Alternatively, in Version 1.3 onwards after having executed `library(tutorialExtras)`, a list of tutorials appears in a tutorial tab (by default it will be in the upper-right pane).
 
 # Acknowledgments
 

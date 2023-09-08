@@ -69,7 +69,7 @@ question_wordbank <- function(
     random_answer_order = TRUE,
     options = sortable::sortable_options()
 ) {
-  ISDSfunctions:::wordbank_question(
+  tutorialExtras:::wordbank_question(
     text = text,
     ...,
     choices = choices,

@@ -14,6 +14,6 @@ LaTeX: pdfLaTeX
 
 BuildType: Package
 PackageUseDevtools: Yes
-PackagePath: C:/Users/dks7600/Documents/ISDSfunctions
+PackagePath: C:/Users/dks7600/Documents/tutorialExtras
 PackageInstallArgs: --no-multiarch --with-keep.source
 PackageRoxygenize: rd,collate,namespace

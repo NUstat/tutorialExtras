@@ -209,7 +209,7 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
   }
   # Grab exercise fix end -----------------------------------------------
   
-  table <- ISDSfunctions:::submissions(get_grades = get_grades)
+  table <- tutorialExtras:::submissions(get_grades = get_grades)
   
   # catch error - if empty do not continue
   if(rlang::is_empty(table)){
