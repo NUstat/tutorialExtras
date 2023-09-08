@@ -11,7 +11,6 @@ template:
 
 navbar:
   background: "#4E2A84"
-  logo: "images/logo_isds.png"
   align: center
   title: false
 
@@ -39,6 +38,8 @@ reference:
     - '`lock_server`'
     - '`reset_button_ui`'
     - '`reset_server`'
+    - '`text_ui`'
+    - '`text_server`'
   - subtitle: Tutorial Grading
     contents:
     - '`grade_button_ui`'
