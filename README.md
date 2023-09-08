@@ -1,7 +1,7 @@
 
 # tutorialExtras
 
-The tutorialExtras package contains a variety of functions to help enhance learnr tutorials. The tutorialExtras package is free and offered to support instructors who want to teach R.
+The tutorialExtras package contains a variety of functions to help enhance learnr tutorials. The tutorialExtras package is free and offered to support instructors who want to teach R. These functions are currently being implemented in the following packages: isdsTutorials and r4dsQuizzes.
 
 # Installation
 
@@ -34,3 +34,11 @@ Tutorials can be run by typing the following line in the R console: `learnr::run
 # Acknowledgments
 
 This work was made possible through funding from the Alumnae of Northwestern University grant and the Open Educational Resources (OER) grant.
+
+# Citations
+
+Aden-Buie G, Chen D, Grolemund G, Rossell Hayes A, Schloerke B (2023). gradethis: Automated Feedback for Student Exercises in 'learnr' Tutorials. https://pkgs.rstudio.com/gradethis/, https://rstudio.github.io/learnr/, https://github.com/rstudio/gradethis.
+
+Aden-Buie G, Schloerke B, Allaire J, Rossell Hayes A (2023). learnr: Interactive Tutorials for R. https://rstudio.github.io/learnr/, https://github.com/rstudio/learnr.
+
+de Vries A, Schloerke B, Russell K (2023). sortable: Drag-and-Drop in 'shiny' Apps with 'SortableJS'. R package version 0.5.0, https://rstudio.github.io/sortable/.
