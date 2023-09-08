@@ -1,72 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/404.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/404.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/LICENSE.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/authors.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/authors.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/index.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/index.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/grade_button_ui.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/grade_button_ui.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/grade_print_ui.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/grade_print_ui.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/grade_server.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/grade_server.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/index.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/isds_setup.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/isds_setup.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/knit_print.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/knit_print.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/lock_button_ui.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/lock_button_ui.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/lock_check_ui.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/lock_check_ui.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/lock_server.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/lock_server.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/question_blank.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/question_blank.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/question_dropdown.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/question_dropdown.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/question_wordbank.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/question_wordbank.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/quiz.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/quiz.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/reset_button_ui.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/reset_button_ui.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/reference/reset_server.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/reset_server.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/tutorials/exam_tutorial_example.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/text_server.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/tutorials/grade_tutorial_example.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/reference/text_ui.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/tutorials/index.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/tutorials/exam_tutorial_example.html</loc>
   </url>
   <url>
-    <loc>https://nustat.github.io/ISDSfunctions/tutorials/new_question_types.html</loc>
+    <loc>https://nustat.github.io/tutorialExtras/tutorials/grade_tutorial_example.html</loc>
+  </url>
+  <url>
+    <loc>https://nustat.github.io/tutorialExtras/tutorials/index.html</loc>
+  </url>
+  <url>
+    <loc>https://nustat.github.io/tutorialExtras/tutorials/new_question_types.html</loc>
   </url>
 </urlset>
