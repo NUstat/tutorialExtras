@@ -43,7 +43,15 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
         
         ns <- getDefaultReactiveDomain()$ns
         
-        #if lock was pressed get time since lock was pressed
+        # check if max_attempt is reached
+        if(attempt > max_retry){
+          output$response <- renderText({
+            paste0("You have used your ", max_retry, " attempts.")
+          })
+          return()
+        }
+        
+        # check if enough time has passed
         if(!is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock)){
           
           lock_time <- learnr:::get_object(session, NS("lock", id = "pressed"))$data$time
@@ -56,20 +64,13 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           if(wait_time <  retry_cooldown){
             
             output$response <- renderText({
-              paste0("Retry option available at ", format(retry_time, tz = tz, usetz=TRUE))
+              paste0("Retry option available at ", format(retry_time, tz = tz, usetz = TRUE))
               })
             
             return()
           }
         }
         
-        # check if max_attempt is reached
-        if(attempt > max_retry){
-          output$response <- renderText({
-            paste0("You have used your ", max_retry, " retry attempts.")
-          })
-          return()
-        }
         
         ##########################################################
         # YES this resets all questions and exercises
