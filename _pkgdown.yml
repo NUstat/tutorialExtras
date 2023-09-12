@@ -47,7 +47,7 @@ reference:
     - '`grade_server`'
   - subtitle: Setup
     contents:
-    - '`isds_setup`'
+    - '`tutorialExtras_setup`'
     #- '`knit_print.tutorial_question`'
     
 
