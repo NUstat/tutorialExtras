@@ -7,7 +7,7 @@ The tutorialExtras package contains a variety of functions to help enhance learn
 
 Install the latest version of tutorialExtras from GitHub.
 
-devtools::install_github("NUstat/tutorialExtras", dependencies = TRUE)
+remotes::install_github("NUstat/tutorialExtras", dependencies = TRUE)
 
 Currently not available on CRAN.
 
@@ -33,7 +33,8 @@ Tutorials can be run by typing the following line in the R console: `learnr::run
 
 # Acknowledgments
 
-This work was made possible through funding from the Alumnae of Northwestern University grant and the Open Educational Resources (OER) grant.
+This work was produced with support from Northwestern University Libraries, with funding from Northwestern University’s 
+Affordable Instructional Resources initiative, and funding from the Open Educational Resources (OER) grant.
 
 # Citations
 
