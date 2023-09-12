@@ -11,7 +11,7 @@ output:
     css: ["css/nu-theme.css"]
 runtime: shiny_prerendered
 description: >
-  This tutorial is for educators to demonstrate how to add ISDS functions for exam formatting, grading, and downloading.
+  This tutorial is for educators to demonstrate how to add tutorialExtras functions for exam formatting, grading, and downloading.
 ---
 
 ```{r setup, include=FALSE}
@@ -26,7 +26,7 @@ tutorial_options(
   exercise.diagnostics = FALSE
 )
 
-isds_setup(isds_exam = TRUE, max_retry = 3, retry_cooldown = 24)
+tutorialExtras_setup(is_exam = TRUE, max_retry = 3, retry_cooldown = 24)
 
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -80,7 +80,7 @@ Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarct
 
 ## Set up
 
-In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `isds_setup()` function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
+In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `tutorialExtras_setup()` function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
 
 ````markdown
 `r ''```{r setup, include=FALSE}
@@ -89,7 +89,7 @@ library(tidyverse)
 library(tutorialExtras)
 library(gradethis)
 
-isds_setup(isds_exam = TRUE, 
+tutorialExtras_setup(is_exam = TRUE, 
            max_retry = 3,     
            retry_cooldown = 24)
 ```
@@ -97,7 +97,7 @@ isds_setup(isds_exam = TRUE,
 
 In a context = "server" code chunk you will need the `lock_server()` with an id that matches the `lock_button_ui()`. In the `lock_server()` you have the option to specify the names of any exercises and manually graded questions. These should be the name of your code chunk containing the exercise/question.
 
-The `reset_server()` is only needed if you would like to include a "retry button" that can reset and re-randomize the questions. This is useful if you are writing a proficiency exam that chooses from a set of random questions. In `isds_setup()`, the `retry_cooldown` determines how often the student can retry the exam and `max_retry` determines the number of re-attempts the student gets.
+The `reset_server()` is only needed if you would like to include a "retry button" that can reset and re-randomize the questions. This is useful if you are writing a proficiency exam that chooses from a set of random questions. In `tutorialExtras_setup()`, the `retry_cooldown` determines how often the student can retry the exam and `max_retry` determines the number of re-attempts the student gets.
 
 ````markdown
 `r ''````{r, context = "server"}
@@ -279,7 +279,7 @@ question_text("Name:",
               allow_retry = FALSE)
 ```
 
-The submitted answer will ALWAYS be marked incorrect when `isds_setup(exam = TRUE)`. This is so users can go back and change their answer within the exam time frame. Once the exam is locked, the exam will display the "correct" feedback if the answer was correct. If you do not want the correct answer to be displayed, set `correct = Submitted` (ie: whatever you defined `incorrect =` to be), you would also then need to change the css so the buttons are the same color.
+The submitted answer will ALWAYS be marked incorrect when `tutorialExtras_setup(exam = TRUE)`. This is so users can go back and change their answer within the exam time frame. Once the exam is locked, the exam will display the "correct" feedback if the answer was correct. If you do not want the correct answer to be displayed, set `correct = Submitted` (ie: whatever you defined `incorrect =` to be), you would also then need to change the css so the buttons are the same color.
 
 
 The downloaded exam will have the number of minutes each question/exercise was submitted at in case it is a timed exam. There is no functionality that will end the tutorial at a given time or display the time, meaning it would be a self-timed exam.  

@@ -11,7 +11,7 @@ output:
     css: ["css/nu-theme.css"]
 runtime: shiny_prerendered
 description: >
-  This tutorial is for educators to demonstrate how to add ISDS functions for grading and downloading a tutorial.
+  This tutorial is for educators to demonstrate how to add tutorialExtras functions for grading and downloading a tutorial.
 ---
 
 ```{r setup, include=FALSE}
@@ -26,7 +26,7 @@ tutorial_options(
   exercise.diagnostics = FALSE
 )
 
-isds_setup(isds_exam = FALSE)
+tutorialExtras_setup(is_exam = FALSE)
 
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -85,7 +85,7 @@ Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarct
 
 ## Set up
 
-In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `isds_setup()` function. By default, `isds_exam` is FALSE and `max_attempt` is set to Inf. If you do not need to change these settings then you do not need to load the function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
+In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `tutorialExtras_setup()` function. By default, `tutorialExtras_exam` is FALSE and `max_attempt` is set to Inf. If you do not need to change these settings then you do not need to load the function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
 
 ````markdown
 `r ''```{r setup, include=FALSE}
@@ -94,9 +94,9 @@ library(tidyverse)
 library(tutorialExtras)
 library(gradethis)
 
-# optional max_attempt arguement can be set in isds_setup()
-# isds_setup(isds_exam = FALSE, 
-#           max_attempt = Inf)
+# optional max_attempt arguement can be set in tutorial_extras_setup()
+# tutorialExtras_setup(is_exam = FALSE, 
+#                      max_attempt = Inf)
 ```
 ````
 

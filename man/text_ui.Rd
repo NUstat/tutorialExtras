@@ -2,7 +2,7 @@
 % Please edit documentation in R/description.R
 \name{text_ui}
 \alias{text_ui}
-\title{Text and description}
+\title{Text and description storage}
 \usage{
 text_ui(id = NULL)
 }
@@ -12,7 +12,7 @@ text_ui(id = NULL)
 \description{
 Add text descriptions to exercises.
 Including a ui/server for the question text will allow
-the text to be printed in the exam grade output.
+the text to be printed in the downloaded exam html.
 
 In order for the text to appear with the exercise when downloading,
 the id for the text_ui and text_server must match the

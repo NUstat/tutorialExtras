@@ -257,12 +257,10 @@ setup_exercise_handler <- function(exercise_rx, session) {
           # questions: always update exercises until correct answer is submitted
           current_state <- learnr::get_tutorial_state(exercise$label, session = session)
           
-          #print(!(isFALSE(exercise$restore) & isTRUE(isolate(val$lock))))
-          #print(!(isFALSE(isds_exam) & isTRUE(current_state$correct)) )
           # if restore = FALSE AND lock = TRUE do NOT update state
-          # OR if isds_exam = FALSE and correct = TRUE do NOT update state
+          # OR if is_exam = FALSE and correct = TRUE do NOT update state
           if(!(isFALSE(exercise$restore) & isTRUE(isolate(val$lock))) & 
-             !(isFALSE(isds_exam) & isTRUE(current_state$correct) ) ){
+             !(isFALSE(is_exam) & isTRUE(current_state$correct) ) ){
           #if (!isTRUE(current_state$correct)) {
             # new ============================
             # initialize counter

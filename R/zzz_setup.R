@@ -1,21 +1,22 @@
-# load isds_setup on load to prevent errors
+# load tutorialExtras_setup on load to prevent errors
 # user can define the options in setup
 .onLoad <- function(libname, pkgname) {
-  isds_setup()
+  tutorialExtras_setup()
 }
 
-#' @title ISDS setup variables
+#' @title Tutorial Extras Setup
 #'
 #' @description
-#' Define if the tutorial is an exam and if there is a max_attempt limit on quiz questions
+#' Define if the tutorial is an exam, if the exam has a max_retry and cooldown, and if a tutorial has
+#' a max_attempt limit on quiz questions.
 #' 
-#' @param isds_exam defaults to FALSE. If the tutorial is an exam with a lock button set to TRUE.
+#' @param is_exam defaults to FALSE. If the tutorial is an exam with a lock button set to TRUE.
 #' @param max_attempt stop allowing submits if max_attempt is reached.
 #' @param max_retry stop allowing re-attempts when max_retry is reached.
 #' @param retry_cooldown length of time after lock is pressed until retry becomes available (in hours). Default = 24
 #'
 #' @export
-isds_setup <- function(isds_exam = FALSE, max_attempt = Inf, max_retry = Inf, retry_cooldown = 24){
+tutorialExtras_setup <- function(is_exam = FALSE, max_attempt = Inf, max_retry = Inf, retry_cooldown = 24){
   # hacky less than optimal solution
   
   # error checking
@@ -40,7 +41,7 @@ isds_setup <- function(isds_exam = FALSE, max_attempt = Inf, max_retry = Inf, re
   
   
   # setting global variables accessible to override_exercise and override_quiz
-  isds_exam <<- isds_exam
+  is_exam <<- is_exam
   max_attempt <<- max_attempt
   max_retry <<- max_retry
   retry_cooldown <<- retry_cooldown

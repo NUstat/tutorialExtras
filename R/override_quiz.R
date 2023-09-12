@@ -156,7 +156,7 @@ question_module_server_impl <- function(
     
     # new : mark wrong until locked =======
     # if exam == TRUE and lock is NOT pressed; mark_as(FALSE)
-    if(isds_exam & !isolate(val$lock)){
+    if(is_exam & !isolate(val$lock)){
       ret <- mark_as(FALSE, NULL)
     }
     

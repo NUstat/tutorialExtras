@@ -3,7 +3,7 @@
 #' @description
 #' Reset the entire exam to allow another attempt. 
 #' The number of attempts and how often the retry option is available can be defined in 
-#' the `isds_setup()` function. 
+#' the `tutorialExtras_setup()` function. 
 #' The tutorial must be available in a package for this button to work as the function requires 
 #' a name and package specification.
 #'

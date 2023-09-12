@@ -5,7 +5,7 @@ account: amkuyper
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9706606
-bundleId: 7674918
+bundleId: 7675020
 url: https://amkuyper.shinyapps.io/new_question_types/
 version: 1
 asMultiple: FALSE
