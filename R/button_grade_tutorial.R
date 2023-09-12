@@ -90,17 +90,12 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
           
           grade <- grade_calc(session = session, id = id, num_blanks = num_blanks, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
           
-          if(is.null(grade)){
-            return()
-          }
-          
           tab_html <- grade$calc %>%
             as.data.frame() %>%
             dplyr::select(label, pts_possible, attempt, pts_earned) %>% 
             tableHTML::tableHTML(footer = paste0(format(as.POSIXct(Sys.time()),
                                                         tz = tz,
                                                         usetz = TRUE), " - ",
-                                                 #tutorial_info$user_id,
                                                  grade$user_name),
                                  rownames = FALSE,
                                  caption = paste0("Scaled score: ",
@@ -211,17 +206,24 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
   
   table <- tutorialExtras:::submissions(get_grades = get_grades)
   
-  # catch error - if empty do not continue
+  # handle no submissions
   if(rlang::is_empty(table)){
-    return()
+    # if nothing submitted enter everything as 0
+    grades <- rubric %>% 
+      dplyr::mutate(attempt = 0,
+                    deduction = 0,
+                    partial_cred = 0,
+                    blanks = 1,
+                    correct = 0,
+                    answer = NA)
+  }else{
+    # merge rubric of all questions with table of submitted questions
+    grades <- dplyr::left_join(rubric, table, by = "label") %>% 
+      dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
+                    deduction = ifelse(deduction > 1, 1, deduction),
+                    partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred)
+      )
   }
-  
-  # merge rubric of all questions with table of submitted questions
-  grades <- dplyr::left_join(rubric, table, by = "label") %>% 
-    dplyr::mutate(deduction = ifelse(attempt > num_try, deduction*(attempt - num_try), 0),
-                  deduction = ifelse(deduction > 1, 1, deduction),
-                  partial_cred = ifelse(is.na(partial_cred), as.numeric(correct), partial_cred)
-                  )
   
   # handle pts_possible 1) priority goes to manual setting 
   # 2) then to num_blanks setting 3) then default to 1

@@ -197,9 +197,18 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
         table <- tutorialExtras:::submissions(get_grades = get_grades)
         
-        # catch error - if empty do not continue
+        # handle no submissions
         if(rlang::is_empty(table)){
-          return()
+          table <- rubric %>%
+            select(label) %>%
+            mutate(answer = NA,
+                   attempt = 0,
+                   type = NA,
+                   blanks = 1,
+                   partial_cred = 0,
+                   correct = 0,
+                   time_stamp = learnr:::timestamp_utc(),
+            )
         }
         
         # merge rubric of all questions with table of submitted questions
@@ -354,9 +363,18 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           
           table <- tutorialExtras:::submissions(get_grades = get_grades)
           
-          # catch error - if empty do not continue
+          # handle no submissions
           if(rlang::is_empty(table)){
-            return()
+            table <- rubric %>%
+              select(label) %>%
+              mutate(answer = NA,
+                     attempt = 0,
+                     type = NA,
+                     blanks = 1,
+                     partial_cred = 0,
+                     correct = 0,
+                     time_stamp = learnr:::timestamp_utc(),
+              )
           }
           
           # merge rubric of all questions with table of submitted questions
