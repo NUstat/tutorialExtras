@@ -5,7 +5,7 @@ account: amkuyper
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9702110
-bundleId:
+bundleId: 7675218
 url: https://amkuyper.shinyapps.io/exam_tutorial_example/
 version: 1
 asMultiple: FALSE

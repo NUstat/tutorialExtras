@@ -26,7 +26,7 @@ tutorial_options(
   exercise.diagnostics = FALSE
 )
 
-tutorialExtras_setup(is_exam = TRUE, max_retry = 3, retry_cooldown = 24)
+tutorialExtras_setup(is_exam = TRUE, max_retry = Inf, retry_cooldown = 0)
 
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -62,7 +62,7 @@ question_text("Name:",
 
 ## Introduction
 
-The `tutorialExtras` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
+The `tutorialExtras` package is designed to help customize `learnr` tutorials. It provides functions to... 
 
 1. shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions
 1. grade tutorials, deduct points based on attempt, and download an html output for submissions.
@@ -72,7 +72,7 @@ This tutorial demonstrates how to **shuffle questions, randomly select questions
 
 <br>
 
-Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/)  package which these functions are derived from.
+Thanks to the authors who developed the [learnr](https://github.com/rstudio/learnr/)  package which these functions are derived from.
 
 Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/. doi:
 10.5281/zenodo.3960218.
@@ -90,14 +90,14 @@ library(tutorialExtras)
 library(gradethis)
 
 tutorialExtras_setup(is_exam = TRUE, 
-           max_retry = 3,     
-           retry_cooldown = 24)
+                     max_retry = Inf,     
+                     retry_cooldown = 0)
 ```
 ````
 
-In a context = "server" code chunk you will need the `lock_server()` with an id that matches the `lock_button_ui()`. In the `lock_server()` you have the option to specify the names of any exercises and manually graded questions. These should be the name of your code chunk containing the exercise/question.
+In a context = "server" code chunk you will need the `lock_server()` with an `id` that matches the `lock_button_ui()`. In the `lock_server()` you have the option to specify the names of any exercises and manually graded questions. These should be the name of your code chunk containing the exercise/question.
 
-The `reset_server()` is only needed if you would like to include a "retry button" that can reset and re-randomize the questions. This is useful if you are writing a proficiency exam that chooses from a set of random questions. In `tutorialExtras_setup()`, the `retry_cooldown` determines how often the student can retry the exam and `max_retry` determines the number of re-attempts the student gets.
+The `reset_server()` is only needed if you would like to include a "retry button" that can reset and re-randomize the questions. This is useful if you are writing a proficiency exam that chooses from a set of random questions. In `tutorialExtras_setup()`, the `retry_cooldown` determines how often the student can retry the exam and `max_retry` determines the number of attempts the student gets.
 
 ````markdown
 `r ''````{r, context = "server"}
@@ -116,20 +116,22 @@ reset_server(id = "reset",
 ```
 ````
 
-Somewhere in your exam tutorial you will need to include the `lock_button_ui()`. I recommend having the `lock_check_ui()` button with it, that way users can check if they forgot to submit any questions or exercises. The `reset_button_ui()` is only needed if you would like to include a "retry button". I recommend putting these buttons at the end of the exam tutorial in a section header "Submit". See the "Submit" section for an example of this setup.
+Somewhere in your exam tutorial you will need to include the `lock_button_ui()`. I recommend having the `lock_check_ui()` button with it, that way users can check if they forgot to submit any questions or exercises. The `reset_button_ui()` is only needed if you would like to include a "Retry Button". I recommend putting these buttons at the end of the exam tutorial in a section header "Submit". See the **Submit** section for an example of this setup.
 
 
 ## Exercise Example
 
-You can have question text appear in the downloaded exam html by putting the text in a `text_server()` function. The `text_ui()` function should have a matching `id`. Remember, server functions must always be in a code chunk of `context = server`. It is recommended the `id` be the same as the exercise name, so the text appears with the exercise in the html. This is useful if you are writing functions for random exercise selection so you know what exercise was selected. If you do not need the text to appear in the downloaded exam html simply type the question in the document instead of using these functions.
+You can have question text appear in the downloaded exam html by putting the text in a `text_server()` function. The `text_ui()` function should have a matching `id`. Remember, server functions must always be in a code chunk of `context = server`. It is recommended the `id` be the same as the exercise name, so the text appears with the exercise in the html. This is useful if you are writing functions for random exercise selection so you know what exercise was selected. If you do not need the text to appear in the downloaded exam html, simply type the question in the document instead of using these functions.
 
 ```{r, context = "server"}
-text_server(id = "App1", text = "The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.")
+text_server(id = "App1", 
+            text = "The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.")
 ```
 
 ````markdown
 `r ''````{r, context = "server"}
-text_server(id = "App1", text = "The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.")
+text_server(id = "App1", 
+            text = "The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.")
 ```
 ````
 
@@ -159,7 +161,11 @@ grade_this_code(
 )
 ```
 
-Compare and contrast the flipper length of each species.
+<br>
+
+<br>
+
+**Compare and contrast the flipper length of each species.**
 
 *Note: The below code chunk is named App1-desc and contains a single question_text()*
 
@@ -188,7 +194,7 @@ In the example below, there are two questions with the argument `options = list(
 There are three questions with the argument `options = list(group = "prob")` ("prob" could be any string name you choose). Only one of the questions defined with the same group will be randomly used.
 
 
-It is important to understand the naming convention of a question is specifying manual points. If you have a `quiz()` or `exam()` with a set of questions, the label of the questions is the "chunkname-#". For example, if you name your code chunk "Q", ie: ``{r Q}`, then the first question is referenced by "Q-1" and the second question is "Q-2". If a question is not in a `quiz()` or `exam()`, then the label is simply the name of the code chunk. An exercise label is the name of the code chunk. 
+It is important to understand the naming convention of a question when specifying manual points. If you have a `quiz()` or `exam()` with a set of questions, the label of the questions is the "chunkname-#". For example, if you name your code chunk "Q", ie: `{r Q}`, then the first question is referenced by "Q-1" and the second question is "Q-2". If a question is not in a `quiz()` or `exam()`, then the label is simply the name of the code chunk. An exercise label is the name of the code chunk. 
 
 If you "shuffle" an `exam()` you cannot reference the questions by "chunkname-#" as the order will be random for each user. Instead, within the question you can specify `options = list(label = "string")` and reference the question based on your defined label. In the below example we defined a question with `label = "lm-calc"` and defined the custom points in the `lock_server` to demonstrate. 
 
@@ -264,7 +270,7 @@ exam(
 
 ## Important Exam Tips
 
-Include a code chunk called "Name", ``{r Name}`, that includes a `question_text()` with `allow_retry = FALSE`, example shown below. This will ensure the student's name is on the downloaded exam! You can always set `exclude = c("Name")` in the `lock_server()` so that it will not be counted towards the points.
+Include a code chunk called "Name", `{r Name}`, that includes a `question_text()` with `allow_retry = FALSE`, example shown below. This will ensure the student's name is on the downloaded exam! You can always set `exclude = c("Name")` in the `lock_server()` so that it will not be counted towards the points.
 
 ```{r, echo = TRUE, eval = FALSE}
 question_text("Name:",
@@ -279,7 +285,7 @@ question_text("Name:",
               allow_retry = FALSE)
 ```
 
-The submitted answer will ALWAYS be marked incorrect when `tutorialExtras_setup(exam = TRUE)`. This is so users can go back and change their answer within the exam time frame. Once the exam is locked, the exam will display the "correct" feedback if the answer was correct. If you do not want the correct answer to be displayed, set `correct = Submitted` (ie: whatever you defined `incorrect =` to be), you would also then need to change the css so the buttons are the same color.
+The submitted answer will ALWAYS be marked incorrect when `tutorialExtras_setup(is_exam = TRUE)`. This is so users can go back and change their answer within the exam time frame. Once the exam is locked, the exam will display the "correct" feedback if the answer was correct. If you do not want the "correct" feedback to be displayed, set `correct = Submitted` (ie: whatever you defined `incorrect =` to be), you would also then need to change the css so the buttons are the same color.
 
 
 The downloaded exam will have the number of minutes each question/exercise was submitted at in case it is a timed exam. There is no functionality that will end the tutorial at a given time or display the time, meaning it would be a self-timed exam.  
@@ -295,7 +301,7 @@ Once you are finished:
 -   Click the 'Lock Exam' button. Once you click this you will not be able to make any changes to your exam!
 -   Once the lock is pressed a `Download Exam` option will become available,
 -   Download and **Check your HTML!**
--   Upload the html to your assessment platform (ie: Canvas).
+-   Upload the html to your assessment platform (ie: Canvas, Blackboard, ... ).
 
 ````markdown
 `r ''````{r}

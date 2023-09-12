@@ -67,7 +67,7 @@ grade_button_ui("grade")
 
 ## Introduction
 
-The `tutorialExtras` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
+The `tutorialExtras` package is designed to help customize `learnr` tutorials. It provides functions to... 
 
 1. shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions
 1. grade tutorials, deduct points based on attempt, and download an html output for submissions.
@@ -77,7 +77,7 @@ This tutorial demonstrates how to **grade tutorials, deduct points based on atte
 
 <br>
 
-Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/) package which these functions are derived from.
+Thanks to the authors who developed the [learnr](https://github.com/rstudio/learnr/) package which these functions are derived from.
 
 Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/. doi:
 10.5281/zenodo.3960218.
@@ -85,7 +85,7 @@ Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarct
 
 ## Set up
 
-In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `tutorialExtras_setup()` function. By default, `tutorialExtras_exam` is FALSE and `max_attempt` is set to Inf. If you do not need to change these settings then you do not need to load the function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
+In order to set up your tutorial you will want to include the `tutorialExtras` package and specify your desired settings in the `tutorialExtras_setup()` function. By default, `is_exam` is FALSE and `max_attempt` is set to Inf. If you do not need to change these settings then you do not need to load the function. You may want to also consider adding any desired learnr `tutorial_options()` and `gradethis_setup()` options from the `gradethis` package.
 
 ````markdown
 `r ''```{r setup, include=FALSE}
@@ -94,13 +94,13 @@ library(tidyverse)
 library(tutorialExtras)
 library(gradethis)
 
-# optional max_attempt arguement can be set in tutorial_extras_setup()
+# optional max_attempt arguement can be set in tutorialExtras_setup()
 # tutorialExtras_setup(is_exam = FALSE, 
 #                      max_attempt = Inf)
 ```
 ````
 
-In a context = "server" code chunk you will need the `grade_server()` with an id that matches the `grade_print_ui()` and optional `grade_button_ui()`. In the `grade_server()` you have the option to specify the names of any questions or exercises with custom points and the number of submit attempts before a grade deduction. See Important Grading Tips for more details on grading.
+In a context = "server" code chunk you will need the `grade_server()` with an `id` that matches the `grade_print_ui()` and optional `grade_button_ui()`. In the `grade_server()` you have the option to specify the names of any questions or exercises with custom points and the number of submit attempts before a grade deduction. See **Important Grading Tips** for more details on grading.
 
 ````markdown
 `r ''````{r, context = "server"}
@@ -112,10 +112,10 @@ grade_server(id = "grade",
 ```
 ````
 
-In this example, the Exercise with code chunk label "Ex1" is worth 2 points and the first question in the quiz from code chunk label "Q" is worth 3 points.
+In this example, the first question in the quiz from code chunk label "Q" is worth 3 points and the exercise with code chunk label "Ex1" is worth 2 points.
 
 
-Somewhere in your exam tutorial you will need to include the `grade_print_ui()`. I recommend putting this buttons at the end of the tutorial in a section header "Submit". See the "Submit" section for an example of this setup.
+Somewhere in your tutorial you will need to include the `grade_print_ui()`. I recommend putting this button at the end of the tutorial in a section header "Submit". See the **Submit** section for an example of this setup.
 
 I also recommend putting the `grade_button_ui()` somewhere in the tutorial. This will allow users to see their current progress in the tutorial. I will generally include this before any sections after a `Name` code chunk, so that it is easily clickable but it could also go in the "Submit" section.
 
@@ -144,7 +144,7 @@ grade_this_code()
 
 ## Multiple Choice Questions
 
-A few random quiz questions to help demonstrate grading features. In this setup, after 3 attempts a deduction of 10% will be made for that question. 
+A few quiz questions to help demonstrate grading features. In this setup, after 3 attempts a deduction of 10% will be made for that question. 
 
 This could alternatively be put in an `exam()` function.
 
@@ -179,7 +179,7 @@ quiz(
 
 ## Important Grading Tips
 
-Include a code chunk called "Name", ``{r Name}`, that includes a `question_text()` with `allow_retry = FALSE`, example shown below. This will ensure the user's name is on the downloaded tutorial! You can always set `exclude = c("Name")` in the `grade_server()` if you do not want it counted towards the points.
+Include a code chunk called "Name", `{r Name}`, that includes a `question_text()` with `allow_retry = FALSE`, example shown below. This will ensure the user's name is on the downloaded tutorial! You can always set `exclude = c("Name")` in the `grade_server()` if you do not want it counted towards the points.
 
 ```{r, echo = TRUE, eval = FALSE}
 question_text("Name:",
@@ -194,7 +194,7 @@ question_text("Name:",
               allow_retry = FALSE)
 ```
 
-By default each question and exercise is worth 1 point. The amount of points a question/exercise is worth can be changed in the `grade_server()`. It is important to understand the naming convention of a question when specifying the `graded` option. If you have a `quiz()` or `exam()` with a set of questions, the label of the questions is the "chunkname-#". For example, if you name your code chunk "Q", ie: ``{r Q}`, then the first question is referenced by "Q-1" and the second question is "Q-2". If a question is not in a `quiz()` or `exam()`, then the label is simply the name of the code chunk. An exercise label is the name of the code chunk. 
+By default each question and exercise is worth 1 point. The amount of points a question/exercise is worth can be changed in the `grade_server()`. It is important to understand the naming convention of a question when specifying the `graded` option. If you have a `quiz()` or `exam()` with a set of questions, the label of the questions is the "chunkname-#". For example, if you name your code chunk "Q", ie: `{r Q}`, then the first question is referenced by "Q-1" and the second question is "Q-2". If a question is not in a `quiz()` or `exam()`, then the label is simply the name of the code chunk. An exercise label is the name of the code chunk. 
 
 If you "shuffle" an `exam()` you cannot reference the questions by "chunkname-#" as the order will be random for each user. Instead, within the question you can specify `options = list(label = "string")` and reference the question based on your defined label.
 
@@ -203,7 +203,7 @@ If you "shuffle" an `exam()` you cannot reference the questions by "chunkname-#"
 Once you are finished:
 
 -   Click the "Download Grade" button to download an html grade.
--   Upload the html to your assessment platform (ie: Canvas).
+-   Upload the html to your assessment platform (ie: Canvas, Blackboard, ...).
 
 ````markdown
 `r ''````{r}

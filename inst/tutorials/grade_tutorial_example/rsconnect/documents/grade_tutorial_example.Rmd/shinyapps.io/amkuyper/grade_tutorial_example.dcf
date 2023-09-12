@@ -5,7 +5,7 @@ account: amkuyper
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9702102
-bundleId: 7621147
+bundleId: 7675235
 url: https://amkuyper.shinyapps.io/grade_tutorial_example/
 version: 1
 asMultiple: FALSE
