@@ -42,7 +42,7 @@ text_server <- function(id, text = NULL) {
                                                              list(store = text) ) )
                
                output$text <- renderUI({
-                     print(text)
+                     text
                  })
                
              }

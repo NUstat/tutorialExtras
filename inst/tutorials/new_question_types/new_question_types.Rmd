@@ -17,7 +17,7 @@ description: >
 
 ## Introduction
 
-The `tutorialExtras` package (Introduction to Statistics and Data Science) is designed to help customize `learnr` tutorials. It provides functions to... 
+The `tutorialExtras` package is designed to help customize `learnr` tutorials. It provides functions to... 
 
 1. shuffle questions, randomly select questions, time submissions, prevent feedback until the tutorial is complete, and download an html grade report for submissions
 1. grade tutorials, deduct points based on attempt, and download an html output for submissions.
@@ -28,7 +28,7 @@ This tutorial demonstrates how to **create new question types such as `question_
 
 <br>
 
-Thanks to the authors who developed the `learnr` (https://github.com/rstudio/learnr/)  package which these functions are derived from. Many thanks to the author of the `sortable` (https://github.com/rstudio/sortable) package and a solution thread by "stefan's on Jun 01, 2022" which helped with the code to develop the word bank question type.
+Thanks to the authors who developed the [learnr](https://github.com/rstudio/learnr/) package, which these functions are derived from. Many thanks to the author of the [sortable](https://github.com/rstudio/sortable) package and a solution thread by "stefan's on Jun 01, 2022" which helped with the code to develop the word bank question type.
 
 ## Set up
 

@@ -40,7 +40,8 @@ lock_server("lock",
             ex = c("App1"), 
             ex_pts = c(1),
             manual = c("App1-desc"),
-            manual_pts = c(1))
+            manual_pts = c(1),
+            exclude = "Name")
 
 reset_server("reset", file_name = "exam_tutorial_example", package_name = "tutorialExtras")
 ```
@@ -110,7 +111,7 @@ lock_server(id = "lock",
             manual_pts = c(1),
             exclude = "Name")
 reset_server(id = "reset", 
-             file_name = "exam_ex", 
+             file_name = "exam_tutorial_example", 
              package_name = "tutorialExtras")
 ```
 ````
@@ -120,7 +121,25 @@ Somewhere in your exam tutorial you will need to include the `lock_button_ui()`.
 
 ## Exercise Example
 
-The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.
+You can have question text appear in the downloaded exam html by putting the text in a `text_server()` function. The `text_ui()` function should have a matching `id`. Remember, server functions must always be in a code chunk of `context = server`. It is recommended the `id` be the same as the exercise name, so the text appears with the exercise in the html. This is useful if you are writing functions for random exercise selection so you know what exercise was selected. If you do not need the text to appear in the downloaded exam html simply type the question in the document instead of using these functions.
+
+```{r, context = "server"}
+text_server(id = "App1", text = "The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.")
+```
+
+````markdown
+`r ''````{r, context = "server"}
+text_server(id = "App1", text = "The `palmerpenguins` dataset has been pre-loaded for you. Using the `penguins` dataset, construct a side-by-side boxplot of `flipper_length_mm` by `species`.")
+```
+````
+
+<br>
+
+```{r, echo = TRUE}
+text_ui(id = "App1")
+```
+
+<br>
 
 *Note: The below code chunk is named App1 with exercise = TRUE. There is also a corresponding App1-solution and App1-check code chunk to check the answer.*
 ```{r App1, exercise=TRUE}
