@@ -47,7 +47,8 @@ tutorialExtras_setup <- function(is_exam = FALSE, max_attempt = Inf, max_retry =
   retry_cooldown <<- retry_cooldown
   
   # storage must be local for reset option to work
-  options(tutorial.storage = "local")
+  # this messes up shinyio though so cannot set
+  #options(tutorial.storage = "local")
   
   # create a temp directory that stores "attempt" and "time"
   tmp_dir <- tempdir()
