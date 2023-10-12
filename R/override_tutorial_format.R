@@ -10,6 +10,7 @@
 #' dependency for custom tutorial formats that wish to ensure that that
 #' tutorial.js and tutorial.css are loaded prior their own scripts and stylesheets.
 #'
+#' @keywords internal
 tutorial_html_dependency <- function() {
   htmltools::htmlDependency(
     name = "tutorial",
