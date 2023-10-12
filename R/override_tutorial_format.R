@@ -10,7 +10,6 @@
 #' dependency for custom tutorial formats that wish to ensure that that
 #' tutorial.js and tutorial.css are loaded prior their own scripts and stylesheets.
 #'
-#' @export
 tutorial_html_dependency <- function() {
   htmltools::htmlDependency(
     name = "tutorial",
@@ -59,6 +58,7 @@ tutorial_html_dependency <- function() {
 #' @return An [rmarkdown::output_format()] for \pkg{learnr} tutorials.
 #'
 #' @export
+#' @keywords internal
 #' @importFrom utils getFromNamespace
 tutorial <- function(
     fig_width = 6.5,
