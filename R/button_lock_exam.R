@@ -75,11 +75,25 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
         # if session restarted get original start time or set start time to now
         # if user clicks "start over" we do not want time to restart
-        if(file.exists(paste0(mod_dir,"time.RData"))){
-          load(file = paste0(mod_dir,"time.RData"))
+        tutorial_id <- isolate(get_tutorial_info())$tutorial_id
+        exam_dir <- paste0(mod_dir, tutorial_id)
+        
+        # remove so not lingering from other exams
+        if(exists("start_time")){
+          rm(start_time)
         }
-        start_time <<- ifelse(exists("start_time") && start_time != 0, start_time, learnr:::timestamp_utc())
-        save(start_time, file = paste0(mod_dir, "time.RData"))
+        
+        if(file.exists(paste0(exam_dir,"time.RData"))){
+          # if file exists time has already started
+          load(file = paste0(exam_dir,"time.RData"))
+        }else{
+          # if file does not exist we need to start the time
+          start_time <- setup_time
+        }
+        
+        start_time <<- start_time
+        
+        save(start_time, file = paste0(exam_dir, "time.RData"))
         
         ###################################################################################
         #show download button if lock is pressed
@@ -99,6 +113,25 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         
         tutorial_info <- isolate(get_tutorial_info())
         
+        # get start time ----------------------------------------------------------
+        tutorial_id <- tutorial_info$tutorial_id
+        exam_dir <- paste0(mod_dir, tutorial_id)
+        
+        # remove so not lingering from other exams
+        if(exists("start_time")){
+          rm(start_time)
+        }
+        
+        if(file.exists(paste0(exam_dir,"time.RData"))){
+          # if file exists time has already started
+          load(file = paste0(exam_dir,"time.RData"))
+        }else{
+          # if file does not exist we need to start the time
+          start_time <- setup_time
+        }
+        
+        start_time <<- start_time
+          
         # ERROR CHECKING START-----------------------------------------------------
         
         #error checking for label names provided
@@ -164,6 +197,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         ################################################
         #this will get submissions and if correct
         get_grades <- isolate(learnr::get_tutorial_state())
+        
         
         # Grab exercise fix start ----------------------------------------
         # for some reason doesn't always grab exercises
@@ -264,6 +298,25 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           ns <- getDefaultReactiveDomain()$ns
           
           tutorial_info <- isolate(get_tutorial_info())
+          
+          # get start time ----------------------------------------------------------
+          tutorial_id <- tutorial_info$tutorial_id
+          exam_dir <- paste0(mod_dir, tutorial_id)
+          
+          # remove so not lingering from other exams
+          if(exists("start_time")){
+            rm(start_time)
+          }
+          
+          if(file.exists(paste0(exam_dir,"time.RData"))){
+            # if file exists time has already started
+            load(file = paste0(exam_dir,"time.RData"))
+          }else{
+            # if file does not exist we need to start the time
+            start_time <- setup_time
+          }
+          
+          start_time <<- start_time
           
           # ERROR CHECKING START-----------------------------------------------------
           

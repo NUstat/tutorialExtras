@@ -51,6 +51,14 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
           return()
         }
         
+        # if lock is not pressed do not proceed
+        if(is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock)){
+          output$response <- renderText({
+            paste0("You must lock your quiz before retrying.")
+          })
+          return()
+        }
+        
         # check if enough time has passed
         if(!is.null(learnr:::get_object(session, NS("lock", id = "pressed"))$data$lock)){
           
@@ -70,7 +78,6 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
             return()
           }
         }
-        
         
         ##########################################################
         # YES this resets all questions and exercises

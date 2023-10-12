@@ -116,6 +116,7 @@ question_module_server_impl <- function(
       numtry = 0,
       lock = FALSE
   )
+  
   # restore counter
   isolate(val$numtry <- ifelse(is.null(learnr:::get_object(session, ns("count"))$data$numtry),
           0, learnr:::get_object(session, ns("count"))$data$numtry- 1))

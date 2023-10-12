@@ -61,10 +61,11 @@ tutorialExtras_setup <- function(is_exam = FALSE, max_attempt = Inf, max_retry =
   # get time if it exists
   # this prevents time from being reset if "start over" is pressed
   
-  if(file.exists(paste0(mod_dir,"time.RData"))){
-    load(file = paste0(mod_dir,"time.RData"))
-  }
-  start_time <<- ifelse(exists("start_time"), start_time, 0)
+  # if(file.exists(paste0(mod_dir,"time.RData"))){
+  #   load(file = paste0(mod_dir,"time.RData"))
+  # }
+  # start_time <<- ifelse(exists("start_time"), start_time, 0)
+  setup_time <<- learnr:::timestamp_utc()
   
   # get attempt if it exists
   if(file.exists(paste0(mod_dir,"attempt.RData"))){
