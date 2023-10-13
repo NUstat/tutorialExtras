@@ -79,19 +79,19 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         exam_dir <- paste0(mod_dir, tutorial_id)
         
         # remove so not lingering from other exams
-        if(exists("start_time")){
-          rm(start_time)
-        }
+        # if(exists("start_time")){
+        #   rm(start_time)
+        # }
         
         if(file.exists(paste0(exam_dir,"time.RData"))){
           # if file exists time has already started
           load(file = paste0(exam_dir,"time.RData"))
         }else{
           # if file does not exist we need to start the time
-          start_time <- setup_time
+          start_time <- learnr:::timestamp_utc()
         }
         
-        start_time <<- start_time
+        #start_time <<- start_time
         
         save(start_time, file = paste0(exam_dir, "time.RData"))
         
@@ -118,19 +118,19 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         exam_dir <- paste0(mod_dir, tutorial_id)
         
         # remove so not lingering from other exams
-        if(exists("start_time")){
-          rm(start_time)
-        }
+        # if(exists("start_time")){
+        #   rm(start_time)
+        # }
         
         if(file.exists(paste0(exam_dir,"time.RData"))){
           # if file exists time has already started
           load(file = paste0(exam_dir,"time.RData"))
         }else{
           # if file does not exist we need to start the time
-          start_time <- setup_time
+          start_time <- learnr:::timestamp_utc()
         }
         
-        start_time <<- start_time
+        # start_time <<- start_time
           
         # ERROR CHECKING START-----------------------------------------------------
         
@@ -304,19 +304,19 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           exam_dir <- paste0(mod_dir, tutorial_id)
           
           # remove so not lingering from other exams
-          if(exists("start_time")){
-            rm(start_time)
-          }
+          #if(exists("start_time")){
+          #  rm(start_time)
+          #}
           
           if(file.exists(paste0(exam_dir,"time.RData"))){
             # if file exists time has already started
             load(file = paste0(exam_dir,"time.RData"))
           }else{
             # if file does not exist we need to start the time
-            start_time <- setup_time
+            start_time <- learnr:::timestamp_utc()
           }
           
-          start_time <<- start_time
+          start_time <- start_time
           
           # ERROR CHECKING START-----------------------------------------------------
           
@@ -485,7 +485,8 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           # Divide into subsections for rendered report
           graded <- grades %>%
             dplyr::filter(eval == "question") %>% 
-            dplyr::select(label, answer, time, pts_earned)
+            dplyr::select(label, answer, time, pts_earned) %>%
+            dplyr::mutate(answer = stringr::str_replace_all(answer, "\n", " "))
             
           score <- ifelse(nrow(graded) == 0, 0, sum(graded$pts_earned))
           
@@ -498,7 +499,9 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           
           manual <- grades %>%
             dplyr::filter(eval == "manual") %>%
-            dplyr::select(label, answer, time) 
+            dplyr::select(label, answer, time) %>%
+            dplyr::mutate(answer = stringr::str_replace_all(answer, "\n", " "))
+            
           
           incomplete <- grades %>%
             dplyr::filter(is.na(eval)) %>%
@@ -534,7 +537,6 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           content <- ex_text %>%
             dplyr::filter(is.na(eval)) %>%
             select(label, content)
-          
 
           # Create document content to render ---------------------------------------
           #--------------------------------------------------------------------------

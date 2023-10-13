@@ -65,7 +65,7 @@ tutorialExtras_setup <- function(is_exam = FALSE, max_attempt = Inf, max_retry =
   #   load(file = paste0(mod_dir,"time.RData"))
   # }
   # start_time <<- ifelse(exists("start_time"), start_time, 0)
-  setup_time <<- learnr:::timestamp_utc()
+  #setup_time <<- learnr:::timestamp_utc()
   
   # get attempt if it exists
   if(file.exists(paste0(mod_dir,"attempt.RData"))){
