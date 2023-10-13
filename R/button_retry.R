@@ -85,9 +85,13 @@ reset_server <- function(id, file_name = NULL, package_name = NULL, tz = Sys.tim
         # must have storage set to LOCAL or won't work on Posit Cloud/Shiny.io
         learnr:::remove_all_objects(session)
         
-        # reset the time to the current time
-        start_time <<- learnr:::timestamp_utc()
-        save(start_time, file = paste0(mod_dir, "time.RData"))
+        # get path
+        tutorial_id <- isolate(get_tutorial_info())$tutorial_id
+        exam_dir <- paste0(mod_dir, tutorial_id)
+        # delete the time file if it exists
+        if(file.exists(paste0(exam_dir,"time.RData"))){
+          file.remove(paste0(exam_dir,"time.RData"))
+        }
         
         # update attempt to set new seed
         attempt <<- attempt + 1
