@@ -117,11 +117,6 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         tutorial_id <- tutorial_info$tutorial_id
         exam_dir <- paste0(mod_dir, tutorial_id)
         
-        # remove so not lingering from other exams
-        # if(exists("start_time")){
-        #   rm(start_time)
-        # }
-        
         if(file.exists(paste0(exam_dir,"time.RData"))){
           # if file exists time has already started
           load(file = paste0(exam_dir,"time.RData"))
@@ -302,11 +297,6 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           # get start time ----------------------------------------------------------
           tutorial_id <- tutorial_info$tutorial_id
           exam_dir <- paste0(mod_dir, tutorial_id)
-          
-          # remove so not lingering from other exams
-          #if(exists("start_time")){
-          #  rm(start_time)
-          #}
           
           if(file.exists(paste0(exam_dir,"time.RData"))){
             # if file exists time has already started
