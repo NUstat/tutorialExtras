@@ -19,6 +19,7 @@
 #' @param id ID matching ui with server
 #' @param label Label to appear on the submit grade button
 #'
+#' @import tibble
 #' @export
 lock_button_ui <- function(id, label = "Lock Exam") {
   ns <- NS(id)
@@ -67,7 +68,9 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
   moduleServer(
     id,
     function(input, output, session) {
-     
+      # resolve global variable note
+      label <- pts_possible <- time <- NULL
+      
       # Set time and determine if download should be shown
       observeEvent(
         req(session$userData$learnr_state() == "restored"),{
@@ -156,6 +159,9 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
         }
         
         # ERROR CHECKING END ------------------------------------------------------
+        
+        # resolve global variable note
+        lael <- type <- partial_cred <- time_stamp <- blanks <- pts_earned <- NULL
         
         # DEFINE RUBRIC POINTS ----------------------------------------------------
 
@@ -508,7 +514,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
               id <- gsub( pattern = "store-", replacement = "", x = x$id)
               descr[[id]] <- as.character(x$data$store)
             }
-            content_tmp <- unnest(enframe(descr, name = "label", value = "content"), content)
+            content_tmp <- unnest(tibble::enframe(descr, name = "label", value = "content"), content)
             
             # put text with corresponding exercises
             ex_text <- full_join(exercise_tmp, content_tmp, by = "label")
@@ -522,7 +528,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
           exercises <- ex_text %>%
             dplyr::filter(eval == "exercise") %>%
             dplyr::mutate(content = ifelse(is.na(content), "", content)) %>%
-            transpose()
+            purrr::transpose()
           
           content <- ex_text %>%
             dplyr::filter(is.na(eval)) %>%
@@ -552,7 +558,7 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
             graded_string <- c(" ", paste0("# Concept  ", score), "No concept questions graded.", " ")
           }
           
-          exercise_substring <- map(exercises, function(x){
+          exercise_substring <- purrr::map(exercises, function(x){
             c(toString(paste0("### ", x$label, " - ", ifelse(isTRUE(x$correct), "Correct", "Needs Grading")) ), 
               toString(paste0("Time: ", x$time, " <br> <br> ")),
               toString(paste0(x$content)),
@@ -629,8 +635,11 @@ lock_server <- function(id, num_blanks = TRUE, show_correct = FALSE,
 # used for button_grade_tutorial AND button_lock_exam
 # need to calculate outside of observe event so that it can apply to download handler
 submissions <- function(get_grades = list()){
+  # resolve global variable note
+  answer_last <- correct_last <- label <- time_last <- NULL
+  
   # get and organize all user submission questions and exercises
-  table_list <- map(names(get_grades), function(x){
+  table_list <- purrr::map(names(get_grades), function(x){
     # handle multiple answer issues
     get_grades[[x]]$blanks <- length(get_grades[[x]]$answer)
     get_grades[[x]]$answer <- toString(get_grades[[x]]$answer)

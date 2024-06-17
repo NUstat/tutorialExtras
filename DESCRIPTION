@@ -1,11 +1,11 @@
 Type: Package
 Package: tutorialExtras
-Title: Custom questions and exam functions for learnr tutorials
+Title: Custom Questions and Exam Functions for 'learnr' Tutorials
 Version: 0.0.0.9000
 Authors@R: 
     person("Danielle", "Sass", , "danielle.sass@northwestern.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9755-738X"))
-Description: A modification of learnR functions for exams purposes, the addition of 3 new question types, and grading options for standard tutorials.
+Description: A modification of learnr functions for exam purposes, the addition of 3 new question types, and grading options for standard tutorials.
 License: CC BY 4.0
 Depends:
     R (>= 3.2.0)
@@ -29,12 +29,9 @@ Imports:
     stringr,
     tableHTML,
     TeachingDemos,
+    tibble,
     tidyr,
     utils
-Suggests:
-    gradethis
-VignetteBuilder: 
-    knitr
 Remotes: 
     rstudio/learnr,
     rstudio/gradethis
@@ -45,5 +42,5 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 URL: https://NUstat.github.io/tutorialExtras/

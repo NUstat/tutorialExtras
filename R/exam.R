@@ -91,7 +91,7 @@ exam <- function(..., caption = rlang::missing_arg(),
     if (rlang::is_missing(caption)) {
       learnr:::i18n_span("text.quiz", "Quiz")
     } else if (!is.null(caption)) {
-      quiz_text(caption)
+      learnr:::quiz_text(caption)
     }
   
   ret <- list(caption = caption, questions = questions)

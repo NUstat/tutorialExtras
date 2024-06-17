@@ -67,6 +67,8 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
   moduleServer(
     id,
     function(input, output, session) {
+    # resolve global variable note
+    label <- pts_possible <- pts_earned <- NULL
     # View grade
     observeEvent(input$button, {
       grade <- grade_calc(session = session, id = id, num_blanks = num_blanks, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
@@ -86,6 +88,9 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
                  ".html")
         },
         content = function(file) {
+          # resolve global variable note
+          label <- pts_possible <- pts_earned <- NULL
+          
           ns <- getDefaultReactiveDomain()$ns
           
           grade <- grade_calc(session = session, id = id, num_blanks = num_blanks, label = graded, pts_possible = graded_pts, num_try = num_try, deduction = deduction, exclude = exclude)
@@ -120,6 +125,10 @@ grade_server <- function(id, num_blanks = FALSE, graded = NULL, graded_pts = NUL
 # need to calculate outside of observe event so that it can apply to download handler
 grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, pts_possible = NULL, 
                        num_try = 3, deduction = 0.1, exclude = NULL){
+  
+  # resolve global variable note
+  type <- partial_cred <- blanks <- pts_earned <- NULL
+  
   ns <- getDefaultReactiveDomain()$ns
   
   tutorial_info <- isolate(get_tutorial_info())
@@ -147,7 +156,7 @@ grade_calc <- function(session = session, id, num_blanks = FALSE, label = NULL, 
     if (length(label) != length(pts_possible)) {
       stop("Length of graded must equal length of graded_pts.")
     }
-    map(label, function(x){
+    purrr::map(label, function(x){
       if( !(x %in% tutorial_info$items$label)){
         stop(paste0(x, " is not a name of a question or exercise."))
       }
