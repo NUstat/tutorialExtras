@@ -1,81 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/404.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/grade_button_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/grade_print_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/grade_server.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/knit_print.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/lock_button_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/lock_check_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/lock_server.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/question_blank.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/question_dropdown.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/question_wordbank.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/quiz.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/reset_button_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/reset_server.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/text_server.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/text_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/reference/tutorialExtras_setup.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/tutorials/exam_tutorial_example.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/tutorials/grade_tutorial_example.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/tutorials/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nustat.github.io/tutorialExtras/tutorials/new_question_types.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://nustat.github.io/tutorialExtras/404.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/LICENSE.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/authors.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/index.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/news/index.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/exam.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/grade_button_ui.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/grade_print_ui.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/grade_server.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/index.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/knit_print.tutorial_question.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/lock_button_ui.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/lock_check_ui.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/lock_server.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/question_blank.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/question_dropdown.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/question_wordbank.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/reset_button_ui.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/reset_server.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/text_server.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/text_ui.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/reference/tutorialExtras_setup.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/tutorials/exam_tutorial_example.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/tutorials/grade_tutorial_example.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/tutorials/index.html</loc></url>
+<url><loc>https://nustat.github.io/tutorialExtras/tutorials/new_question_types.html</loc></url>
 </urlset>
+
