@@ -1,8 +1,9 @@
 # OVERRIDE LEARNR TO COUNT ATTEMPTS
 #' Knitr quiz print methods
 #'
-#' \code{knitr::\link[knitr]{knit_print}} methods for \code{\link{question}} and
-#' \code{\link{quiz}}
+#' Print methods for question and exam functions
+# \code{knitr::\link[knitr]{knit_print}} methods for \code{\link{tutorial_question}} and
+# \code{\link{quiz}}
 #'
 #' @inheritParams knitr::knit_print
 #' 
@@ -12,7 +13,7 @@
 #' @method knit_print tutorial_question
 #' @keywords internal
 #' @export
-#' @rdname knit_print
+# @rdname knit_print
 knit_print.tutorial_question <- function(x, ...) {
   question <- x
   ui <- tutorialExtras:::question_module_ui(question$ids$question)

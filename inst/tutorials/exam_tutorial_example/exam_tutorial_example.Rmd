@@ -19,7 +19,7 @@ library(learnr)
 library(tidyverse)
 library(tutorialExtras)
 library(palmerpenguins)
-library(gradethis)
+#library(gradethis)
 
 tutorial_options(
   exercise.timelimit = 10,
@@ -154,12 +154,12 @@ ggplot(penguins, aes(x = species, y = flipper_length_mm)) +
   geom_boxplot()
 ```
 
-```{r App1-check, exercise.diagnostics = FALSE}
-grade_this_code(
-  correct = "Submitted",
-  incorrect = "Submitted"
-)
-```
+<!-- ```{r App1-check, exercise.diagnostics = FALSE} -->
+<!-- grade_this_code( -->
+<!--   correct = "Submitted", -->
+<!--   incorrect = "Submitted" -->
+<!-- ) -->
+<!-- ``` -->
 
 <br>
 

@@ -15,7 +15,7 @@
 #' @param ... One or more questions or answers
 #' @param caption Optional quiz caption (defaults to "Quiz")
 #' @param shuffle Randomly shuffle the questions within exam
-#' @rdname quiz
+# @rdname quiz
 #' @export
 exam <- function(..., caption = rlang::missing_arg(), 
                  shuffle = FALSE) {

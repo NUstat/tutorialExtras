@@ -14,7 +14,6 @@ except two optional arguments \code{options} and \code{inline}; see
 the references below.}
 }
 \description{
-\code{knitr::\link[knitr]{knit_print}} methods for \code{\link{question}} and
-\code{\link{quiz}}
+Print methods for question and exam functions
 }
 \keyword{internal}

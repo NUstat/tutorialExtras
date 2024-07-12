@@ -36,9 +36,9 @@ Thanks to the authors who developed the [learnr](https://github.com/rstudio/lear
 library(learnr)
 library(tidyverse)
 library(tutorialExtras)
-library(gradethis)
+#library(gradethis)
 
-gradethis_setup()
+#gradethis_setup()
 knitr::opts_chunk$set(echo = FALSE)
 
 ```

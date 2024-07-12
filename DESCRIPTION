@@ -5,7 +5,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Danielle", "Sass", , "danielle.sass@northwestern.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9755-738X"))
-Description: A modification of learnr functions for exam purposes, the addition of 3 new question types, and grading options for standard tutorials.
+Description: A modification of 'learnr' functions for exam purposes, the addition of 3 new question types, and grading options for standard tutorials.
 License: CC BY 4.0
 Depends:
     R (>= 3.2.0)
@@ -32,9 +32,6 @@ Imports:
     tibble,
     tidyr,
     utils
-Remotes: 
-    rstudio/learnr,
-    rstudio/gradethis
 Config/Needs/connect: rsconnect
 Config/Needs/coverage: covr
 Config/Needs/website: pkgdown
@@ -43,4 +40,5 @@ Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-URL: https://NUstat.github.io/tutorialExtras/
+BugReports: https://github.com/NUstat/tutorialExtras/issues
+URL: https://NUstat.github.io/tutorialExtras/, https://github.com/NUstat/tutorialExtras
